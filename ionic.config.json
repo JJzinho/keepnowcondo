@@ -1,0 +1,7 @@
+{
+  "name": "keepnowcondo",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
