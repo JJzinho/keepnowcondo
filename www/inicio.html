@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeepNow - Seleção de Condomínio</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/app-bar.css">
+    <link rel="stylesheet" href="./styles/inicio.css">
+</head>
+<body>
+
+    <div class="app-bar">
+        <a href="./inicio.html" class="app-bar-logo-link">
+             <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo KeepNow" class="app-bar-logo" style="filter: brightness(0) invert(1);">
+         </a>
+    </div>
+
+    <div id="condo-list-container" class="condo-list-container">
+        <p>Carregando seus condomínios...</p>
+    </div>
+
+    <div class="add-button-container">
+        <button class="add-button" id="add-condo-btn">Adicionar Novo Condomínio</button>
+    </div>
+    <script type="module" src="./script/supabaseClient.js"></script>
+    <script type="module" src="./script/inicio.js"></script>
+</body>
+</html>

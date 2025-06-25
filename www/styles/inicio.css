@@ -1,0 +1,124 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding-top: 0px;
+    background-color: #f0f2f5; /* Cor de fundo clara similar à imagem */
+    color: #333;
+    padding-top:0px; /* Para compensar a app-bar sticky */
+}
+
+.condo-list-container {
+    padding: 20px;
+}
+
+.condo-item {
+    background-color: #FF9800; /* Laranja da imagem */
+    color: white;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.condo-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.condo-info {
+    display: flex;
+    align-items: center;
+}
+
+.condo-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.condo-icon.blue {
+    background-color: #2196F3; /* Azul da imagem */
+}
+
+.condo-icon.red {
+    background-color: #F44336; /* Vermelho da imagem */
+}
+
+.condo-name {
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.condo-arrow {
+    font-size: 20px;
+}
+
+.add-button-container {
+    display: flex;
+    justify-content: center;
+    padding: 10px 20px 30px 20px;
+}
+
+.add-button {
+    background-color: #7E57C2; /* Roxo um pouco mais claro para o botão */
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.2s ease;
+}
+
+.add-button:hover {
+    background-color: #5E35B1;
+}
+:root {
+    --app-bar-height: 50px;
+    --app-bar-logo-height: 40px; /* Ex: Logo menor contido na barra */
+}
+.app-bar-logo-link {
+    /* ... (mantenha position, left, transform) ... */
+    height: var(--app-bar-height); /* Link ocupa a altura da barra */
+    top: 0; /* Alinha no topo da barra */
+    display: flex;
+    align-items: center; /* Centraliza o logo verticalmente dentro do link */
+}
+.app-bar-logo {
+    height: var(--app-bar-logo-height); /* Altura real da imagem do logo */
+    max-height: 100%; /* Garante que não ultrapasse a altura do link */
+}
+/* Ajustes para o menu dropdown (se os estilos de index.css não forem suficientes ou conflitarem) */
+/* Certifique-se que o #navbar-dropdown e seus itens estejam estilizados corretamente por index.css ou app-bar.css */
+
+/* Responsividade básica */
+@media (max-width: 600px) {
+    .condo-item {
+        padding: 12px 15px;
+    }
+    .condo-name {
+        font-size: 0.9em;
+    }
+    .add-button {
+        padding: 10px 25px;
+        font-size: 0.95em;
+    }
+}
+/* In www/styles/inicio.css */
+button#user-condo-item.condo-item {
+    border: none; /* Remove default button border */
+    width: 100%;  /* Make the button take full available width */
+    font-family: inherit; /* Ensure font properties are inherited */
+    font-size: inherit;
+    line-height: inherit;
+    /* text-align: left; /* display: flex on .condo-item handles child alignment */
+}

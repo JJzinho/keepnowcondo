@@ -1,0 +1,683 @@
+/* ================================================ */
+/* SECTION 1: BASE, VARIABLES, SHARED             */
+/* ================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500;700&display=swap');
+
+:root {
+    --primary: #2A3F54; /* Azul escuro para elementos principais */
+    --secondary: #EDEDED; /* Cinza claro para fundo da página */
+    --background: #FFFFFF; /* Branco para cards e modais */
+    --text: #333333; /* Texto principal escuro */
+    --primary-text: #14181B; /* Texto mais escuro para títulos e labels */
+    --secondary-text: #57636C; /* Texto cinza para descrições e informações secundárias */
+    --text-light: #FFFFFF; /* Texto branco para botões escuros */
+    --accent: #1ABB9C; /* Verde/Turquesa para sucesso */
+    --warning: #f0ad4e; /* Amarelo para avisos */
+    --danger: #d9534f; /* Vermelho para erros */
+    --info: #5bc0de; /* Azul claro para informações gerais */
+    --success: #5cb85c; /* Verde alternativo para sucesso */
+    --border-color: #D9DEE4; /* Cor de borda padrão */
+    --alternate-bg: #f8f9fa; /* Fundo sutil para inputs e áreas de preview */
+    --shadow-color: rgba(0, 0, 0, 0.08); /* Sombra suave */
+    --border-radius: 6px; /* Raio de borda padrão */
+    --spacing-unit: 1rem; /* Unidade base de espaçamento (16px) */
+    --orange: #FF7000; /* Laranja para botões de ação específicos */
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 100%; scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background-color: var(--secondary); color: var(--text); line-height: 1.55; overflow-x: hidden; }
+body.modal-open { overflow: hidden; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: calc(var(--spacing-unit) * 1.25); }
+img, embed { max-width: 100%; height: auto; display: block; }
+button, input, textarea, select { font: inherit; margin: 0; }
+i.material-icons { vertical-align: middle; line-height: 1; margin-right: 5px; }
+
+/* Utility */
+.hidden { display: none !important; }
+.optional-label { font-weight: normal; font-size: 0.8em; color: var(--secondary-text); }
+.empty-list-message { text-align: center; color: var(--secondary-text); padding: 1.25rem 1rem; font-style: italic; border: 1px dashed var(--border-color); border-radius: var(--border-radius); margin-top: 1rem; background-color: var(--alternate-bg); font-size: 0.9rem;}
+.section-card { background-color: var(--background); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: var(--spacing-unit); box-shadow: 0 1px 3px var(--shadow-color); margin-bottom: calc(var(--spacing-unit) * 1.25); }
+.section-card h2, .section-card h4 { /* Aplicado a h2 e h4 dentro de .section-card */
+    margin: 0 0 var(--spacing-unit) 0;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+.section-card h2 i.material-icons, .section-card h4 i.material-icons { font-size: 1.4rem; color: var(--primary); }
+.section-card h4 { font-size: 1.1rem; font-weight: 500;} /* Estilo específico para H4 se necessário */
+
+
+/* ================================================ */
+/* SECTION 2: PAGE HEADER & ACTION BUTTONS        */
+/* ================================================ */
+.action-buttons-section { display: flex; flex-direction: column; gap: calc(var(--spacing-unit)*0.75); margin-bottom: var(--spacing-unit); }
+.action-button { padding: 10px 15px; font-size: 0.9rem; font-weight: 600; border-radius: var(--border-radius); border: none; color: var(--text-light); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: opacity 0.2s ease; width: 100%; justify-content: center; text-align: center; min-height: 44px; }
+.action-button:hover { opacity: 0.9; }
+.action-button i.material-icons { font-size: 1.15rem; }
+/* .maintenance-button { background-color: var(--accent); } -- Removido pois botão Criar Atividade saiu */
+.ticket-button { background-color: var(--orange); }
+
+/* ================================================ */
+/* SECTION 3: FORMULÁRIO & LISTAS (REMOVIDOS/ADAPTADOS) */
+/* ================================================ */
+
+#overdue-activities-section h2 i.material-icons { color: var(--warning); } /* Ícone amarelo para vencidas */
+
+.overdue-activity-item {
+    border-left: 5px solid var(--warning); /* Destaque lateral para itens vencidos */
+    margin-bottom: calc(var(--spacing-unit)*0.8);
+    padding: calc(var(--spacing-unit)*0.8);
+}
+.overdue-activity-item:last-child { margin-bottom: 0; }
+
+.overdue-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px dashed var(--border-color);
+    flex-wrap: wrap;
+    gap: 5px 10px;
+}
+.overdue-item-header h4 { /* Nome da atividade vencida */
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin: 0;
+    border-bottom: none; /* Remove a borda padrão de h4 dentro de .section-card */
+    padding-bottom: 0;
+    flex-grow: 1;
+}
+.overdue-status {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--danger);
+    background-color: rgba(217, 83, 79, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+.overdue-item-details p {
+    margin: 0.3rem 0;
+    font-size: 0.85rem;
+    color: var(--secondary-text);
+    line-height: 1.4;
+}
+.overdue-item-details strong {
+    color: var(--primary-text);
+    font-weight: 500;
+}
+.overdue-item-actions {
+    margin-top: 0.8rem;
+    text-align: right;
+}
+.overdue-item-actions .btn-warning { /* Botão Abrir Chamado para item vencido */
+    background-color: var(--orange);
+    color: var(--text-light);
+    font-size: 0.85rem;
+    padding: 7px 12px;
+}
+.overdue-item-actions .btn-warning:hover {
+    background-color: #e06500; /* Laranja mais escuro */
+}
+
+
+/* ================================================ */
+/* SECTION 5: MODAL STYLES (Geral e Chamado)      */
+/* ================================================ */
+.modal, .modal-overlay {
+    display: none; position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1050; overflow-y: auto; padding: var(--spacing-unit);
+    align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0s 0.25s linear;
+}
+.modal.hidden, .modal-overlay.hidden { display: none !important; }
+.modal:not(.hidden), .modal-overlay:not(.hidden) { opacity: 1; visibility: visible; transition: opacity 0.25s ease; display: flex; }
+
+.modal-content, .modal-container {
+    background-color: var(--background);
+    padding: calc(var(--spacing-unit) * 1.25);
+    width: 90%;
+    max-width: 550px; /* Largura padrão */
+    border-radius: var(--border-radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: auto;
+    transform: scale(0.95); opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.modal:not(.hidden) .modal-content,
+.modal-overlay:not(.hidden) .modal-container { transform: scale(1); opacity: 1; }
+
+.modal-content > h3 { /* Título de modais como Realizar, Não Realizar */
+    font-size: 1.2rem; color: var(--primary); text-align: center;
+    margin-top: 0; margin-bottom: 1rem; padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.modal-container .modal-title { /* Título do Modal de Chamado */
+    font-family: 'Inter Tight', sans-serif; font-size: 1.25rem; font-weight: 700; /* Mais destaque */
+    color: var(--primary); margin: 0 auto 1.2rem auto; /* Aumenta margem inferior */
+    text-align: center;
+    padding: 0 30px 0.8rem 30px; /* Aumenta padding inferior */
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-close-x {
+    background: none; border: none; font-size: 1.8rem; line-height: 1;
+    color: var(--secondary-text); cursor: pointer; padding: 0;
+    position: absolute; top: calc(var(--spacing-unit) * 0.75); right: calc(var(--spacing-unit) * 0.75);
+    z-index: 10;
+}
+.modal-close-x:hover { color: var(--danger); }
+
+/* Melhorias para Formulários dentro de Modais (#ticket-modal especificamente) */
+.modal-container .form-group {
+    margin-bottom: calc(var(--spacing-unit) * 1); /* Espaçamento entre grupos */
+}
+.modal-container .form-label {
+    display: block; margin-bottom: 6px; font-weight: 500;
+    font-size: 0.85rem; color: var(--primary-text);
+}
+.modal-container .form-control,
+.modal-container .form-select {
+    width: 100%; padding: 10px 12px; /* Padding interno dos inputs */
+    border: 1px solid var(--border-color);
+    border-radius: calc(var(--border-radius) / 1.5); font-size: 0.9rem;
+    background-color: var(--alternate-bg);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 42px; /* Altura mínima consistente */
+    color: var(--primary-text);
+}
+.modal-container .form-control:focus,
+.modal-container .form-select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(42, 63, 84, 0.15); /* Sombra de foco mais suave */
+}
+.modal-container textarea.form-control {
+    min-height: 80px; resize: vertical;
+}
+.modal-container .form-select { /* Estilo da seta para selects */
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357636C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat; background-position: right 12px center; background-size: 15px;
+    padding-right: 40px; /* Espaço para a seta */
+}
+
+/* Equipment List Box no Modal de Chamado */
+#ticket-modal .equipment-list-box {
+    max-height: 130px; /* Altura máxima ajustada */
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    padding: 10px; /* Padding interno */
+    border-radius: calc(var(--border-radius)/2);
+    background-color: var(--background); /* Fundo branco para contraste */
+}
+#ticket-modal .equipment-item {
+    margin-bottom: 8px; /* Espaço entre itens */
+    font-size: 0.9rem; /* Tamanho da fonte dos itens */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaço entre checkbox, label e input de quantidade */
+}
+#ticket-modal .equipment-item:last-child { margin-bottom: 0; }
+#ticket-modal .equipment-item input[type="checkbox"] {
+    width: 16px; height: 16px; /* Tamanho do checkbox */
+    accent-color: var(--primary);
+    flex-shrink: 0; margin-top:1px; /* Alinhamento fino */
+}
+#ticket-modal .equipment-item label {
+    margin-bottom: 0 !important; font-weight: normal;
+    color: var(--text); flex-grow:1; cursor:pointer;
+}
+#ticket-modal .equipment-item .equip-qty-input {
+    width: 60px !important; padding: 5px 8px !important; font-size: 0.85em !important;
+    margin-left: auto !important; /* Empurra para a direita */
+    min-height: auto !important; text-align: center;
+    border-radius: 4px;
+}
+
+/* Ações e botões dentro dos modais */
+.modal-actions, .form-actions { /* form-actions é usado em #ticket-form-manutencao */
+    margin-top: 1.5rem; /* Aumenta espaço antes dos botões */
+    display: flex;
+    justify-content: flex-end;
+    gap: calc(var(--spacing-unit)*0.75);
+    flex-wrap: wrap;
+}
+.modal-actions button, .form-actions button { margin: 0 !important; }
+.modal-actions button, .form-actions .btn { flex: 0 0 auto; /* Botões não esticam por padrão */ }
+
+.btn {
+    padding: 9px 18px; /* Padding ajustado */
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 600; min-height: 42px; /* Altura mínima igual aos inputs */
+    border:none; cursor:pointer;
+    transition: background-color 0.2s, opacity 0.2s, box-shadow 0.2s;
+    display:inline-flex; align-items:center; justify-content:center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.1); opacity: 0.9; }
+.btn i.material-icons { font-size: 1.1em; margin-right: 6px; }
+
+.btn-primary { background-color: var(--primary); color: var(--text-light); }
+.btn-primary:hover { background-color: #1e2e40;}
+.btn-secondary { background-color: var(--secondary-text); color: var(--text-light); }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-success { background-color: var(--success); color: var(--text-light); }
+.btn-success:hover { background-color: #4a934a; }
+.btn-warning { background-color: var(--warning); color: var(--primary-text); }
+.btn-warning:hover { background-color: #ec971f; }
+
+/* Preview de Imagem nos Modais (Realizar, etc.) */
+.image-preview {
+    margin: 8px 0; max-height: 130px; padding: 5px;
+    border: 1px dashed var(--border-color); border-radius: calc(var(--border-radius)/2);
+    background-color: var(--alternate-bg); min-height: 60px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+}
+.image-preview img { max-height: 120px; max-width:100%; object-fit:contain; border-radius: calc(var(--border-radius)/2 - 2px);}
+.image-preview p { color: var(--secondary-text); font-size: 0.85em;}
+
+/* Estilos específicos para Preview do Chamado (preview-modal) */
+#preview-modal .modal-container { max-width: 600px; }
+#preview-modal .preview-container { padding: 12px; margin-top: 0.8rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: var(--alternate-bg); }
+#preview-modal .preview-title { font-size: 1rem; color: var(--primary); font-weight: 600; margin-bottom: 0.75rem; padding-bottom: 0.4rem; border-bottom: 1px dashed var(--border-color); }
+#preview-modal .preview-item { margin-bottom: 8px; font-size: 0.9rem; display: flex; gap: 8px; align-items: flex-start; }
+#preview-modal .preview-label { font-weight: 600; color: var(--primary-text); min-width: 110px; flex-shrink: 0;}
+#preview-modal .preview-value { color: var(--secondary-text); word-break: break-word; }
+#preview-modal #preview-occurrence-contract-info { font-size: 0.8em; color: var(--success); font-style: italic;}
+#preview-modal .whatsapp-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+#preview-modal .whatsapp-section .form-label { /* Label do select de fornecedor */
+    font-size: 0.9rem; margin-bottom: 8px;
+}
+#preview-modal .whatsapp-section .form-select { margin-bottom: 10px;}
+#preview-modal .whatsapp-btn { padding: 10px 18px; margin-top: 0.8rem; font-size: 0.9rem; background-color: #25D366; color:white; width:100%;}
+#preview-modal .whatsapp-btn:hover { background-color: #1DA851; }
+#preview-modal .whatsapp-btn:disabled { background-color: #9ce6b6; cursor: not-allowed; }
+#preview-modal .whatsapp-btn i.fab { margin-right: 8px; font-size:1.1em; }
+#preview-modal .status-message.status-info { background-color: #e7f3fe; color: #0c5460; border: 1px solid #b8daff; padding: 10px; font-size: 0.85rem; border-radius: var(--border-radius); margin-bottom: 10px; }
+
+
+/* Modal Viewer de Imagem */
+.modal.image-viewer { background-color: rgba(0, 0, 0, 0.85); }
+.modal-content.image-viewer-content { background: none; box-shadow: none; padding: 0; max-width: 95%; max-height: 95vh; width: auto; height: auto; overflow: hidden; display:flex; align-items:center; justify-content:center;}
+#modalImageViewer { max-width: 100%; max-height: 100%; object-fit: contain; display: block; border-radius: 4px; }
+.image-viewer-close { position:fixed; top: 15px; right: 15px; width: 32px; height: 32px; font-size: 22px; line-height: 32px; background-color: rgba(0,0,0,0.5); color:white; border-radius:50%; text-align:center;}
+.image-viewer-close:hover { background-color: rgba(0,0,0,0.8); }
+
+/* ================================================ */
+/* SECTION 6: RESPONSIVE OVERRIDES (< 768px)      */
+/* ================================================ */
+@media (max-width: 768px) {
+    .container { padding: calc(var(--spacing-unit) * 0.8); }
+    .header h1 { font-size: 1.3rem; }
+    .action-buttons-section { gap: calc(var(--spacing-unit)*0.6); }
+    .section-card { padding: var(--spacing-unit); margin-bottom: var(--spacing-unit); }
+    .section-card h2, .section-card h4 { font-size: 1.1rem; }
+
+    .modal-content, .modal-container { width: 95%; padding: 1rem; max-width: none;}
+    .modal-content > h3, .modal-container .modal-title { font-size: 1.1rem; }
+
+    .modal-actions, .form-actions {
+        flex-direction: row; flex-wrap: nowrap;
+    }
+    .modal-actions button, .form-actions .btn { flex: 1; margin: 0 !important; }
+    .overdue-item-header { align-items: flex-start; }
+    .overdue-status { margin-left: 0; margin-top: 5px;}
+}
+
+/* ================================================ */
+/* SECTION 7: RESPONSIVE OVERRIDES (< 480px)      */
+/* ================================================ */
+@media (max-width: 480px) {
+    html { font-size: 94%; }
+    .container { padding: calc(var(--spacing-unit) * 0.6); }
+    .header h1 { font-size: 1.2rem; }
+    button, .button, .btn { padding: 8px 12px; font-size: 0.85rem; }
+    .action-button { font-size: 0.85rem;}
+    .section-card { padding: calc(var(--spacing-unit)*0.8); }
+    .section-card h2, .section-card h4 { font-size: 1rem; }
+
+    .modal-content, .modal-container { padding: calc(var(--spacing-unit)*0.8); }
+    .modal-content > h3, .modal-container .modal-title { font-size: 1rem; }
+
+    .modal-actions, .form-actions {
+        flex-direction: column; gap: 8px;
+    }
+    .modal-actions button, .form-actions .btn { width: 100%; }
+
+    .image-viewer-close { top: 5px; right: 5px; width: 28px; height: 28px; font-size: 18px; line-height: 28px; }
+
+    #ticket-modal .equipment-item { flex-wrap: wrap;}
+    #ticket-modal .equipment-item label { flex-basis: calc(100% - 75px); }
+    #ticket-modal .equipment-item .equip-qty-input { margin-left: 0 !important; margin-top: 4px;}
+
+    .overdue-item-actions .btn-warning { width: 100%; }
+}
+/* ================================================ */
+/* SECTION: ESTILOS DE ALERTA PARA ATIVIDADES VENCIDAS */
+/* ================================================ */
+
+#overdue-activities-section.has-overdue-alert {
+    border-color: var(--danger); /* Vermelho para alerta forte */
+    border-width: 2px;
+    background-color: #fff7f7; /* Um tom de vermelho/rosa muito claro */
+    box-shadow: 0 2px 8px rgba(217, 83, 79, 0.2); /* Sombra avermelhada sutil */
+}
+
+#overdue-activities-section.has-overdue-alert h2 {
+    color: var(--danger); /* Título em vermelho */
+    font-weight: 700; /* Mais destaque no título */
+}
+
+#overdue-activities-section.has-overdue-alert h2 i.material-icons {
+    color: var(--danger); /* Ícone de aviso também em vermelho */
+    animation: pulseWarning 1.5s infinite; /* Animação de pulsar para o ícone */
+}
+
+@keyframes pulseWarning {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Ajuste no estilo do item individual de atividade vencida para consistência */
+.overdue-activity-item {
+    /* A borda esquerda já é var(--warning), pode manter ou mudar para var(--danger) se preferir mais forte */
+    /* border-left: 5px solid var(--danger); */ 
+    background-color: var(--background); /* Mantém o fundo branco para os cards internos */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07); /* Sombra padrão para os cards internos */
+}
+
+.overdue-activity-item .overdue-status {
+    /* Este já é vermelho e destacado, o que é bom. */
+    font-size: 0.85rem; /* Leve aumento para mais visibilidade */
+}
+
+/* Se a mensagem de "Nenhuma atividade vencida" estiver visível, o card não deve ter o estilo de alerta */
+#overdue-activities-section:not(.has-overdue-alert) .empty-list-message {
+    /* Estilo padrão para a mensagem, o card em si não estará em alerta */
+    border: 1px dashed var(--border-color);
+    background-color: var(--alternate-bg);
+}
+
+#overdue-activities-section.has-overdue-alert .empty-list-message {
+    /* Se por algum motivo a classe 'has-overdue-alert' for adicionada mas a lista ficar vazia,
+       a mensagem deve refletir o alerta, mas isso não deveria acontecer com a lógica atual. */
+    border-color: var(--danger);
+    background-color: rgba(217, 83, 79, 0.05);
+    color: var(--danger);
+}
+
+/* NOVOS ESTILOS PARA AGENDAMENTO DE VISITAS */
+#scheduled-visits-section h2 i.material-icons {
+    color: var(--primary); /* Azul padrão para o ícone da seção */
+}
+
+.scheduled-visit-item {
+    background-color: var(--alternate-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary); /* Destaque azul */
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 0.8);
+    margin-bottom: calc(var(--spacing-unit) * 0.75);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.scheduled-visit-item:last-child {
+    margin-bottom: 0;
+}
+
+.visit-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px dashed #e0e0e0;
+}
+.visit-item-header h5 { /* Título com nome do fornecedor */
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin: 0;
+    flex-grow: 1;
+}
+.visit-item-date {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--secondary-text);
+    white-space: nowrap;
+    text-align: right;
+}
+.visit-item-date.past-due {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+.visit-item-details p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--secondary-text);
+    line-height: 1.4;
+}
+.visit-item-details p strong {
+    color: var(--primary-text);
+    font-weight: 500;
+}
+
+.visit-item-actions {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.visit-item-actions .btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    min-width: 80px; /* Para melhor toque */
+}
+.visit-item-actions .btn-info { /* Para o botão Editar */
+    background-color: var(--info);
+    color: var(--text-light);
+}
+.visit-item-actions .btn-info:hover {
+    background-color: #46b8da;
+}
+.visit-item-actions .btn-danger { /* Para o botão Excluir */
+    background-color: var(--danger);
+    color: var(--text-light);
+}
+.visit-item-actions .btn-danger:hover {
+    background-color: #c9302c;
+}
+/* FIM DOS NOVOS ESTILOS */
+/* ... (previous styles remain the same) ... */
+
+/* NOVOS ESTILOS PARA AGENDAMENTO DE VISITAS */
+#scheduled-visits-section h2 i.material-icons,
+#archived-visits-section h2 i.material-icons { /* Aplicado a ambos */
+    color: var(--primary); 
+}
+
+.scheduled-visit-item {
+    background-color: var(--alternate-bg);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary); 
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 0.8);
+    margin-bottom: calc(var(--spacing-unit) * 0.75);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.scheduled-visit-item:last-child {
+    margin-bottom: 0;
+}
+
+.visit-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px dashed #e0e0e0;
+}
+.visit-item-header h5 { 
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin: 0;
+    flex-grow: 1;
+}
+.visit-item-date {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--secondary-text);
+    white-space: nowrap;
+    text-align: right;
+}
+.visit-item-date.past-due {
+    color: var(--danger);
+    font-weight: bold;
+}
+
+.visit-item-details p {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--secondary-text);
+    line-height: 1.4;
+}
+.visit-item-details p strong {
+    color: var(--primary-text);
+    font-weight: 500;
+}
+
+.visit-item-actions {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap; /* Para botões quebrarem em telas menores */
+}
+
+.visit-item-actions .btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    min-width: 80px; 
+}
+.visit-item-actions .btn-info { 
+    background-color: var(--info);
+    color: var(--text-light);
+}
+.visit-item-actions .btn-info:hover {
+    background-color: #46b8da;
+}
+.visit-item-actions .btn-danger { 
+    background-color: var(--danger);
+    color: var(--text-light);
+}
+.visit-item-actions .btn-danger:hover {
+    background-color: #c9302c;
+}
+.visit-item-actions .btn-success { /* Para o botão "Já Realizado" */
+    background-color: var(--success);
+    color: var(--text-light);
+}
+.visit-item-actions .btn-success:hover {
+    background-color: #4a934a;
+}
+
+
+/* ESTILOS PARA HISTÓRICO DE VISITAS */
+#archived-visits-section {
+    margin-top: calc(var(--spacing-unit) * 1.5); /* Espaço acima da seção de histórico */
+}
+.archived-visit-item {
+    background-color: #fdfdfd; /* Fundo ligeiramente diferente para distinguir */
+    border: 1px solid #e9e9e9;
+    border-left: 4px solid var(--secondary-text); /* Destaque cinza para arquivado */
+    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-unit) * 0.7);
+    margin-bottom: calc(var(--spacing-unit) * 0.6);
+    font-size: 0.85rem; /* Textos um pouco menores no histórico */
+}
+.archived-visit-item:last-child {
+    margin-bottom: 0;
+}
+.archived-visit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px dotted #e0e0e0;
+}
+.archived-visit-header h6 { /* Nome do fornecedor no histórico */
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-text);
+    margin: 0;
+}
+.archived-realized-date {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--secondary-text);
+}
+.archived-visit-details p {
+    margin: 0.2rem 0;
+    color: var(--secondary-text);
+}
+.archived-visit-details p strong {
+    color: var(--text); /* Um pouco mais escuro que o texto secundário normal */
+    font-weight: 500;
+}
+.archived-visit-notes {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px dashed #e9e9e9;
+    font-style: italic;
+    color: #444; /* Notas um pouco mais escuras */
+}
+.archived-visit-notes p { margin: 0; }
+
+/* Input de recorrência customizada no modal de agendamento */
+#scheduledVisitModal .form-group input#visitCustomRecurrenceValue.form-control {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+    min-height: 38px;
+}
+
+/* Ajustes responsivos para botões de ação de visita */
+@media (max-width: 480px) {
+    .visit-item-actions {
+        flex-direction: column;
+        align-items: stretch; /* Faz botões ocuparem largura total */
+    }
+    .visit-item-actions .btn {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    .visit-item-actions .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+/* FIM DOS NOVOS ESTILOS */

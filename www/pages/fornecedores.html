@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fornecedores e Ocorrências</title>
+    <link rel="stylesheet" href="../styles/app-bar.css">
+    <link rel="stylesheet" href="../styles/fornecedores.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="app-bar">
+        <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
+            <i class="material-icons">arrow_back</i>
+        </button>
+         <a href="../condo.html" class="app-bar-logo-link">
+             <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo">
+         </a>
+         <h1 class="app-bar-title" style="display: none;"></h1>
+         <div class="app-bar-nav-container">
+              <div class="navbar-container">
+                  <button class="navbar-toggle" id="navbar-toggle">
+                      <i class="material-icons">menu</i>
+                  </button>
+                  <div class="navbar-dropdown" id="navbar-dropdown">
+                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                          <i class="material-icons">account_circle</i>
+                          <span>Perfil</span>
+                      </a>
+                      <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
+                          <i class="material-icons">notifications</i>
+                          <span>Notificações</span>
+                          <span class="notification-badge" style="display: none;"></span>
+                      </a>
+                      <a href="./configuracoes.html" class="navbar-item">
+                          <i class="material-icons">settings</i>
+                          <span>Configurações</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+    </div>
+
+    <div class="container fornecedores-admin-container" style= "margin-top: 20px;">
+        
+        <div id="occurrences-management-section" class="occurrences-management-card">
+            <h2>Gerenciar Tipos de Ocorrência/Serviço</h2>
+            <div class="form-group">
+                <label for="new-occurrence-type-name-input">Nome do Novo Tipo de Ocorrência:</label>
+                <div class="custom-occurrence-input-group">
+                    <input type="text" id="new-occurrence-type-name-input" placeholder="Ex: Conserto de Portão Eletrônico">
+                    <button type="button" class="btn btn-success" id="add-new-global-occurrence-type-btn">
+                        <i class="material-icons">add_circle_outline</i> Cadastrar Tipo
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tipos de Ocorrência Registrados no Sistema:</label>
+                <div id="all-occurrences-list-display" class="all-occurrences-display-area">
+                    <p>Carregando ocorrências...</p>
+                    </div>
+            </div>
+        </div>
+
+        <div id="suppliers-management-section">
+            <h2>Gerenciar Fornecedores de Manutenção</h2>
+            
+            <div class="lista-fornecedores-card">
+                <h3>Fornecedores Cadastrados</h3>
+                <div id="suppliers-list-container">
+                    <p class="empty-list-message">Nenhum fornecedor cadastrado.</p>
+                </div>
+                <div class="add-supplier-button-container">
+                    <button type="button" class="btn btn-primary" id="open-add-supplier-modal-btn">
+                        <i class="material-icons">add</i> Adicionar Novo Fornecedor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="supplier-form-modal" class="modal-overlay hidden">
+        <div class="modal-container fornecedor-modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="supplier-modal-title">Adicionar Novo Fornecedor</h3>
+                <button type="button" class="modal-close-x" id="close-supplier-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="form-fornecedor">
+                    <input type="hidden" id="supplier-id">
+                    <div class="form-group">
+                        <label for="supplier-name-modal">Nome do Fornecedor:</label>
+                        <input type="text" id="supplier-name-modal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier-cnpj-modal">CNPJ (opcional):</label>
+                        <input type="text" id="supplier-cnpj-modal">
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier-phone-modal">Telefone:</label>
+                        <input type="tel" id="supplier-phone-modal" required>
+                    </div>
+
+                    <fieldset class="occurrences-fieldset">
+                        <legend>Serviço Principal</legend>
+                        <div class="form-group">
+                            <label for="supplier-main-occurrence-modal">Serviço Principal / Ocorrência Padrão (para Contrato):</label>
+                            <select id="supplier-main-occurrence-modal" required>
+                                <option value="">Selecione...</option>
+                                </select>
+                        </div>
+                    </fieldset>
+
+                    <div class="form-group form-check" style="margin-top: 15px;">
+                        <input type="checkbox" id="supplier-has-contract-modal">
+                        <label for="supplier-has-contract-modal" class="form-check-label">Possui Contrato Vigente (vinculado ao Serviço Principal)?</label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-edit-supplier-btn-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Fornecedor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script/fornecedores.js"></script>
+    <script>
+        const navbarToggle = document.getElementById('navbar-toggle');
+        const navbarDropdown = document.getElementById('navbar-dropdown');
+        if (navbarToggle && navbarDropdown) {
+            navbarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navbarDropdown.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (navbarToggle && navbarDropdown && !navbarToggle.contains(e.target) && !navbarDropdown.contains(e.target)) {
+                    navbarDropdown.classList.remove('show');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+/* Styles for Location Configuration within Modal (index.css or new file) */
+
+#location-config-in-modal {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 2px solid var(--primary);
+}
+
+#location-config-in-modal .modal-section-title i.material-icons {
+    font-size: 1.2em;
+    margin-right: 8px;
+    vertical-align: bottom;
+}
+
+#location-config-content-wrapper {
+    max-height: 60vh; /* Altura máxima para o conteúdo da configuração */
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: var(--ff-border-radius);
+    border: 1px solid var(--alternate);
+}
+
+#location-config-form-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.config-category, .custom-location-section {
+    border: 1px solid var(--alternate);
+    border-radius: var(--ff-border-radius);
+    padding: 10px 12px;
+    background-color: var(--secondary-background);
+    margin-bottom: 10px;
+}
+
+.config-category-header {
+    display: flex; align-items: center; padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #eee;
+}
+.custom-location-section .config-category-header {
+    border-bottom: none; /* Sem borda para header de custom location, pois o nome já é o título */
+}
+
+
+.config-category-header input[type="checkbox"],
+.custom-location-section .config-category-header input[type="checkbox"] { /* Se for usar checkbox para custom */
+    margin-right: 8px; width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;
+}
+.config-category-header label,
+.custom-location-section .config-category-header label.custom-loc-label {
+    flex-grow: 1; font-weight: 600; color: var(--primary-text); cursor: pointer; font-size: 1rem;
+}
+.custom-location-section .config-category-header .custom-loc-icon {
+    color: var(--primary); margin-right: 8px; font-size: 1.3em;
+}
+
+
+.toggle-details-btn {
+    background: none; border: none; font-size: 1.5rem; color: var(--secondary-text); cursor: pointer;
+    padding: 0 4px; margin-left: auto; line-height: 1; transition: transform 0.3s ease; flex-shrink: 0;
+}
+
+.config-details {
+    padding: 10px 0 0 10px; /* Reduzido padding esquerdo */
+    margin-top:8px;
+    transition: max-height 0.4s ease-out, opacity 0.4s ease-out, padding 0.3s ease, margin-top 0.3s ease;
+    max-height: 4000px; opacity: 1; overflow: hidden;
+    border-left: 2px solid var(--primary-background); /* Linha lateral para identar visualmente */
+}
+.config-details.hidden {
+    max-height: 0; opacity: 0; padding-top:0; padding-bottom:0; margin-top:0;
+    border-left-color: transparent;
+}
+
+.config-category h4, .config-category h5,
+.custom-location-section h4, .custom-location-section h5 {
+    font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-top: 12px;
+    margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: center; gap: 6px;
+}
+.config-category h4:first-child, .custom-location-section h4:first-child { margin-top: 0; }
+.config-category h5, .custom-location-section h5 {
+    font-size: 0.85rem; color: var(--secondary-text); border-bottom: none;
+    margin-top: 10px; margin-bottom: 6px;
+}
+.config-category h5 i.material-icons, .config-category h4 i.material-icons,
+.custom-location-section h5 i.material-icons, .custom-location-section h4 i.material-icons {
+    font-size: 1.1em;
+}
+
+.config-sub-list {
+    display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; padding-left: 10px;
+}
+.config-item { display: flex; align-items: center; font-size: 0.85rem; padding: 3px 0;}
+.config-item input[type="checkbox"] { margin-right: 7px; width: 15px; height: 15px; accent-color: var(--primary); }
+.config-item label { font-size: 0.85rem; color: var(--primary-text); cursor: pointer; flex-grow: 1; }
+
+.add-new-item-section, .add-new-item-form {
+    display: flex; gap: 8px; margin: 10px 0; align-items: center; padding: 8px;
+    background-color: #f0f3f6; border-radius: 6px;
+}
+.add-new-item-section.top-level-add { background-color: #e9edff; /* Destaque para adição de localização principal */ }
+.add-new-item-form.indented-add-form { margin-left: 15px; }
+
+
+.add-new-item-section input[type="text"],
+.add-new-item-form input[type="text"],
+.add-new-item-form input[type="number"] {
+    flex-grow: 1; margin-top: 0; padding: 7px 10px; font-size: 0.9rem; min-height: 36px;
+}
+
+.btn.btn-add {
+    padding: 7px 12px; font-size: 0.85rem; background-color: var(--success); color: white;
+    border: none; border-radius: var(--ff-border-radius); cursor: pointer; flex-shrink: 0;
+    line-height: 1.2; min-height: 36px; display: inline-flex; align-items: center;
+}
+.btn-add i.material-icons { font-size: 1.1em; margin-right: 4px; }
+
+.pavimento-section { margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--alternate); }
+.pavimento-section h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 6px;}
+#pavimentos-list-modal-ANDARES_TIPO .pavimento-item {
+    padding: 8px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 8px;
+}
+.pavimento-item span.pavimento-name { flex-grow: 1; font-weight: 500;}
+.pavimento-item h6 { font-size: 0.8rem; color: var(--secondary-text); margin: 8px 0 5px 0; display: flex; align-items: center; gap: 4px;}
+
+
+.custom-items-list-container { margin-top:10px; padding-left: 5px; }
+.custom-items-list-container h5 { font-size: 0.8rem; color: var(--primary); margin-bottom: 5px; display: flex; align-items: center; gap: 4px;}
+.custom-items-list-container ul.custom-items {
+    list-style: none; padding-left: 10px; border-left: 1px dotted #ccc;
+}
+.custom-items-list-container li.custom-item-entry {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px; margin-bottom: 4px; background-color: #fdfdfd;
+    border-radius: 3px; font-size: 0.8rem;
+}
+.custom-items-list-container li.custom-item-entry span { flex-grow: 1; }
+
+
+.remove-custom-btn {
+    background: var(--danger); color: white; border: none; border-radius: 50%;
+    width: 22px; height: 22px; font-size: 0.9rem; cursor: pointer;
+    line-height: 22px; padding: 0; text-align: center; margin-left: 8px; flex-shrink: 0;
+}
+.remove-custom-btn:hover { opacity: 0.8; }
+.remove-custom-location-btn { margin-left: 10px !important; } /* Mais espaço para o botão principal de remover localização */
+
+
+.config-sub-list.specific-area-equipment { margin-top: 6px; padding-left: 15px; }
+hr.divider { border: none; border-top: 1px dashed var(--alternate); margin: 15px 0; }
+
+.config-save-btn {
+    width: auto; /* Não mais 100% */
+    padding: 10px 25px;
+    font-size: 1rem;
+    margin: 20px auto 10px auto; /* Centraliza com margem */
+    display: block; /* Para que margin auto funcione */
+    min-width: 250px; /* Largura mínima */
+}
+
+/* Ajustes para telas menores dentro do modal de config */
+@media (max-width: 480px) {
+    #location-config-content-wrapper { padding: 5px; }
+    .config-category, .custom-location-section { padding: 8px; }
+    .config-category-header label, .custom-location-section .config-category-header label.custom-loc-label { font-size: 0.9rem; }
+    .add-new-item-section, .add-new-item-form { flex-direction: column; align-items: stretch; }
+    .add-new-item-section input[type="text"], .add-new-item-form input[type="text"] { margin-bottom: 8px; }
+    .btn.btn-add { width: 100%; }
+    .config-details { padding-left: 5px; }
+    .config-save-btn { min-width: 100%; }
+}

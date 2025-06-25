@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-T">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Condomínio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Inter+Tight:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="./styles/condo.css">
+    <link rel="stylesheet" href="./styles/app-bar.css">
+    <link rel="stylesheet" href="./styles/location_config.css">
+</head>
+<body>
+    <div class="app-bar">
+        <button class="app-bar-back-button" onclick="window.history.back()" style="display: none;">
+             <i class="material-icons">arrow_back</i>
+        </button>
+         <a href="./condo.html" class="app-bar-logo-link">
+             <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo">
+         </a>
+         <h1 class="app-bar-title" style="display: none;" id="condo-name-header"></h1>
+         <div class="app-bar-nav-container">
+              <div class="navbar-container">
+                  <button class="navbar-toggle" id="navbar-toggle">
+                      <i class="material-icons">menu</i>
+                  </button>
+                  <div class="navbar-dropdown" id="navbar-dropdown">
+                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                          <i class="material-icons">account_circle</i>
+                          <span>Perfil</span>
+                      </a>
+                      <a href="./pages/notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
+                          <i class="material-icons">notifications</i>
+                          <span>Notificações</span>
+                          <span class="notification-badge" style="display: none;"></span>
+                      </a>
+                      <a href="./pages/configuracoes.html" class="navbar-item">
+                          <i class="material-icons">settings</i>
+                          <span>Configurações</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+    </div>
+    <img src="" alt="Condomínio" class="condo-image" id="condo-image-display">
+    <div style="text-align: center; margin-top: 15px; margin-bottom: 15px;" class="condo-name-container-with-guide">
+        <button class="button button-primary" id="show-more-btn-condo-name">
+            <span id="condo-name-display-button">Carregando...</span>
+            <button id="edit-condo-btn"></button>
+        </a>
+    </div>
+    <div class="menu-card">
+       <a href="./pages/documentos.html" class="menu-item">
+           <span class="menu-item-content-wrapper">
+               <div class="menu-item-icon"></div> <span class="menu-item-text">Documentos</span>
+           </span>
+           <button class="guide-btn" data-guide-id="documentos" aria-label="Guia para Documentos">
+               <i class="material-icons">help_outline</i>
+           </button>
+       </a>
+       <a href="./pages/checklist.html" class="menu-item">
+            <span class="menu-item-content-wrapper">
+                <div class="menu-item-icon"></div>
+                <span class="menu-item-text">Check-up</span>
+            </span>
+            <button class="guide-btn" data-guide-id="planoGestao" aria-label="Guia para Check-up (Plano de Gestão)">
+                <i class="material-icons">help_outline</i>
+            </button>
+       </a>
+       <a href="./pages/manutencao.html" class="menu-item">
+           <span class="menu-item-content-wrapper">
+               <div class="menu-item-icon"></div>
+               <span class="menu-item-text">Abertura de chamado</span>
+           </span>
+           <button class="guide-btn" data-guide-id="aberturaChamado" aria-label="Guia para Abertura de Chamado">
+               <i class="material-icons">help_outline</i>
+           </button>
+       </a>
+       <a href="./pages/fornecedores.html" class="menu-item">
+            <span class="menu-item-content-wrapper">
+                <div class="menu-item-icon"></div>
+                <span class="menu-item-text">Listagem de gerenciamento</span>
+            </span>
+            <button class="guide-btn" data-guide-id="fornecedores" aria-label="Guia para Listagem de gerenciamento">
+                <i class="material-icons">help_outline</i>
+            </button>
+       </a>
+       <a href="./pages/chamados.html" class="menu-item">
+            <span class="menu-item-content-wrapper">
+                <div class="menu-item-icon"></div>
+                <span class="menu-item-text">Acompanhamento de chamados</span>
+            </span>
+            <button class="guide-btn" data-guide-id="acompanhamentoChamados" aria-label="Guia para Acompanhamento de Chamados">
+                <i class="material-icons">help_outline</i>
+            </button>
+       </a>
+    </div>
+
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="modal-container">
+              <div class="modal-header">
+                  <div class="modal-title">Informações Gerais e localização</div>
+                  <button class="modal-close-x" title="Fechar">&times;</button>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">badge</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-name-display"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">map</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-cep"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">location_on</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-location"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">maps_home_work</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-bairro-display"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">location_city</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-city"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">phone</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-phone"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">support_agent</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-manager-phone"></span>
+                  </div>
+              </div>
+               <div class="modal-row" id="edit-modal-cnpj-row"> 
+                  <span class="material-icons info-icon">business</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-cnpj"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">image</span>
+                  <div class="modal-field-content">
+                      <img id="modal-image-preview" src="" alt="Prévia" class="info-display" style="max-width: 100px; max-height: 80px; margin-left: 0; border: 1px solid #eee; display: none;">
+                      <span class="info-display hidden" id="modal-photo-url-display" style="word-break: break-all;"></span>
+                  </div>
+              </div>
+              <div class="modal-section-title">Adicionais</div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">people_outline</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-residents"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">apartment</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-units"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">domain</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-blocks"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">admin_panel_settings</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-admin"></span>
+                  </div>
+              </div>
+              <div class="modal-row">
+                  <span class="material-icons info-icon">corporate_fare</span>
+                  <div class="modal-field-content">
+                      <span class="info-display" id="modal-admin-phone-display"></span>
+                  </div>
+              </div>
+              <div class="info-display" id="modal-location-config-container" style="display: block;"> <div class="modal-section-title">
+                      <i class="material-icons">place</i> Configuração de Localizações e Equipamentos
+                  </div>
+                  <div id="modal-location-config-display" class="location-config-display-area">
+                      <p>Carregando configuração...</p>
+                  </div>
+              </div>
+        </div>
+    </div>
+
+    <div id="guide-modal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title" id="guide-modal-title" style="text-align: left; font-size: 1.1rem;">Guia Rápido</h2>
+                <button class="modal-close-x" id="guide-modal-close-btn" aria-label="Fechar Guia">&times;</button>
+            </div>
+            <div class="modal-body" id="guide-modal-body" style="padding: 15px 20px; font-size: 0.9em; line-height: 1.6; max-height: 70vh; overflow-y: auto;">
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="./script/supabaseClient.js"></script>
+    <script type="module" src="./script/condo.js"></script>
+</body>
+</html>
