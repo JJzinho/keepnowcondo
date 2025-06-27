@@ -1,4 +1,3 @@
-/* www/styles/fornecedores.css */
 :root {
     --primary: #4B39EF;
     --primary-background: #F1F4F8;
@@ -25,46 +24,40 @@ body {
 }
 
 .fornecedores-admin-container {
-    margin-top: calc(var(--app-bar-height) + 20px);
     padding: calc(var(--spacing-unit) * 1.5);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* Card de Gerenciamento de Tipos de Ocorrência */
-.occurrences-management-card {
+/* Card de Gerenciamento */
+.occurrences-management-card, .lista-fornecedores-card {
     background-color: var(--secondary-background);
     padding: calc(var(--spacing-unit) * 1.25);
     border-radius: var(--ff-border-radius);
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
 }
-.occurrences-management-card h2 {
+
+.occurrences-management-card h2, #suppliers-management-section > h2 {
     font-size: 1.4rem; color: var(--primary);
     margin-top: 0; margin-bottom: calc(var(--spacing-unit) * 1.25);
     padding-bottom: calc(var(--spacing-unit) * 0.5);
     border-bottom: 1px solid var(--border-color);
     text-align: center;
 }
-
-/* Seção de Gerenciamento de Fornecedores */
 #suppliers-management-section > h2 {
-    text-align: center; font-size: 1.6rem; font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: calc(var(--spacing-unit) * 1.5);
+    font-size: 1.6rem;
+    border: none;
 }
 
-.form-group {
-    margin-bottom: var(--spacing-unit);
-}
+.form-group { margin-bottom: var(--spacing-unit); }
 .form-group label {
     display: block; margin-bottom: 6px; font-weight: 500;
     font-size: 0.9rem; color: var(--text-primary); text-align: left;
 }
-.form-group input[type="text"],
-.form-group input[type="tel"],
-.form-group select {
+.form-group input[type="text"], .form-group input[type="tel"], .form-group select {
     width: 100%; padding: calc(var(--spacing-unit) * 0.7);
     border: 1px solid var(--border-color);
     border-radius: var(--ff-border-radius);
@@ -72,25 +65,17 @@ body {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     box-sizing: border-box;
 }
-.form-group input[type="text"]:focus,
-.form-group input[type="tel"]:focus,
-.form-group select:focus {
+.form-group input[type="text"]:focus, .form-group input[type="tel"]:focus, .form-group select:focus {
     outline: none; border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(75, 57, 239, 0.15);
 }
-.form-group.form-check {
-    display: flex; align-items: center;
-    padding-top: calc(var(--spacing-unit) * 0.5);
-}
+.form-group.form-check { display: flex; align-items: center; padding-top: calc(var(--spacing-unit) * 0.5); }
 .form-group input[type="checkbox"] {
     width: 18px; height: 18px;
     margin-right: calc(var(--spacing-unit) * 0.5);
     accent-color: var(--primary); flex-shrink: 0;
 }
-.form-check-label {
-    font-weight: normal; color: var(--text-primary);
-    font-size: 0.9rem; cursor: pointer; margin-bottom: 0;
-}
+.form-check-label { font-weight: normal; color: var(--text-primary); font-size: 0.9rem; cursor: pointer; margin-bottom: 0; }
 .form-actions {
     margin-top: calc(var(--spacing-unit) * 1.5); display: flex;
     flex-wrap: wrap; gap: calc(var(--spacing-unit) * 0.75);
@@ -105,24 +90,16 @@ body {
     display: inline-flex; align-items: center; justify-content: center;
     gap: 6px; line-height: 1.2;
 }
-.btn i.material-icons { font-size: 1.2em; margin-bottom: -2px; }
+.btn i.material-icons { font-size: 1.2em; }
 .btn-primary { background-color: var(--primary); color: var(--info); }
 .btn-primary:hover { background-color: #3a2dbd; }
 .btn-secondary { background-color: var(--text-secondary); color: var(--info); }
 .btn-secondary:hover { background-color: #5a6268; }
 .btn-danger { background-color: var(--danger); color: var(--info); }
 .btn-danger:hover { background-color: #c82333; }
-.btn-success { background-color: #ff7000; color: var(--info); }
+.btn-success { background-color: var(--success); color: var(--info); }
 .btn-success:hover { background-color: #218838; }
 
-.lista-fornecedores-card {
-    background-color: var(--secondary-background);
-    padding: calc(var(--spacing-unit) * 1.25);
-    border-radius: var(--ff-border-radius);
-    margin-bottom: calc(var(--spacing-unit) * 1.5);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.07);
-}
 .lista-fornecedores-card h3 {
     font-size: 1.3rem; color: var(--primary);
     margin-top: 0; margin-bottom: var(--spacing-unit);
@@ -133,76 +110,49 @@ body {
     margin-top: calc(var(--spacing-unit) * 1.5);
     text-align: center;
 }
-#open-add-supplier-modal-btn {
-    padding: calc(var(--spacing-unit) * 0.75) calc(var(--spacing-unit) * 1.5);
-}
 #open-add-supplier-modal-btn i.material-icons { margin-right: 8px; }
 
-/* Estilos do Modal */
+/* Modal */
 .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; padding: 15px; }
 .modal-overlay.hidden { display: none !important; }
 .modal-overlay:not(.hidden) { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
 .modal-container { background-color: var(--secondary-background); border-radius: var(--ff-border-radius); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s ease; opacity: 0; }
 .modal-overlay:not(.hidden) .modal-container { transform: scale(1); opacity: 1; }
-.fornecedor-modal-container .modal-header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.25); border-bottom: 1px solid var(--border-color); }
-.fornecedor-modal-container .modal-title { font-size: 1.25rem; color: var(--primary); margin: 0; font-weight: 600; }
-.fornecedor-modal-container .modal-close-x { background: none; border: none; font-size: 1.8rem; color: var(--text-secondary); cursor: pointer; padding: 0; line-height: 1; }
-.fornecedor-modal-container .modal-close-x:hover { color: var(--danger); }
-.fornecedor-modal-container .modal-body { padding: calc(var(--spacing-unit) * 1.25); overflow-y: auto; }
-#form-fornecedor .form-group { margin-bottom: calc(var(--spacing-unit) * 0.9); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.25); border-bottom: 1px solid var(--border-color); }
+.modal-title { font-size: 1.25rem; color: var(--primary); margin: 0; font-weight: 600; }
+.modal-close-x { background: none; border: none; font-size: 1.8rem; color: var(--text-secondary); cursor: pointer; padding: 0; line-height: 1; }
+.modal-close-x:hover { color: var(--danger); }
+.modal-body { padding: calc(var(--spacing-unit) * 1.25); overflow-y: auto; }
 #form-fornecedor .form-actions { padding-top: var(--spacing-unit); border-top: 1px solid var(--border-color); }
 
-/* Ocorrências Globais (Seção Superior) */
+/* Seção de Ocorrências */
 .occurrences-fieldset { border: 1px solid var(--border-color); padding: var(--spacing-unit); margin-top: calc(var(--spacing-unit) * 1.5); margin-bottom: var(--spacing-unit); border-radius: var(--ff-border-radius); }
 .occurrences-fieldset legend { font-weight: 600; color: var(--primary); padding: 0 0.75em; font-size: 1.1rem; }
 .custom-occurrence-input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
 .custom-occurrence-input-group input[type="text"] { flex-grow: 1; }
-.custom-occurrence-input-group .btn-success i.material-icons { margin-right: 5px; font-size: 1.1em; }
 .all-occurrences-display-area { margin-top: 10px; padding: 15px; background-color: var(--primary-background); border: 1px solid var(--border-color); border-radius: var(--ff-border-radius); min-height: 60px; max-height: 200px; overflow-y: auto; }
 .all-occurrences-display-area ul { list-style-type: none; padding: 0; margin: 0; }
 .all-occurrences-display-area li { padding: 8px 10px; background-color: var(--secondary-background); border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
 .all-occurrences-display-area li:last-child { margin-bottom: 0; }
 .remove-global-occurrence-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; padding: 0 5px; line-height: 1; }
-.remove-global-occurrence-btn:hover { opacity: 0.7; }
 
 /* Tabela de Fornecedores */
+#suppliers-list-container { overflow-x: auto; }
 #suppliers-list-container table { width: 100%; border-collapse: collapse; margin-top: var(--spacing-unit); }
-#suppliers-list-container th,
-#suppliers-list-container td { border: 1px solid var(--border-color); padding: calc(var(--spacing-unit) * 0.75); text-align: left; font-size: 0.9rem; vertical-align: middle; }
-#suppliers-list-container th { background-color: #e9ecef; color: var(--text-primary); font-weight: 600; }
-/* Ajuste para a coluna de "Outras Ocorrências" que foi removida da tabela */
-/* Se você tinha uma coluna específica para "Outras Ocorrências" no renderSuppliersTable, ela foi removida. */
-/* Se a tabela agora tem menos colunas, pode ser necessário ajustar os :nth-child se usou para ocultar. */
-/* No momento, a tabela só tem "Serviço Principal". */
+#suppliers-list-container th, #suppliers-list-container td { border: 1px solid var(--border-color); padding: calc(var(--spacing-unit) * 0.75); text-align: left; font-size: 0.9rem; vertical-align: middle; }
+#suppliers-list-container th { background-color: #e9ecef; color: var(--text-primary); font-weight: 600; white-space: nowrap;}
 #suppliers-list-container .actions-cell { text-align: center; white-space: nowrap; }
-#suppliers-list-container .actions-cell button { margin: 2px; padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 0.75); font-size: 0.8rem; }
+#suppliers-list-container .actions-cell .btn { margin: 2px; padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 0.75); font-size: 0.8rem; }
 .empty-list-message { text-align: center; color: var(--text-secondary); padding: var(--spacing-unit); font-style: italic; border: 1px dashed var(--border-color); border-radius: var(--ff-border-radius); margin-top: var(--spacing-unit); background-color: var(--primary-background); }
 
-/* --- Media Queries para Responsividade --- */
+/* Media Queries */
 @media (max-width: 768px) {
-    .fornecedores-admin-container { margin-top: calc(var(--app-bar-height) + 15px); padding: calc(var(--spacing-unit) * 0.75); }
+    .fornecedores-admin-container { padding: calc(var(--spacing-unit) * 0.75); }
     #suppliers-management-section > h2, .occurrences-management-card h2 { font-size: 1.3rem; }
     .lista-fornecedores-card h3, .occurrences-fieldset legend { font-size: 1.15rem; }
-    .btn { padding: calc(var(--spacing-unit) * 0.6) var(--spacing-unit); font-size: 0.85rem; }
-    #suppliers-list-container th, #suppliers-list-container td { padding: calc(var(--spacing-unit) * 0.6); font-size: 0.85rem; }
-    .modal-container { max-width: 95%; }
 }
 @media (max-width: 480px) {
-    .fornecedores-admin-container { margin-top: calc(var(--app-bar-height) + 10px); padding: calc(var(--spacing-unit) * 0.5); }
-    #suppliers-management-section > h2, .occurrences-management-card h2 { font-size: 1.2rem; }
-    .lista-fornecedores-card, .occurrences-management-card { padding: var(--spacing-unit); }
-    .lista-fornecedores-card h3, .occurrences-fieldset legend { font-size: 1.05rem; }
-    .form-group label, .form-check-label { font-size: 0.85rem; }
-    .form-group input[type="text"], .form-group input[type="tel"], .form-group select { padding: calc(var(--spacing-unit) * 0.6); font-size: 0.9rem; }
-    .form-actions { flex-direction: column; }
-    .form-actions .btn { width: 100%; }
+    .fornecedores-admin-container { padding: calc(var(--spacing-unit) * 0.5); }
     .custom-occurrence-input-group { flex-direction: column; align-items: stretch; }
     .custom-occurrence-input-group input[type="text"] { margin-bottom: 8px; }
-    .custom-occurrence-input-group .btn-success { width: 100%; }
-    #suppliers-list-container { overflow-x: auto; }
-    #suppliers-list-container table { min-width: 500px; }
-    #suppliers-list-container th, #suppliers-list-container td { font-size: 0.8rem; white-space: normal; }
-    #suppliers-list-container .actions-cell { white-space: nowrap; }
-    .fornecedor-modal-container .modal-body { padding: var(--spacing-unit); }
-    .fornecedor-modal-container .modal-title { font-size: 1.1rem; }
 }

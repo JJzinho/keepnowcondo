@@ -19,27 +19,17 @@
          </a>
          <h1 class="app-bar-title" style="display: none;"></h1>
          <div class="app-bar-nav-container">
-              <div class="navbar-container">
-                  <button class="navbar-toggle" id="navbar-toggle">
-                      <i class="material-icons">menu</i>
-                  </button>
-                  <div class="navbar-dropdown" id="navbar-dropdown">
-                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
-                          <i class="material-icons">account_circle</i>
-                          <span>Perfil</span>
-                      </a>
-                      <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
-                          <i class="material-icons">notifications</i>
-                          <span>Notificações</span>
-                          <span class="notification-badge" style="display: none;"></span>
-                      </a>
-                      <a href="./configuracoes.html" class="navbar-item">
-                          <i class="material-icons">settings</i>
-                          <span>Configurações</span>
-                      </a>
-                  </div>
-              </div>
-          </div>
+             <div class="navbar-container">
+                 <button class="navbar-toggle" id="navbar-toggle">
+                     <i class="material-icons">menu</i>
+                 </button>
+                 <div class="navbar-dropdown" id="navbar-dropdown">
+                     <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada"><i class="material-icons">account_circle</i><span>Perfil</span></a>
+                     <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada"><i class="material-icons">notifications</i><span>Notificações</span><span class="notification-badge" style="display: none;"></span></a>
+                     <a href="./configuracoes.html" class="navbar-item"><i class="material-icons">settings</i><span>Configurações</span></a>
+                 </div>
+             </div>
+         </div>
     </div>
     <div class="container">
         <div class="action-buttons-section">
@@ -48,7 +38,7 @@
             </button>
         </div>
         <div id="overdue-activities-section" class="section-card">
-            <h2><i class="material-icons">warning</i> Atividades Vencidas do Plano de gestão.</h2>
+            <h2><i class="material-icons">warning</i> Atividades Vencidas do Plano de gestão</h2>
             <div id="overdueActivitiesList">
                 <p class="empty-list-message">Nenhuma atividade vencida no momento.</p>
             </div>
@@ -56,7 +46,7 @@
 
         <div id="scheduled-visits-section" class="section-card">
             <h2><i class="material-icons">event_available</i> Agendamento de Visitas Técnicas</h2>
-            <button id="openScheduledVisitModalBtn" class="action-button schedule-visit-button" style="margin-bottom: 15px; background-color: var(--primary); width:auto; min-width: 200px; padding: 10px 15px;">
+            <button id="openScheduledVisitModalBtn" class="action-button schedule-visit-button">
                 <i class="material-icons">add_alarm</i> Programar Nova Visita
             </button>
             <div id="scheduledVisitsListContainer">
@@ -70,101 +60,47 @@
                 <p class="empty-list-message">Nenhuma visita no histórico.</p>
             </div>
         </div>
-        <div id="imageViewerModal" class="modal image-viewer hidden">
-            <div class="modal-content image-viewer-content">
-                <img id="modalImageViewer" src="" alt="Visualização Ampliada">
-                <button class="image-viewer-close modal-dynamic-close" data-modal-id="imageViewerModal">&times;</button>
-            </div>
-        </div>
 
         <div id="ticket-modal" class="modal-overlay hidden">
             <div class="modal-container">
                 <button class="modal-close-x modal-dynamic-close" data-modal-id="ticket-modal">&times;</button>
                 <h2 class="modal-title">Criar Chamado Corretivo</h2>
-                <form id="ticket-form-manutencao">
+                <form id="ticket-form-manutencao" novalidate>
                     <input type="hidden" id="ticketAssociatedActivityId">
-                    <div class="form-group">
-                        <label class="form-label" for="occurrence-type-chamado">Sistema</label>
-                        <select class="form-select" id="occurrence-type-chamado" required>
-                            <option value="" selected disabled>Selecione...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="ticket-location-category-chamado">Localização (Categoria)</label>
-                        <select class="form-select" id="ticket-location-category-chamado" required>
-                            <option value="" selected disabled>Carregando categorias...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="ticket-location-area-chamado">Área Específica / Local no Pavimento</label>
-                        <select class="form-select" id="ticket-location-area-chamado" required disabled>
-                            <option value="" selected disabled>Selecione a Categoria Primeiro...</option>
-                        </select>
-                        <input type="text" class="form-control hidden" id="ticket-area-custom-chamado" placeholder="Especifique outra área/localização" style="margin-top: 8px;">
-                    </div>
-                    <div id="equipment-section-chamado" class="form-group hidden">
-                        <label class="form-label">Equipamentos na Área <span class="optional-label">(Opcional)</span></label>
-                        <div id="equipment-list-chamado" class="equipment-list-box">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="description-chamado">Descrição</label>
-                        <textarea class="form-control" id="description-chamado" placeholder="Descreva o problema ou a solicitação" required rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="priority-chamado">Prioridade</label>
-                        <select class="form-select" id="priority-chamado" required>
-                            <option value="" selected disabled>Selecione...</option>
-                            <option value="Baixo">Baixo -</option>
-                            <option value="Média">Média</option>
-                            <option value="Alta">Alta</option>
-                            <option value="Urgência">Urgência</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="ticket-modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Próximo</button>
-                    </div>
+                    <div class="form-group"><label class="form-label" for="occurrence-type-chamado">Sistema</label><select class="form-select" id="occurrence-type-chamado" required><option value="" selected disabled>Selecione...</option></select></div>
+                    <div class="form-group"><label class="form-label" for="ticket-location-category-chamado">Localização (Pavimento)</label><select class="form-select" id="ticket-location-category-chamado" required><option value="" selected disabled>Carregando...</option></select></div>
+                    <div class="form-group"><label class="form-label" for="ticket-location-area-chamado">Área Específica / Sublocal</label><select class="form-select" id="ticket-location-area-chamado" required disabled><option value="" selected disabled>Selecione o Pavimento...</option></select></div>
+                    <div id="equipment-section-chamado" class="form-group hidden"><label class="form-label">Equipamentos na Área <span class="optional-label">(Opcional)</span></label><div id="equipment-list-chamado" class="equipment-list-box"></div></div>
+                    <div class="form-group"><label class="form-label" for="description-chamado">Descrição</label><textarea class="form-control" id="description-chamado" placeholder="Descreva o problema ou a solicitação" required rows="3"></textarea></div>
+                    <div class="form-group"><label class="form-label" for="priority-chamado">Prioridade</label><select class="form-select" id="priority-chamado" required><option value="" selected disabled>Selecione...</option><option value="Baixo">Baixo</option><option value="Média">Média</option><option value="Alta">Alta</option><option value="Urgência">Urgência</option></select></div>
+                    <div class="form-actions"><button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="ticket-modal">Cancelar</button><button type="submit" class="btn btn-primary">Próximo</button></div>
                 </form>
             </div>
         </div>
+        
         <div id="preview-modal" class="modal-overlay hidden">
             <div class="modal-container">
                 <button class="modal-close-x modal-dynamic-close" data-modal-id="preview-modal">&times;</button>
-                <h2 class="modal-title">Pré-visualização do Chamado</h2>
+                <h2 class="modal-title">Revisar e Enviar Chamado</h2>
                 <div class="preview-container">
-                    <div class="preview-title">Detalhes</div>
-                    <div class="preview-item">
-                        <span class="preview-label">Sistema:</span>
-                        <span class="preview-value" id="preview-occurrence-chamado"></span>
-                        <span id="preview-occurrence-contract-info" style="font-size: 0.8em; margin-left: 10px; color: green; display: none;"></span>
-                    </div>
+                    <div class="preview-title">Detalhes do Chamado</div>
+                    <div class="preview-item"><span class="preview-label">Sistema:</span><span class="preview-value" id="preview-occurrence-chamado"></span></div>
                     <div class="preview-item"><span class="preview-label">Localização:</span><span class="preview-value" id="preview-location-chamado"></span></div>
-                    <div class="preview-item" id="preview-equipment-item-chamado" style="display: none;"><span class="preview-label">Equipamento(s):</span><span class="preview-value" id="preview-equipment-chamado" style="white-space: pre-wrap;"></span></div>
+                    <div class="preview-item" id="preview-equipment-item-chamado" style="display: none;"><span class="preview-label">Equipamento(s):</span><span class="preview-value" id="preview-equipment-chamado"></span></div>
                     <div class="preview-item"><span class="preview-label">Descrição:</span><span class="preview-value" id="preview-description-chamado"></span></div>
                     <div class="preview-item"><span class="preview-label">Prioridade:</span><span class="preview-value" id="preview-priority-chamado"></span></div>
                 </div>
-                <div class="whatsapp-section">
-                    <h3 class="preview-title">Enviar para Fornecedor</h3>
-                    <div id="supplier-info-chamado">
-                        <label for="supplier-select-chamado" class="form-label">Selecione o fornecedor para esta ocorrência:</label>
-                        <select class="form-select" id="supplier-select-chamado"><option value="" selected disabled>Carregando...</option></select>
-                        <div id="no-supplier-chamado" class="hidden">
-                            <div class="status-message status-info">Nenhum fornecedor cadastrado para este tipo de ocorrência.</div>
-                            <p style="margin-top: 10px;">
-                                 Não encontrou o fornecedor ou precisa de outro tipo de serviço? 
-                                 <a href="../pages/fornecedores.html" target="_blank" class="btn btn-info" 
-                                    style="text-decoration: none; display: inline-block; padding: 5px 10px; font-size:0.8em; color:white; background-color: var(--primary); border-radius:4px;">
-                                    Gerenciar Fornecedores
-                                 </a>
-                            </p>
-                        </div>
+                <div class="supplier-section">
+                    <h3 class="preview-title">Notificar Fornecedor</h3>
+                    <div class="form-group">
+                        <label for="supplier-select-chamado" class="form-label">Selecione um fornecedor para cotação:</label>
+                        <select class="form-select" id="supplier-select-chamado"><option value="">Nenhum (apenas registrar)</option></select>
                     </div>
-                    <button class="whatsapp-btn" id="send-whatsapp-btn-chamado" disabled><i class="fab fa-whatsapp"></i> Enviar via WhatsApp</button>
+                    <button class="whatsapp-btn" id="send-whatsapp-btn" disabled><i class="fab fa-whatsapp"></i> Enviar Pedido de Orçamento</button>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" id="back-to-form-btn-chamado">Voltar</button>
-                    <button type="button" class="btn btn-primary" id="confirm-ticket-btn-chamado">Confirmar Chamado</button>
+                    <button type="button" class="btn btn-primary" id="confirm-ticket-btn-chamado">Salvar Chamado</button>
                 </div>
             </div>
         </div>
@@ -172,43 +108,14 @@
         <div id="scheduledVisitModal" class="modal-overlay hidden">
             <div class="modal-container">
                 <button class="modal-close-x modal-dynamic-close" data-modal-id="scheduledVisitModal">&times;</button>
-                <h2 class="modal-title" id="scheduledVisitModalTitle">Programar Nova Visita Técnica</h2>
-                <form id="scheduledVisitForm">
+                <h2 class="modal-title" id="scheduledVisitModalTitle">Programar Nova Visita</h2>
+                <form id="scheduledVisitForm" novalidate>
                     <input type="hidden" id="scheduledVisitId">
-                    <div class="form-group">
-                        <label class="form-label" for="visitSupplier">Fornecedor (com contrato):</label>
-                        <select class="form-select" id="visitSupplier" required>
-                            <option value="" selected disabled>Selecione...</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="visitDateTime">Data e Hora da Visita:</label>
-                        <input type="datetime-local" class="form-control" id="visitDateTime" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="visitDescription">Descrição/Anotações da Visita:</label>
-                        <textarea class="form-control" id="visitDescription" placeholder="Ex: Manutenção preventiva do gerador, verificar contrato..." required rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="visitRecurrence">Recorrência:</label>
-                        <select class="form-select" id="visitRecurrence" required>
-                            <option value="none" selected>Não Repetir</option>
-                            <option value="daily">Diariamente</option>
-                            <option value="weekly">Semanalmente</option>
-                            <option value="biweekly">Quinzenalmente</option>
-                            <option value="monthly">Mensalmente</option>
-                            <option value="bimonthly">Bimestralmente</option>
-                            <option value="quarterly">Trimestralmente</option>
-                            <option value="semiannually">Semestralmente</option>
-                            <option value="annually">Anualmente</option>
-                            <option value="custom">Customizado</option>
-                        </select>
-                         <input type="text" class="form-control hidden" id="visitCustomRecurrenceValue" placeholder="Ex: 7 dias, 2 meses, 1 ano" style="margin-top: 8px;">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="scheduledVisitModal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary" id="saveScheduledVisitBtn">Salvar Agendamento</button>
-                    </div>
+                    <div class="form-group"><label class="form-label" for="visitSupplier">Fornecedor (com contrato)</label><select class="form-select" id="visitSupplier" required><option value="" selected disabled>Selecione...</option></select></div>
+                    <div class="form-group"><label class="form-label" for="visitDateTime">Data e Hora</label><input type="datetime-local" class="form-control" id="visitDateTime" required></div>
+                    <div class="form-group"><label class="form-label" for="visitDescription">Descrição/Anotações</label><textarea class="form-control" id="visitDescription" placeholder="Ex: Manutenção preventiva..." required rows="3"></textarea></div>
+                    <div class="form-group"><label class="form-label" for="visitRecurrence">Recorrência</label><select class="form-select" id="visitRecurrence" required><option value="none" selected>Não Repetir</option><option value="weekly">Semanalmente</option><option value="monthly">Mensalmente</option><option value="bimonthly">Bimestralmente</option><option value="quarterly">Trimestralmente</option><option value="semiannually">Semestralmente</option><option value="annually">Anualmente</option></select></div>
+                    <div class="form-actions"><button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="scheduledVisitModal">Cancelar</button><button type="submit" class="btn btn-primary" id="saveScheduledVisitBtn">Salvar</button></div>
                 </form>
             </div>
         </div>
@@ -217,24 +124,18 @@
             <div class="modal-container" style="max-width: 500px;">
                 <button class="modal-close-x modal-dynamic-close" data-modal-id="markVisitDoneModal">&times;</button>
                 <h2 class="modal-title">Marcar Visita como Realizada</h2>
-                <form id="markVisitDoneForm">
+                <form id="markVisitDoneForm" novalidate>
                     <input type="hidden" id="markDoneVisitId">
-                    <div class="form-group">
-                        <p><strong>Fornecedor:</strong> <span id="markDoneSupplierName"></span></p>
-                        <p><strong>Agendado para:</strong> <span id="markDoneVisitScheduledDate"></span></p>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="realizationNotes">Observações da Realização (Opcional):</label>
-                        <textarea class="form-control" id="realizationNotes" placeholder="Ex: Serviço concluído com sucesso, técnico João." rows="3"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="markVisitDoneModal">Cancelar</button>
-                        <button type="submit" class="btn btn-success">Confirmar Realização</button>
-                    </div>
+                    <div class="form-group"><p><strong>Fornecedor:</strong> <span id="markDoneSupplierName"></span></p><p><strong>Agendado para:</strong> <span id="markDoneVisitScheduledDate"></span></p></div>
+                    <div class="form-group"><label class="form-label" for="realizationNotes">Observações (Opcional)</label><textarea class="form-control" id="realizationNotes" placeholder="Ex: Serviço concluído." rows="3"></textarea></div>
+                    <div class="form-actions"><button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="markVisitDoneModal">Cancelar</button><button type="submit" class="btn btn-success">Confirmar Realização</button></div>
                 </form>
             </div>
         </div>
-        <script src="../script/manutencao.js"></script>
+    </div>
+    
+    <script type="module" src="../script/manutencao.js"></script>
+    
     <script>
         const navbarToggle = document.getElementById('navbar-toggle');
         const navbarDropdown = document.getElementById('navbar-dropdown');

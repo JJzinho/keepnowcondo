@@ -11,76 +11,66 @@
 </head>
 <body>
     <div class="app-bar">
-        <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
-            <i class="material-icons">arrow_back</i>
-        </button>
-         <a href="../condo.html" class="app-bar-logo-link">
-             <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo">
-         </a>
-         <h1 class="app-bar-title" style="display: none;"></h1>
-         <div class="app-bar-nav-container">
-              <div class="navbar-container">
-                  <button class="navbar-toggle" id="navbar-toggle">
-                      <i class="material-icons">menu</i>
-                  </button>
-                  <div class="navbar-dropdown" id="navbar-dropdown">
-                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
-                          <i class="material-icons">account_circle</i>
-                          <span>Perfil</span>
-                      </a>
-                      <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
-                          <i class="material-icons">notifications</i>
-                          <span>Notificações</span>
-                          <span class="notification-badge" style="display: none;"></span>
-                      </a>
-                      <a href="./configuracoes.html" class="navbar-item">
-                          <i class="material-icons">settings</i>
-                          <span>Configurações</span>
-                      </a>
-                  </div>
-              </div>
-          </div>
+        <button class="app-bar-back-button" onclick="history.back();"><i class="material-icons">arrow_back</i></button>
+        <a href="../condo.html" class="app-bar-logo-link"><img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo"></a>
+        <h1 class="app-bar-title" style="display: none;"></h1>
+        <div class="app-bar-nav-container">
+            <div class="navbar-container">
+                <button class="navbar-toggle" id="navbar-toggle"><i class="material-icons">menu</i></button>
+                <div class="navbar-dropdown" id="navbar-dropdown">
+                    <a href="#" class="navbar-item disabled"><i class="material-icons">account_circle</i><span>Perfil</span></a>
+                    <a href="./notificacoes.html" class="navbar-item"><i class="material-icons">notifications</i><span>Notificações</span><span class="notification-badge" style="display: none;"></span></a>
+                    <a href="./configuracoes.html" class="navbar-item"><i class="material-icons">settings</i><span>Configurações</span></a>
+                </div>
+            </div>
+        </div>
     </div>
+
     <div class="header-container">
         <h1 class="page-title">Meus Chamados</h1>
-
+        <button id="generate-report-btn" class="report-button"><i class="material-icons">assessment</i> Gerar Relatório de Arquivados</button>
         <div class="tab-nav">
-            <button class="tab-button active" data-tab="pendente">Pendentes <span class="tab-count"></span></button>
-            <button class="tab-button" data-tab="andamento">Em Andamento <span class="tab-count"></span></button>
-            <button class="tab-button" data-tab="concluido">Concluídos <span class="tab-count"></span></button>
-            <button class="tab-button" data-tab="arquivado">Arquivados <span class="tab-count"></span></button>
+            <button class="tab-button active" data-tab="PENDENTE">Pendentes <span class="tab-count" data-count-for="PENDENTE">0</span></button>
+            <button class="tab-button" data-tab="EM ANDAMENTO">Em Andamento <span class="tab-count" data-count-for="EM ANDAMENTO">0</span></button>
+            <button class="tab-button" data-tab="CONCLUIDO">Concluídos <span class="tab-count" data-count-for="CONCLUIDO">0</span></button>
+            <button class="tab-button" data-tab="ARQUIVADO">Arquivados <span class="tab-count" data-count-for="ARQUIVADO">0</span></button>
         </div>
-
+    </div>
+    
+    <main class="content-container">
         <div class="tab-content">
-            <div id="pendente-list" class="tab-pane active">
-                <div class="status-message">Carregando chamados pendentes...</div>
-            </div>
+            <div id="tab-PENDENTE" class="tab-pane active"></div>
+            <div id="tab-EM ANDAMENTO" class="tab-pane"></div>
+            <div id="tab-CONCLUIDO" class="tab-pane"></div>
+            <div id="tab-ARQUIVADO" class="tab-pane"></div>
+        </div>
+    </main>
 
-            <div id="andamento-list" class="tab-pane">
-                <div class="status-message">Carregando chamados em andamento...</div>
+    <!-- Modal para Detalhes e Ações do Chamado -->
+    <div id="ticket-detail-modal" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-ticket-title">Detalhes do Chamado</h3>
+                <button type="button" class="modal-close-x">&times;</button>
             </div>
-
-            <div id="concluido-list" class="tab-pane">
-                <div class="status-message">Carregando chamados concluídos...</div>
+            <div class="modal-body" id="modal-ticket-body">
+                <!-- Conteúdo dinâmico será injetado aqui -->
             </div>
-
-            <div id="arquivado-list" class="tab-pane">
-                <div class="status-message">Carregando chamados arquivados...</div>
+            <div class="modal-footer" id="modal-ticket-footer">
+                <!-- Ações dinâmicas serão injetadas aqui -->
             </div>
         </div>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
-    <script src="../script/dados.js"></script>
-    <script src="../script/chamados.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module" src="../script/supabaseClient.js"></script>
+    <script type="module" src="../script/chamados.js"></script>
     <script>
         const navbarToggle = document.getElementById('navbar-toggle');
         const navbarDropdown = document.getElementById('navbar-dropdown');
         if (navbarToggle && navbarDropdown) {
-            navbarToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                navbarDropdown.classList.toggle('show');
-            });
+            navbarToggle.addEventListener('click', (e) => { e.stopPropagation(); navbarDropdown.classList.toggle('show'); });
             document.addEventListener('click', (e) => {
                 if (navbarToggle && navbarDropdown && !navbarToggle.contains(e.target) && !navbarDropdown.contains(e.target)) {
                     navbarDropdown.classList.remove('show');

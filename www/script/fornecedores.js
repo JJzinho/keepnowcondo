@@ -1,187 +1,306 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Elementos da Seção Superior (Gerenciamento de Tipos de Ocorrência)
-    const newOccurrenceTypeNameInput = document.getElementById('new-occurrence-type-name-input');
-    const addNewGlobalOccurrenceTypeBtn = document.getElementById('add-new-global-occurrence-type-btn');
-    const allOccurrencesListDisplay = document.getElementById('all-occurrences-list-display');
+import { supabase } from './supabaseClient.js';
 
-    // Elementos da Seção Inferior (Gerenciamento de Fornecedores)
-    const suppliersListContainer = document.getElementById('suppliers-list-container');
-    const openAddSupplierModalBtn = document.getElementById('open-add-supplier-modal-btn');
-
-    // Elementos do Modal e Formulário de Fornecedor
-    const supplierFormModal = document.getElementById('supplier-form-modal');
-    const supplierModalTitle = document.getElementById('supplier-modal-title');
-    const closeSupplierModalBtn = document.getElementById('close-supplier-modal-btn');
-    const supplierForm = document.getElementById('form-fornecedor');
-    
-    const supplierIdInput = document.getElementById('supplier-id');
-    const supplierNameInput = document.getElementById('supplier-name-modal');
-    const supplierCnpjInput = document.getElementById('supplier-cnpj-modal');
-    const supplierPhoneInput = document.getElementById('supplier-phone-modal');
-    const supplierMainOccurrenceInput = document.getElementById('supplier-main-occurrence-modal');
-    const supplierHasContractInput = document.getElementById('supplier-has-contract-modal');
-    const cancelEditBtnModal = document.getElementById('cancel-edit-supplier-btn-modal');
-
-    const STORAGE_KEY_SUPPLIERS = 'condoSuppliersChamado_manutencao';
-    const STORAGE_KEY_OCCURRENCE_TYPES = 'condoAllOccurrenceTypes_v1';
-
-    let suppliers = [];
-    let allKnownOccurrenceTypes = [];
-
-    const PREDEFINED_OCCURRENCES = [
-        { key: "Hidrossanitario", name: "Sistema Hidrossanitário" },
-    { key: "ProtecaoIncendio", name: "Sistema de Proteção e Combate Contra Incêndio" },
-    { key: "InstalacoesEletricas", name: "Sistema de Instalações Elétricas" },
-    { key: "Climatizacao", name: "Climatização" },
-    { key: "InstalacoesGas", name: "Instalações de Gás" },
-    { key: "Impermeabilizacoes", name: "Impermeabilizações" },
-    { key: "SistemasCivis", name: "Sistemas Civis (Estrutura, Contenção, Divisórias)" },
-    { key: "Esquadrias", name: "Esquadrias (Portas, Janelas)" },
-    { key: "Revestimentos", name: "Revestimentos (Pisos, Fachadas, Pintura)" },
-    { key: "Forros", name: "Forros" },
-    { key: "Vidros", name: "Vidros e Guarda-corpos" },
-    { key: "CoberturaTelhado", name: "Cobertura / Telhado" },
-    { key: "Logistica", name: "Logística (Estacionamento, Garagens, Heliponto)" },
-    { key: "PaisagismoLazer", name: "Paisagismo e Lazer" },
-    { key: "Pavimentacao", name: "Pavimentação" },
-    { key: "TelecomunicacoesCabeamento", name: "Sistemas de Telecomunicações e Cabeamentos" },
-    { key: "Decoracao", name: "Decoração e Mobiliário" },
-    { key: "Elevador", name: "Elevador" },
-    { key: "Gerador", name: "Gerador" },
-    { key: "SegurancaEletronica", name: "Segurança Eletrônica (CFTV, Alarmes, Cerca)" },
-    { key: "Outros", name: "Geral / Outros" }
+// Lista de ocorrências padrão que serão a base para cada condomínio.
+const PREDEFINED_OCCURRENCES = [
+    { chave: "hidrossanitario", nome: "Sistema Hidrossanitário" },
+    { chave: "protecao_incendio", nome: "Sistema de Proteção e Combate a Incêndio" },
+    { chave: "instalacoes_eletricas", nome: "Sistema de Instalações Elétricas" },
+    { chave: "climatizacao", nome: "Climatização" },
+    { chave: "instalacoes_gas", nome: "Instalações de Gás" },
+    { chave: "impermeabilizacoes", nome: "Impermeabilizações" },
+    { chave: "sistemas_civis", nome: "Sistemas Civis (Estrutura, Contenção)" },
+    { chave: "esquadrias", nome: "Esquadrias (Portas, Janelas)" },
+    { chave: "revestimentos", nome: "Revestimentos (Pisos, Fachadas, Pintura)" },
+    { chave: "elevador", nome: "Elevador" },
+    { chave: "gerador", nome: "Gerador" },
+    { chave: "seguranca_eletronica", nome: "Segurança Eletrônica (CFTV, Alarmes)" },
+    { chave: "telecomunicacoes", nome: "Telecomunicações e Cabeamento" },
+    { chave: "paisagismo_lazer", nome: "Paisagismo e Lazer" },
+    { chave: "outros", nome: "Geral / Outros" }
 ];
 
-    // --- Funções de Máscara ---
-    const maskPhone = (value) => { if (!value) return ""; value = value.replace(/\D/g, ''); value = value.substring(0, 11); if (value.length > 2) { value = '(' + value.substring(0, 2) + ') ' + value.substring(2); } if (value.length > 9) { value = value.substring(0, 9) + '-' + value.substring(9); } else if (value.length > 5 && value.length <=9 ) { value = value.substring(0,8) + '-' + value.substring(8); } return value; };
-    const maskCnpj = (value) => { if (!value) return ""; value = value.replace(/\D/g, ''); value = value.substring(0, 14); if (value.length > 12) { value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2}).*/, '$1.$2.$3/$4-$5'); } else if (value.length > 8) { value = value.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/, '$1.$2.$3/$4'); } else if (value.length > 5) { value = value.replace(/^(\d{2})(\d{3})(\d{0,3}).*/, '$1.$2.$3'); } else if (value.length > 2) { value = value.replace(/^(\d{2})(\d{0,3}).*/, '$1.$2'); } return value; };
+let state = {
+    condoId: null,
+    suppliers: [],
+    occurrenceTypes: []
+};
 
-    if (supplierPhoneInput) supplierPhoneInput.addEventListener('input', (e) => e.target.value = maskPhone(e.target.value));
-    if (supplierCnpjInput) supplierCnpjInput.addEventListener('input', (e) => e.target.value = maskCnpj(e.target.value));
+// --- FUNÇÕES DE INICIALIZAÇÃO ---
+async function initializePage() {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+        window.location.replace('/www/index.html');
+        return;
+    }
 
-    // --- Funções Utilitárias (Dados) ---
-    const loadData = (key, defaultVal = []) => { const d = localStorage.getItem(key); try { return d ? JSON.parse(d) : defaultVal; } catch (e) { console.error(`Error loading ${key}:`, e); return defaultVal; }};
-    const saveData = (key, data) => { try { localStorage.setItem(key, JSON.stringify(data)); } catch (e) { console.error(`Error saving ${key}:`, e); }};
-    const loadSuppliersFromStorage = () => loadData(STORAGE_KEY_SUPPLIERS);
-    const saveSuppliersToStorage = (suppliersToSave) => saveData(STORAGE_KEY_SUPPLIERS, suppliersToSave);
-    const cleanInputForStorage = (value = '') => String(value).replace(/\D/g, '');
-    const formatPhoneForDisplay = (phone) => { const cleaned = cleanInputForStorage(phone); if (!cleaned) return "N/A"; if (cleaned.startsWith('55') && cleaned.length >= 12) { const ddd = cleaned.substring(2, 4); const numberPart = cleaned.substring(4); if (numberPart.length === 9) return `+55 (${ddd}) ${numberPart.substring(0, 5)}-${numberPart.substring(5)}`; if (numberPart.length === 8) return `+55 (${ddd}) ${numberPart.substring(0, 4)}-${numberPart.substring(4)}`; } if (cleaned.length === 11) return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`; if (cleaned.length === 10) return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 6)}-${cleaned.substring(6)}`; return phone; };
-    const formatCnpjForDisplay = (cnpj) => { const cleaned = cleanInputForStorage(cnpj); if (!cleaned || cleaned.length !== 14) return cnpj; return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5'); };
-    const getOccurrenceNameByKey = (key) => { const known = allKnownOccurrenceTypes.find(o => o.key === key); return known ? known.name : key; };
+    state.condoId = sessionStorage.getItem('selectedCondoId');
+    if (!state.condoId) {
+        alert('Condomínio não selecionado!');
+        window.location.replace('/www/inicio.html');
+        return;
+    }
 
-    // --- Gerenciamento de Tipos de Ocorrências Globais ---
-    const loadAllKnownOccurrences = () => { let storedTypes = loadData(STORAGE_KEY_OCCURRENCE_TYPES, []); let initialTypes = [...PREDEFINED_OCCURRENCES]; if (Array.isArray(storedTypes) && storedTypes.every(item => typeof item === 'object' && item.key && item.name)) { storedTypes.forEach(st => { if (!initialTypes.some(it => it.key === st.key)) { initialTypes.push(st); } }); } allKnownOccurrenceTypes = initialTypes.sort((a, b) => a.name.localeCompare(b.name)); saveData(STORAGE_KEY_OCCURRENCE_TYPES, allKnownOccurrenceTypes); };
-    const renderAllKnownOccurrencesDisplay = () => { if (!allOccurrencesListDisplay) return; allOccurrencesListDisplay.innerHTML = ''; if (allKnownOccurrenceTypes.length === 0) { allOccurrencesListDisplay.innerHTML = '<p>Nenhum tipo de ocorrência cadastrado.</p>'; return; } const ul = document.createElement('ul'); allKnownOccurrenceTypes.forEach(occType => { const li = document.createElement('li'); li.textContent = occType.name; const isPredefined = PREDEFINED_OCCURRENCES.some(po => po.key === occType.key); if (!isPredefined) { const removeBtn = document.createElement('button'); removeBtn.innerHTML = '&times;'; removeBtn.className = 'remove-global-occurrence-btn'; removeBtn.title = `Remover tipo "${occType.name}"`; removeBtn.onclick = () => handleDeleteGlobalOccurrenceType(occType.key); li.appendChild(removeBtn); } ul.appendChild(li); }); allOccurrencesListDisplay.appendChild(ul); };
-    const populateOccurrenceSelect = (selectElement, includeDefaultOption = true, defaultOptionText = "Selecione...", selectedKey = null) => { if (!selectElement) return; const currentVal = selectedKey || selectElement.value; selectElement.innerHTML = ''; if (includeDefaultOption) { selectElement.add(new Option(defaultOptionText, "")); } allKnownOccurrenceTypes.forEach(occType => { selectElement.add(new Option(occType.name, occType.key)); }); if (selectedKey && allKnownOccurrenceTypes.some(o => o.key === selectedKey)) { selectElement.value = selectedKey; } else if (allKnownOccurrenceTypes.some(o => o.key === currentVal)) { selectElement.value = currentVal; } else if (includeDefaultOption) { selectElement.value = ""; }};
-    const populateMainOccurrenceSelectInModal = (selectedKey = null) => { populateOccurrenceSelect(supplierMainOccurrenceInput, true, "Selecione o serviço principal...", selectedKey); };
-    const handleAddNewGlobalOccurrenceType = () => { const newOccName = newOccurrenceTypeNameInput.value.trim(); if (!newOccName) { alert("Por favor, digite o nome para o novo tipo de ocorrência."); newOccurrenceTypeNameInput.focus(); return; } const newOccKey = newOccName.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''); if (!newOccKey) { alert("Nome da ocorrência inválido. Use letras e números."); return; } if (allKnownOccurrenceTypes.some(occ => occ.key === newOccKey || occ.name.toLowerCase() === newOccName.toLowerCase())) { alert("Este tipo de ocorrência (nome ou chave gerada) já existe."); return; } allKnownOccurrenceTypes.push({ key: newOccKey, name: newOccName }); allKnownOccurrenceTypes.sort((a,b) => a.name.localeCompare(b.name)); saveData(STORAGE_KEY_OCCURRENCE_TYPES, allKnownOccurrenceTypes); renderAllKnownOccurrencesDisplay(); populateMainOccurrenceSelectInModal(); newOccurrenceTypeNameInput.value = ''; alert(`Novo tipo de ocorrência "${newOccName}" cadastrado com sucesso!`); };
-    const handleDeleteGlobalOccurrenceType = (keyToDelete) => { if (PREDEFINED_OCCURRENCES.some(po => po.key === keyToDelete)) { alert("Ocorrências predefinidas não podem ser excluídas."); return; } if (confirm(`Tem certeza que deseja excluir o tipo de ocorrência "${getOccurrenceNameByKey(keyToDelete)}"? Esta ação não pode ser desfeita e pode afetar fornecedores existentes.`)) { allKnownOccurrenceTypes = allKnownOccurrenceTypes.filter(occ => occ.key !== keyToDelete); saveData(STORAGE_KEY_OCCURRENCE_TYPES, allKnownOccurrenceTypes); renderAllKnownOccurrencesDisplay(); populateMainOccurrenceSelectInModal(); } };
-    if (addNewGlobalOccurrenceTypeBtn) addNewGlobalOccurrenceTypeBtn.addEventListener('click', handleAddNewGlobalOccurrenceType);
+    setupEventListeners();
+    await loadInitialData();
+}
 
-    // --- Renderização da Tabela de Fornecedores ---
-    const renderSuppliersTable = () => {
-        suppliersListContainer.innerHTML = '';
-        if (suppliers.length === 0) { suppliersListContainer.innerHTML = '<p class="empty-list-message">Nenhum fornecedor cadastrado.</p>'; return; }
-        const table = document.createElement('table');
-        table.innerHTML = `<thead><tr><th>Nome</th><th>Telefone</th><th>Serviço Principal</th><th>Contrato?</th><th>CNPJ</th><th>Ações</th></tr></thead><tbody></tbody>`;
-        const tbody = table.querySelector('tbody');
-        suppliers.sort((a, b) => a.name.localeCompare(b.name)).forEach(supplier => {
-            const row = tbody.insertRow();
-            row.insertCell().textContent = supplier.name;
-            row.insertCell().textContent = formatPhoneForDisplay(supplier.phone);
-            row.insertCell().textContent = getOccurrenceNameByKey(supplier.mainOccurrence);
-            row.insertCell().textContent = supplier.hasContract ? 'Sim' : 'Não';
-            row.insertCell().textContent = supplier.cnpj ? formatCnpjForDisplay(supplier.cnpj) : 'N/A';
-            const actionsCell = row.insertCell(); actionsCell.className = 'actions-cell';
-            const editButton = document.createElement('button'); editButton.innerHTML = '<i class="material-icons">edit</i> Editar'; editButton.className = 'btn btn-secondary';
-            editButton.onclick = () => openSupplierModal(true, supplier.id); // Ajustado para chamar openSupplierModal
-            actionsCell.appendChild(editButton);
-            const deleteButton = document.createElement('button'); deleteButton.innerHTML = '<i class="material-icons">delete</i> Excluir'; deleteButton.className = 'btn btn-danger';
-            deleteButton.onclick = () => handleDeleteSupplier(supplier.id); // Ajustado para chamar handleDeleteSupplier
-            actionsCell.appendChild(deleteButton);
-        });
-        suppliersListContainer.appendChild(table);
-    };
+async function loadInitialData() {
+    // 1. Busca os tipos de ocorrência que JÁ EXISTEM no banco para este condomínio
+    let occurrencesRes = await supabase.from('tipo_ocorrencia').select('*').eq('condominio_id', state.condoId);
+    if (occurrencesRes.error) {
+        console.error("Erro ao buscar tipos de ocorrência:", occurrencesRes.error);
+        state.occurrenceTypes = [];
+    } else {
+        state.occurrenceTypes = occurrencesRes.data || [];
+    }
+
+    // 2. Verifica se precisa adicionar os tipos padrão (seeding)
+    const newItemsAdded = await seedDefaultOccurrences();
     
-    const handleDeleteSupplier = (id) => { 
-        if (confirm('Tem certeza que deseja excluir este fornecedor?')) { 
-            suppliers = suppliers.filter(s => s.id !== id); 
-            saveSuppliersToStorage(suppliers); 
-            renderSuppliersTable(); 
-        } 
-    };
+    // 3. Se novos itens foram adicionados, busca a lista novamente para ter os dados completos
+    if (newItemsAdded) {
+        occurrencesRes = await supabase.from('tipo_ocorrencia').select('*').eq('condominio_id', state.condoId);
+        if (occurrencesRes.error) console.error("Erro ao re-buscar tipos de ocorrência:", occurrencesRes.error);
+        state.occurrenceTypes = occurrencesRes.data || [];
+    }
+    
+    // 4. Busca os fornecedores
+    const suppliersRes = await supabase.from('fornecedor').select('*, tipo_ocorrencia(nome)').eq('condominio_id', state.condoId);
+    if (suppliersRes.error) {
+        console.error("Erro ao buscar fornecedores:", suppliersRes.error);
+    } else {
+        state.suppliers = suppliersRes.data || [];
+    }
 
-    // --- Modal e Formulário de Fornecedor ---
-    const openSupplierModal = (isEditMode = false, supplierIdToEdit = null) => {
-        supplierForm.reset();
-        supplierIdInput.value = '';
-        
-        populateMainOccurrenceSelectInModal(); // Popula o select de ocorrência principal no modal
+    // 5. Renderiza tudo na tela
+    renderAll();
+}
 
-        if (isEditMode && supplierIdToEdit) {
-            const supplier = suppliers.find(s => s.id === supplierIdToEdit);
-            if (!supplier) { alert("Fornecedor não encontrado para edição."); return; }
-            if(supplierModalTitle) supplierModalTitle.textContent = 'Editar Fornecedor';
-            supplierIdInput.value = supplier.id;
-            supplierNameInput.value = supplier.name;
-            supplierCnpjInput.value = supplier.cnpj ? maskCnpj(supplier.cnpj) : '';
-            supplierPhoneInput.value = supplier.phone ? maskPhone(cleanInputForStorage(supplier.phone)) : '';
-            supplierMainOccurrenceInput.value = supplier.mainOccurrence; // Define o valor do select
-            supplierHasContractInput.checked = supplier.hasContract || false;
-        } else {
-            if(supplierModalTitle) supplierModalTitle.textContent = 'Adicionar Novo Fornecedor';
+// **NOVA FUNÇÃO** para adicionar os tipos padrão se necessário
+async function seedDefaultOccurrences() {
+    const existingKeys = new Set(state.occurrenceTypes.map(o => o.chave));
+    
+    const occurrencesToInsert = PREDEFINED_OCCURRENCES
+        .filter(p => !existingKeys.has(p.chave))
+        .map(p => ({
+            condominio_id: state.condoId,
+            nome: p.nome,
+            chave: p.chave
+        }));
+
+    if (occurrencesToInsert.length > 0) {
+        console.log(`Adicionando ${occurrencesToInsert.length} tipos de serviço padrão...`);
+        const { error } = await supabase.from('tipo_ocorrencia').insert(occurrencesToInsert);
+        if (error) {
+            console.error("Erro ao inserir tipos de ocorrência padrão:", error);
+            return false;
         }
-        if(supplierFormModal) supplierFormModal.classList.remove('hidden');
-        if(supplierNameInput) supplierNameInput.focus();
-    };
+        return true; // Indica que novos itens foram adicionados
+    }
+    
+    return false; // Nenhum item novo foi adicionado
+}
 
-    const closeSupplierModal = () => {
-        if(supplierFormModal) supplierFormModal.classList.add('hidden');
-    };
 
-    if (openAddSupplierModalBtn) openAddSupplierModalBtn.addEventListener('click', () => openSupplierModal(false));
-    if (closeSupplierModalBtn) closeSupplierModalBtn.addEventListener('click', closeSupplierModal);
-    if (cancelEditBtnModal) cancelEditBtnModal.addEventListener('click', closeSupplierModal);
-    if (supplierFormModal) supplierFormModal.addEventListener('click', (e) => { if (e.target === supplierFormModal) closeSupplierModal(); });
-        
-    supplierForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const id = supplierIdInput.value ? parseInt(supplierIdInput.value) : Date.now();
-        const name = supplierNameInput.value.trim();
-        const cnpj = cleanInputForStorage(supplierCnpjInput.value.trim());
-        const phoneRaw = cleanInputForStorage(supplierPhoneInput.value.trim());
-        const mainOccurrence = supplierMainOccurrenceInput.value;
-        const hasContract = supplierHasContractInput.checked;
-
-        if (!name || !phoneRaw || !mainOccurrence) { alert('Nome, Telefone e Serviço Principal são obrigatórios.'); return; }
-        if (cnpj && cnpj.length !== 14 && cnpj.length !== 0) { alert('CNPJ inválido. Deve conter 14 dígitos ou ser deixado em branco.'); supplierCnpjInput.focus(); return; }
-        if (phoneRaw.length < 10 || phoneRaw.length > 11) { alert('Telefone inválido. Deve conter 10 ou 11 dígitos (com DDD).'); supplierPhoneInput.focus(); return; }
-
-        const phone = phoneRaw.startsWith('55') ? phoneRaw : `55${phoneRaw}`;
-        
-        const supplierData = {
-            id, name, cnpj, phone, mainOccurrence, hasContract
-            // additionalOccurrences não existe mais aqui
-        };
-        const existingIndex = suppliers.findIndex(s => s.id === id);
-        if (existingIndex > -1) {
-            suppliers[existingIndex] = supplierData;
-        } else {
-            if (suppliers.some(s => s.name.toLowerCase() === name.toLowerCase() || cleanInputForStorage(s.phone) === phone)) {
-                if (!confirm("Já existe um fornecedor com nome ou telefone similar. Deseja adicionar mesmo assim?")) return;
-            }
-            suppliers.push(supplierData);
-        }
-        saveSuppliersToStorage(suppliers);
-        renderSuppliersTable();
-        closeSupplierModal();
-    });
-    loadAllKnownOccurrences();
+function renderAll() {
     renderAllKnownOccurrencesDisplay();
-    populateMainOccurrenceSelectInModal(); // Popula o select no modal ao carregar
-    
-    suppliers = loadSuppliersFromStorage();
     renderSuppliersTable();
+    populateMainOccurrenceSelectInModal();
+}
+
+// --- CONFIGURAÇÃO DOS EVENT LISTENERS ---
+function setupEventListeners() {
+    const s = (selector) => document.querySelector(selector);
+
+    s('#add-new-occurrence-type-btn').addEventListener('click', handleAddNewOccurrenceType);
+    s('#open-add-supplier-modal-btn').addEventListener('click', () => openSupplierModal());
+    s('#close-supplier-modal-btn').addEventListener('click', closeSupplierModal);
+    s('#cancel-edit-supplier-btn-modal').addEventListener('click', closeSupplierModal);
+    s('#supplier-form-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'supplier-form-modal') closeSupplierModal();
+    });
+    s('#form-fornecedor').addEventListener('submit', handleSupplierFormSubmit);
+
+    IMask(s('#supplier-cnpj-modal'), { mask: '00.000.000/0000-00' });
+    IMask(s('#supplier-phone-modal'), { mask: '+{55} (00) 00000-0000' });
+}
+
+// --- GERENCIAMENTO DE TIPOS DE OCORRÊNCIA ---
+async function handleAddNewOccurrenceType() {
+    const nameInput = document.getElementById('new-occurrence-type-name-input');
+    const nome = nameInput.value.trim();
+    if (!nome) {
+        alert("Digite um nome para o novo tipo de serviço.");
+        return;
+    }
     
-    if(supplierNameInput) supplierNameInput.focus(); // Foco no primeiro campo da página, se visível, ou do modal ao abrir
-});
+    const chave = nome.toLowerCase().replace(/\s+/g, '_').replace(/[^\w-]+/g, '');
+
+    const { error } = await supabase.from('tipo_ocorrencia').insert([{
+        condominio_id: state.condoId,
+        nome,
+        chave
+    }]);
+
+    if (error) {
+        console.error("Erro ao adicionar tipo de ocorrência:", error);
+        alert(`Falha ao adicionar: ${error.message}`);
+    } else {
+        alert("Tipo de serviço adicionado com sucesso!");
+        nameInput.value = '';
+        await loadInitialData();
+    }
+}
+
+async function handleDeleteOccurrenceType(typeId, typeName) {
+    if (!confirm(`Tem certeza que deseja excluir o tipo "${typeName}"? Isso pode afetar fornecedores associados.`)) return;
+
+    const { error } = await supabase.from('tipo_ocorrencia').delete().eq('id', typeId);
+
+    if (error) {
+        console.error("Erro ao excluir tipo de ocorrência:", error);
+        alert(`Falha ao excluir: ${error.message}`);
+    } else {
+        alert("Tipo de serviço excluído.");
+        await loadInitialData();
+    }
+}
+
+function renderAllKnownOccurrencesDisplay() {
+    const container = document.getElementById('all-occurrences-list-display');
+    container.innerHTML = '';
+    if (state.occurrenceTypes.length === 0) {
+        container.innerHTML = '<p>Nenhum tipo de serviço cadastrado.</p>';
+        return;
+    }
+    const ul = document.createElement('ul');
+    state.occurrenceTypes.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(type => {
+        const li = document.createElement('li');
+        li.textContent = type.nome;
+        
+        // Verifica se a ocorrência é predefinida para decidir se mostra o botão de excluir
+        const isPredefined = PREDEFINED_OCCURRENCES.some(p => p.chave === type.chave);
+        if (!isPredefined) {
+            const removeBtn = document.createElement('button');
+            removeBtn.innerHTML = '&times;';
+            removeBtn.className = 'remove-global-occurrence-btn';
+            removeBtn.title = `Remover "${type.nome}"`;
+            removeBtn.onclick = () => handleDeleteOccurrenceType(type.id, type.nome);
+            li.appendChild(removeBtn);
+        }
+        ul.appendChild(li);
+    });
+    container.appendChild(ul);
+}
+
+
+// --- GERENCIAMENTO DE FORNECEDORES ---
+function renderSuppliersTable() {
+    const container = document.getElementById('suppliers-list-container');
+    container.innerHTML = '';
+    if (state.suppliers.length === 0) {
+        container.innerHTML = '<p class="empty-list-message">Nenhum fornecedor cadastrado.</p>';
+        return;
+    }
+    const table = document.createElement('table');
+    table.innerHTML = `<thead><tr><th>Nome</th><th>Telefone</th><th>Serviço Principal</th><th>Contrato?</th><th>CNPJ</th><th>Ações</th></tr></thead><tbody></tbody>`;
+    const tbody = table.querySelector('tbody');
+    state.suppliers.sort((a,b) => a.nome.localeCompare(b.nome)).forEach(supplier => {
+        const row = tbody.insertRow();
+        row.insertCell().textContent = supplier.nome;
+        row.insertCell().textContent = supplier.telefone;
+        row.insertCell().textContent = supplier.tipo_ocorrencia?.nome || 'N/A';
+        row.insertCell().textContent = supplier.possui_contrato ? 'Sim' : 'Não';
+        row.insertCell().textContent = supplier.cnpj || 'N/A';
+        const actionsCell = row.insertCell();
+        actionsCell.className = 'actions-cell';
+        actionsCell.innerHTML = `
+            <button class="btn btn-secondary edit-btn"><i class="material-icons">edit</i></button>
+            <button class="btn btn-danger delete-btn"><i class="material-icons">delete</i></button>
+        `;
+        actionsCell.querySelector('.edit-btn').onclick = () => openSupplierModal(supplier);
+        actionsCell.querySelector('.delete-btn').onclick = () => handleDeleteSupplier(supplier.id, supplier.nome);
+    });
+    container.appendChild(table);
+}
+
+function openSupplierModal(supplier = null) {
+    const form = document.getElementById('form-fornecedor');
+    form.reset();
+    document.getElementById('supplier-id').value = supplier ? supplier.id : '';
+    document.getElementById('supplier-modal-title').textContent = supplier ? 'Editar Fornecedor' : 'Adicionar Novo Fornecedor';
+    
+    populateMainOccurrenceSelectInModal(supplier ? supplier.servico_principal_id : '');
+
+    if (supplier) {
+        document.getElementById('supplier-name-modal').value = supplier.nome;
+        document.getElementById('supplier-cnpj-modal').value = supplier.cnpj || '';
+        document.getElementById('supplier-phone-modal').value = supplier.telefone || '';
+        document.getElementById('supplier-has-contract-modal').checked = supplier.possui_contrato;
+    }
+    document.getElementById('supplier-form-modal').classList.remove('hidden');
+}
+
+function closeSupplierModal() {
+    document.getElementById('supplier-form-modal').classList.add('hidden');
+}
+
+function populateMainOccurrenceSelectInModal(selectedId = null) {
+    const select = document.getElementById('supplier-main-occurrence-modal');
+    select.innerHTML = '<option value="">Selecione...</option>';
+    state.occurrenceTypes.forEach(type => {
+        const option = new Option(type.nome, type.id);
+        select.add(option);
+    });
+    if (selectedId) {
+        select.value = selectedId;
+    }
+}
+
+async function handleSupplierFormSubmit(e) {
+    e.preventDefault();
+    const id = document.getElementById('supplier-id').value;
+    const nome = document.getElementById('supplier-name-modal').value.trim();
+    if (!nome) {
+        alert("O nome do fornecedor é obrigatório.");
+        return;
+    }
+
+    const supplierData = {
+        id: id || undefined,
+        condominio_id: state.condoId,
+        nome,
+        cnpj: document.getElementById('supplier-cnpj-modal').value || null,
+        telefone: document.getElementById('supplier-phone-modal').value || null,
+        servico_principal_id: document.getElementById('supplier-main-occurrence-modal').value || null,
+        possui_contrato: document.getElementById('supplier-has-contract-modal').checked
+    };
+
+    const { error } = await supabase.from('fornecedor').upsert(supplierData);
+
+    if (error) {
+        console.error("Erro ao salvar fornecedor:", error);
+        alert(`Falha ao salvar: ${error.message}`);
+    } else {
+        alert("Fornecedor salvo com sucesso!");
+        closeSupplierModal();
+        await loadInitialData();
+    }
+}
+
+async function handleDeleteSupplier(id, name) {
+    if (!confirm(`Tem certeza que deseja excluir o fornecedor "${name}"?`)) return;
+
+    const { error } = await supabase.from('fornecedor').delete().eq('id', id);
+
+    if (error) {
+        console.error("Erro ao excluir fornecedor:", error);
+        alert(`Falha ao excluir: ${error.message}`);
+    } else {
+        alert("Fornecedor excluído!");
+        await loadInitialData();
+    }
+}
+
+// --- INICIALIZA A PÁGINA ---
+document.addEventListener('DOMContentLoaded', initializePage);

@@ -106,19 +106,35 @@ function updateCondoDataOnUI(data) {
 }
 
 
-// --- RENDERIZAÇÃO DE LOCALIZAÇÃO ---
+// --- RENDERIZAÇÃO DE LOCALIZAÇÃO (ATUALIZADO) ---
 function renderLocationConfigForDisplayUI(configData, containerElement) {
-    if (!configData || !containerElement) {
-        if (containerElement) containerElement.innerHTML = '<p>Configuração de localização não definida.</p>';
+    if (!configData || !configData.pavimentos || configData.pavimentos.length === 0) {
+        if (containerElement) containerElement.innerHTML = '<p>Nenhuma configuração de localização definida.</p>';
         return;
     }
-    let html = '<ul>';
-    if (configData.categorias) {
-        for (const cat in configData.categorias) {
-            html += `<li><strong>${cat}</strong></li>`;
+
+    let html = '';
+    configData.pavimentos.forEach(pav => {
+        html += `<div class="pavimento-display-group">`;
+        html += `<h4>${pav.nome}</h4>`;
+        if (pav.sublocais && pav.sublocais.length > 0) {
+            html += `<ul class="sublocal-display-list">`;
+            pav.sublocais.forEach(sub => {
+                html += `<li><strong>${sub.nome}</strong>`;
+                if (sub.equipamentos && sub.equipamentos.length > 0) {
+                    html += `<ul class="equipamento-display-list">`;
+                    sub.equipamentos.forEach(eq => {
+                        html += `<li>${eq.nome} (Qtde: ${eq.quantidade})</li>`;
+                    });
+                    html += `</ul>`;
+                }
+                html += `</li>`;
+            });
+            html += `</ul>`;
         }
-    }
-    html += '</ul>';
+        html += `</div>`;
+    });
+
     containerElement.innerHTML = html;
 }
 

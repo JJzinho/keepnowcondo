@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fornecedores e Ocorrências</title>
+    <title>Fornecedores e Serviços</title>
     <link rel="stylesheet" href="../styles/app-bar.css">
     <link rel="stylesheet" href="../styles/fornecedores.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -18,52 +18,42 @@
          </a>
          <h1 class="app-bar-title" style="display: none;"></h1>
          <div class="app-bar-nav-container">
-              <div class="navbar-container">
-                  <button class="navbar-toggle" id="navbar-toggle">
-                      <i class="material-icons">menu</i>
-                  </button>
-                  <div class="navbar-dropdown" id="navbar-dropdown">
-                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
-                          <i class="material-icons">account_circle</i>
-                          <span>Perfil</span>
-                      </a>
-                      <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
-                          <i class="material-icons">notifications</i>
-                          <span>Notificações</span>
-                          <span class="notification-badge" style="display: none;"></span>
-                      </a>
-                      <a href="./configuracoes.html" class="navbar-item">
-                          <i class="material-icons">settings</i>
-                          <span>Configurações</span>
-                      </a>
-                  </div>
-              </div>
-          </div>
+             <div class="navbar-container">
+                 <button class="navbar-toggle" id="navbar-toggle">
+                     <i class="material-icons">menu</i>
+                 </button>
+                 <div class="navbar-dropdown" id="navbar-dropdown">
+                     <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada"><i class="material-icons">account_circle</i><span>Perfil</span></a>
+                     <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada"><i class="material-icons">notifications</i><span>Notificações</span><span class="notification-badge" style="display: none;"></span></a>
+                     <a href="./configuracoes.html" class="navbar-item"><i class="material-icons">settings</i><span>Configurações</span></a>
+                 </div>
+             </div>
+         </div>
     </div>
 
     <div class="container fornecedores-admin-container" style= "margin-top: 20px;">
         
         <div id="occurrences-management-section" class="occurrences-management-card">
-            <h2>Gerenciar Tipos de Ocorrência/Serviço</h2>
+            <h2>Gerenciar Tipos de Serviço/Sistema</h2>
             <div class="form-group">
-                <label for="new-occurrence-type-name-input">Nome do Novo Tipo de Ocorrência:</label>
+                <label for="new-occurrence-type-name-input">Nome do Novo Tipo de Serviço:</label>
                 <div class="custom-occurrence-input-group">
-                    <input type="text" id="new-occurrence-type-name-input" placeholder="Ex: Conserto de Portão Eletrônico">
-                    <button type="button" class="btn btn-success" id="add-new-global-occurrence-type-btn">
+                    <input type="text" id="new-occurrence-type-name-input" placeholder="Ex: Elétrica, Hidráulica, Elevadores...">
+                    <button type="button" class="btn btn-success" id="add-new-occurrence-type-btn">
                         <i class="material-icons">add_circle_outline</i> Cadastrar Tipo
                     </button>
                 </div>
             </div>
             <div class="form-group">
-                <label>Tipos de Ocorrência Registrados no Sistema:</label>
+                <label>Tipos de Serviço Registrados:</label>
                 <div id="all-occurrences-list-display" class="all-occurrences-display-area">
-                    <p>Carregando ocorrências...</p>
+                    <p>Carregando...</p>
                     </div>
             </div>
         </div>
 
         <div id="suppliers-management-section">
-            <h2>Gerenciar Fornecedores de Manutenção</h2>
+            <h2>Gerenciar Fornecedores</h2>
             
             <div class="lista-fornecedores-card">
                 <h3>Fornecedores Cadastrados</h3>
@@ -86,34 +76,23 @@
                 <button type="button" class="modal-close-x" id="close-supplier-modal-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="form-fornecedor">
+                <form id="form-fornecedor" novalidate>
                     <input type="hidden" id="supplier-id">
-                    <div class="form-group">
-                        <label for="supplier-name-modal">Nome do Fornecedor:</label>
-                        <input type="text" id="supplier-name-modal" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="supplier-cnpj-modal">CNPJ (opcional):</label>
-                        <input type="text" id="supplier-cnpj-modal">
-                    </div>
-                    <div class="form-group">
-                        <label for="supplier-phone-modal">Telefone:</label>
-                        <input type="tel" id="supplier-phone-modal" required>
-                    </div>
+                    <div class="form-group"><label for="supplier-name-modal">Nome do Fornecedor*</label><input type="text" id="supplier-name-modal" required></div>
+                    <div class="form-group"><label for="supplier-cnpj-modal">CNPJ (opcional)</label><input type="text" id="supplier-cnpj-modal"></div>
+                    <div class="form-group"><label for="supplier-phone-modal">Telefone*</label><input type="tel" id="supplier-phone-modal" required></div>
 
                     <fieldset class="occurrences-fieldset">
                         <legend>Serviço Principal</legend>
                         <div class="form-group">
-                            <label for="supplier-main-occurrence-modal">Serviço Principal / Ocorrência Padrão (para Contrato):</label>
-                            <select id="supplier-main-occurrence-modal" required>
-                                <option value="">Selecione...</option>
-                                </select>
+                            <label for="supplier-main-occurrence-modal">Serviço Principal / Ocorrência Padrão*</label>
+                            <select id="supplier-main-occurrence-modal" required><option value="">Selecione...</option></select>
                         </div>
                     </fieldset>
 
                     <div class="form-group form-check" style="margin-top: 15px;">
                         <input type="checkbox" id="supplier-has-contract-modal">
-                        <label for="supplier-has-contract-modal" class="form-check-label">Possui Contrato Vigente (vinculado ao Serviço Principal)?</label>
+                        <label for="supplier-has-contract-modal" class="form-check-label">Possui Contrato Vigente?</label>
                     </div>
 
                     <div class="form-actions">
@@ -124,8 +103,9 @@
             </div>
         </div>
     </div>
-
-    <script src="../script/fornecedores.js"></script>
+    
+    <script src="https://unpkg.com/imask"></script>
+    <script type="module" src="../script/fornecedores.js"></script>
     <script>
         const navbarToggle = document.getElementById('navbar-toggle');
         const navbarDropdown = document.getElementById('navbar-dropdown');

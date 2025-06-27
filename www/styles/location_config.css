@@ -1,175 +1,284 @@
-/* Styles for Location Configuration within Modal (index.css or new file) */
+/* www/styles/location_config.css */
 
-#location-config-in-modal {
-    margin-top: 20px;
-    padding-top: 15px;
-    border-top: 2px solid var(--primary);
+#location-config-wrapper {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 1rem;
 }
 
-#location-config-in-modal .modal-section-title i.material-icons {
-    font-size: 1.2em;
-    margin-right: 8px;
-    vertical-align: bottom;
+.location-config-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; 
 }
 
-#location-config-content-wrapper {
-    max-height: 60vh; /* Altura máxima para o conteúdo da configuração */
-    overflow-y: auto;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: var(--ff-border-radius);
-    border: 1px solid var(--alternate);
+.location-action-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    flex-grow: 1; 
+}
+.location-action-btn.secondary {
+    background-color: #FF7000;
+}
+.location-action-btn:hover {
+    background-color: #0069d9;
+}
+.location-action-btn.secondary:hover {
+    background-color: #FF7000;
 }
 
-#location-config-form-modal {
+.empty-state-msg {
+    text-align: center;
+    color: #6c757d;
+    padding: 1.5rem;
+    font-size: 1rem;
+    font-style: italic;
+    background-color: #fff;
+    border-radius: 6px;
+}
+
+/* --- Lista de Pavimentos (Tela Principal) --- */
+#pavimentos-list-container {
+    margin-top: 1rem;
+}
+.pavimento-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+.pavimento-list-item-name {
+    font-weight: 500;
+    color: #333;
+}
+.pavimento-list-item-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    margin-left: 8px;
+}
+.pavimento-list-item-actions button:hover {
+    color: #007bff;
+}
+.pavimento-list-item-actions .delete-btn:hover {
+    color: #dc3545;
+}
+
+/* --- Modal Genérico --- */
+.location-modal-backdrop {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh; /* Usa a viewport toda */
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    padding: 1rem; 
+    box-sizing: border-box;
+}
+.location-modal-backdrop:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+.location-modal-content {
+    background-color: #fff;
+    padding: 0; /* Removido para ter controle total */
+    border-radius: 8px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    overflow: hidden; /* Evita que conteúdo vaze antes de rolar */
+}
+.location-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+.location-modal-header h4 { margin: 0; font-size: 1.2rem; }
+.location-modal-header .close-modal-btn { font-size: 1.75rem; cursor: pointer; background: none; border: none; }
+
+.location-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
 }
 
-.config-category, .custom-location-section {
-    border: 1px solid var(--alternate);
-    border-radius: var(--ff-border-radius);
-    padding: 10px 12px;
-    background-color: var(--secondary-background);
-    margin-bottom: 10px;
+.location-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    text-align: right;
+    flex-shrink: 0;
 }
 
-.config-category-header {
-    display: flex; align-items: center; padding-bottom: 8px;
-    margin-bottom: 8px;
-    border-bottom: 1px solid #eee;
+/* --- Modal de Configuração de Pavimento --- */
+#pavimento-modal-sublocais-container {
+    margin-top: 1rem;
 }
-.custom-location-section .config-category-header {
-    border-bottom: none; /* Sem borda para header de custom location, pois o nome já é o título */
+.sublocal-accordion {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    background-color: #fff;
 }
-
-
-.config-category-header input[type="checkbox"],
-.custom-location-section .config-category-header input[type="checkbox"] { /* Se for usar checkbox para custom */
-    margin-right: 8px; width: 17px; height: 17px; accent-color: var(--primary); cursor: pointer; flex-shrink: 0;
+.sublocal-accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f8f9fa;
 }
-.config-category-header label,
-.custom-location-section .config-category-header label.custom-loc-label {
-    flex-grow: 1; font-weight: 600; color: var(--primary-text); cursor: pointer; font-size: 1rem;
+.sublocal-accordion-header .sublocal-name-input {
+    flex-grow: 1;
+    border: 1px solid transparent;
+    padding: 4px;
+    font-weight: 500;
+    background-color: transparent;
 }
-.custom-location-section .config-category-header .custom-loc-icon {
-    color: var(--primary); margin-right: 8px; font-size: 1.3em;
+.sublocal-accordion-header .sublocal-name-input:focus {
+    border-color: #ced4da;
+    background-color: #fff;
 }
-
-
-.toggle-details-btn {
-    background: none; border: none; font-size: 1.5rem; color: var(--secondary-text); cursor: pointer;
-    padding: 0 4px; margin-left: auto; line-height: 1; transition: transform 0.3s ease; flex-shrink: 0;
+.sublocal-accordion-header .toggle-icon {
+    transition: transform 0.3s;
 }
-
-.config-details {
-    padding: 10px 0 0 10px; /* Reduzido padding esquerdo */
-    margin-top:8px;
-    transition: max-height 0.4s ease-out, opacity 0.4s ease-out, padding 0.3s ease, margin-top 0.3s ease;
-    max-height: 4000px; opacity: 1; overflow: hidden;
-    border-left: 2px solid var(--primary-background); /* Linha lateral para identar visualmente */
-}
-.config-details.hidden {
-    max-height: 0; opacity: 0; padding-top:0; padding-bottom:0; margin-top:0;
-    border-left-color: transparent;
+.sublocal-accordion-header .toggle-icon.open {
+    transform: rotate(90deg);
 }
 
-.config-category h4, .config-category h5,
-.custom-location-section h4, .custom-location-section h5 {
-    font-size: 0.9rem; font-weight: 600; color: var(--primary); margin-top: 12px;
-    margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;
-    display: flex; align-items: center; gap: 6px;
+.sublocal-accordion-body {
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+    display: none; /* Inicia fechado */
 }
-.config-category h4:first-child, .custom-location-section h4:first-child { margin-top: 0; }
-.config-category h5, .custom-location-section h5 {
-    font-size: 0.85rem; color: var(--secondary-text); border-bottom: none;
-    margin-top: 10px; margin-bottom: 6px;
+.sublocal-accordion-body.open {
+    display: block; /* Mostra quando aberto */
 }
-.config-category h5 i.material-icons, .config-category h4 i.material-icons,
-.custom-location-section h5 i.material-icons, .custom-location-section h4 i.material-icons {
-    font-size: 1.1em;
-}
-
-.config-sub-list {
-    display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; padding-left: 10px;
-}
-.config-item { display: flex; align-items: center; font-size: 0.85rem; padding: 3px 0;}
-.config-item input[type="checkbox"] { margin-right: 7px; width: 15px; height: 15px; accent-color: var(--primary); }
-.config-item label { font-size: 0.85rem; color: var(--primary-text); cursor: pointer; flex-grow: 1; }
-
-.add-new-item-section, .add-new-item-form {
-    display: flex; gap: 8px; margin: 10px 0; align-items: center; padding: 8px;
-    background-color: #f0f3f6; border-radius: 6px;
-}
-.add-new-item-section.top-level-add { background-color: #e9edff; /* Destaque para adição de localização principal */ }
-.add-new-item-form.indented-add-form { margin-left: 15px; }
-
-
-.add-new-item-section input[type="text"],
-.add-new-item-form input[type="text"],
-.add-new-item-form input[type="number"] {
-    flex-grow: 1; margin-top: 0; padding: 7px 10px; font-size: 0.9rem; min-height: 36px;
+.add-sublocal-btn {
+    background: none;
+    border: 1px dashed #007bff;
+    color: #007bff;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 500;
 }
 
-.btn.btn-add {
-    padding: 7px 12px; font-size: 0.85rem; background-color: var(--success); color: white;
-    border: none; border-radius: var(--ff-border-radius); cursor: pointer; flex-shrink: 0;
-    line-height: 1.2; min-height: 36px; display: inline-flex; align-items: center;
+/* --- Tabela de Equipamentos (Dentro do Modal) --- */
+.equipamentos-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
 }
-.btn-add i.material-icons { font-size: 1.1em; margin-right: 4px; }
-
-.pavimento-section { margin-top: 15px; padding-top: 10px; border-top: 1px dashed var(--alternate); }
-.pavimento-section h4 { margin-bottom: 10px; font-size: 0.9rem; color: var(--primary); display: flex; align-items: center; gap: 6px;}
-#pavimentos-list-modal-ANDARES_TIPO .pavimento-item {
-    padding: 8px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 8px;
+.equipamentos-table th, .equipamentos-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.9rem;
 }
-.pavimento-item span.pavimento-name { flex-grow: 1; font-weight: 500;}
-.pavimento-item h6 { font-size: 0.8rem; color: var(--secondary-text); margin: 8px 0 5px 0; display: flex; align-items: center; gap: 4px;}
-
-
-.custom-items-list-container { margin-top:10px; padding-left: 5px; }
-.custom-items-list-container h5 { font-size: 0.8rem; color: var(--primary); margin-bottom: 5px; display: flex; align-items: center; gap: 4px;}
-.custom-items-list-container ul.custom-items {
-    list-style: none; padding-left: 10px; border-left: 1px dotted #ccc;
+.equipamentos-table th { font-weight: 600; }
+.equipamento-name-input, .equipamento-qty-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
-.custom-items-list-container li.custom-item-entry {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 4px; margin-bottom: 4px; background-color: #fdfdfd;
-    border-radius: 3px; font-size: 0.8rem;
-}
-.custom-items-list-container li.custom-item-entry span { flex-grow: 1; }
-
-
-.remove-custom-btn {
-    background: var(--danger); color: white; border: none; border-radius: 50%;
-    width: 22px; height: 22px; font-size: 0.9rem; cursor: pointer;
-    line-height: 22px; padding: 0; text-align: center; margin-left: 8px; flex-shrink: 0;
-}
-.remove-custom-btn:hover { opacity: 0.8; }
-.remove-custom-location-btn { margin-left: 10px !important; } /* Mais espaço para o botão principal de remover localização */
-
-
-.config-sub-list.specific-area-equipment { margin-top: 6px; padding-left: 15px; }
-hr.divider { border: none; border-top: 1px dashed var(--alternate); margin: 15px 0; }
-
-.config-save-btn {
-    width: auto; /* Não mais 100% */
-    padding: 10px 25px;
-    font-size: 1rem;
-    margin: 20px auto 10px auto; /* Centraliza com margem */
-    display: block; /* Para que margin auto funcione */
-    min-width: 250px; /* Largura mínima */
+.equipamento-qty-input { max-width: 80px; text-align: center; }
+.equipamentos-table .delete-btn { font-size: 1.2rem; }
+.add-equipamento-btn {
+    font-size: 0.85rem;
+    color: #007bff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    font-weight: 500;
 }
 
-/* Ajustes para telas menores dentro do modal de config */
-@media (max-width: 480px) {
-    #location-config-content-wrapper { padding: 5px; }
-    .config-category, .custom-location-section { padding: 8px; }
-    .config-category-header label, .custom-location-section .config-category-header label.custom-loc-label { font-size: 0.9rem; }
-    .add-new-item-section, .add-new-item-form { flex-direction: column; align-items: stretch; }
-    .add-new-item-section input[type="text"], .add-new-item-form input[type="text"] { margin-bottom: 8px; }
-    .btn.btn-add { width: 100%; }
-    .config-details { padding-left: 5px; }
-    .config-save-btn { min-width: 100%; }
+
+/* --- Modal de Pré-definidos --- */
+.predefined-pavimento { margin-bottom: 1.5rem; }
+.predefined-pavimento-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+.predefined-pavimento-header input[type="checkbox"] { width: 20px; height: 20px; accent-color: #007bff; }
+.predefined-pavimento-header label { font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+.predefined-sublocais-list {
+    padding-left: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+.predefined-sublocal { display: flex; align-items: center; gap: 8px; }
+.predefined-sublocal input[type="checkbox"] { width: 16px; height: 16px; }
+.predefined-sublocal label { font-size: 1rem; cursor: pointer; }
+
+
+/* --- Responsividade --- */
+@media (max-width: 600px) {
+    .location-action-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+    .location-config-actions {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .equipamentos-table thead { display: none; }
+    .equipamentos-table, .equipamentos-table tbody, .equipamentos-table tr, .equipamentos-table td {
+        display: block;
+        width: 100%;
+    }
+    .equipamentos-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 0.5rem;
+    }
+    .equipamentos-table td {
+        border: none;
+        padding: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .equipamentos-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .equipamento-name-input { text-align: right; }
+    .equipamento-qty-input { max-width: 60px; }
+    .equipamentos-table td:last-child { justify-content: flex-end; }
+    .equipamentos-table td:last-child::before { display: none; }
 }

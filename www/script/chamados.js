@@ -1,539 +1,312 @@
-// www/script/chamados.js - v5 (LocalForage & New Attachment Fields)
+import { supabase } from './supabaseClient.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // --- Elementos DOM ---
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    const listContainers = {
-        pendente: document.getElementById('pendente-list'),
-        andamento: document.getElementById('andamento-list'),
-        concluido: document.getElementById('concluido-list'),
-        arquivado: document.getElementById('arquivado-list')
-    };
+const ChamadosPage = {
+    // ================================================
+    // ESTADO GLOBAL DO MÓDULO
+    // ================================================
+    state: {
+        condoId: null,
+        tickets: [],
+        currentTicketId: null,
+    },
 
-    let allTickets = [];
-
-    // --- Funções Utilitárias ---
-    function formatDate(dateInput) {
-        if (!dateInput) return 'N/A';
-        try {
-            const date = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
-            if (isNaN(date.getTime())) return 'Data inválida';
-            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric'}) + ' ' +
-                   date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        } catch (e) { return 'Erro data'; }
-    }
-
-    function getOccurrenceName(key) {
-        const names = { /* ... (mantido como antes) ... */
-            'Hidraulica': 'Hidráulica', 'Eletrica': 'Elétrica', 'Elevador': 'Elevador',
-            'Gerador': 'Gerador', 'Pintura': 'Pintura', 'Alvenaria': 'Alvenaria / Estrutura',
-            'Jardinagem': 'Jardinagem / Paisagismo', 'Limpeza': 'Limpeza Específica',
-            'Seguranca': 'Segurança', 'ArCondicionado': 'Ar Condicionado Central',
-            'Pragas': 'Controle de Pragas', 'Telecom': 'Telecomunicações',
-            'Incendio': 'Sistema de Incêndio', 'Gas': 'Sistema de Gás',
-            'Outros': 'Geral / Outros'
-        };
-        return names[key] || key;
-    }
-
-    function formatPhone(phone) {
-        if (!phone) return "N/A";
-        const cleaned = ('' + phone).replace(/\D/g, '');
-        if (!cleaned) return "N/A";
-         if (cleaned.startsWith('55') && cleaned.length >= 12) {
-             const ddd = cleaned.substring(2, 4);
-             const numberPart = cleaned.substring(4);
-             if (numberPart.length === 9) return `+55 (${ddd}) ${numberPart.substring(0, 5)}-${numberPart.substring(5)}`;
-             if (numberPart.length === 8) return `+55 (${ddd}) ${numberPart.substring(0, 4)}-${numberPart.substring(4)}`;
-         }
-         if (cleaned.length === 11) return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 7)}-${cleaned.substring(7)}`;
-         if (cleaned.length === 10) return `(${cleaned.substring(0, 2)}) ${cleaned.substring(2, 6)}-${cleaned.substring(6)}`;
-        return phone;
-    }
-
-    function readFileData(file) {
-        return new Promise((resolve, reject) => {
-            if (!file || !(file.type.startsWith('image/') || file.type === 'application/pdf')) {
-                resolve(null); return;
+    // ================================================
+    // FUNÇÕES UTILITÁRIAS
+    // ================================================
+    utils: {
+        getById: (id) => document.getElementById(id),
+        toggleModal: (show) => {
+            const modal = document.getElementById('ticket-detail-modal');
+            if (modal) {
+                modal.classList.toggle('hidden', !show);
+                document.body.classList.toggle('modal-open', show);
             }
-            const reader = new FileReader();
-            reader.onload = () => resolve({
-                name: file.name, type: file.type, size: file.size, dataUrl: reader.result
+        },
+        formatDate: (dateStr) => dateStr ? new Date(dateStr).toLocaleDateString('pt-BR') : 'N/A',
+    },
+
+    // ================================================
+    // INICIALIZAÇÃO DA PÁGINA
+    // ================================================
+    async init() {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.replace('/www/index.html'); return; }
+        
+        this.state.condoId = sessionStorage.getItem('selectedCondoId');
+        if (!this.state.condoId) {
+            alert("Condomínio não selecionado!");
+            window.location.replace('/www/inicio.html');
+            return;
+        }
+
+        this.setupEventListeners();
+        await this.fetchAndRenderTickets();
+    },
+
+    // ================================================
+    // CONFIGURAÇÃO DOS EVENT LISTENERS
+    // ================================================
+    setupEventListeners() {
+        const reportBtn = this.utils.getById('generate-report-btn');
+        if(reportBtn) reportBtn.addEventListener('click', () => this.generateReport());
+        
+        const modal = this.utils.getById('ticket-detail-modal');
+        if (modal) {
+            const closeButton = modal.querySelector('.modal-close-x');
+            if(closeButton) closeButton.addEventListener('click', () => this.utils.toggleModal(false));
+        }
+        
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.dataset.tab;
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                button.classList.add('active');
+                const activePane = this.utils.getById(`tab-${tabName}`);
+                if(activePane) activePane.classList.add('active');
             });
-            reader.onerror = (error) => { console.error("FileReader error:", error); reject(error); };
-            reader.readAsDataURL(file);
         });
-    }
+    },
 
-    /** Renders a preview for a file object (image or PDF link) */
-    function renderFilePreview(fileObject, previewAreaElement) {
-        if (!fileObject || !fileObject.dataUrl || !previewAreaElement) {
-            if (previewAreaElement) previewAreaElement.innerHTML = '<p>Nenhum anexo.</p>';
-            return;
-        }
-        previewAreaElement.classList.add('visible');
-        if (fileObject.type.startsWith('image/')) {
-            previewAreaElement.innerHTML = `<img src="${fileObject.dataUrl}" alt="Pré-visualização" title="${fileObject.name}">`;
-        } else if (fileObject.type === 'application/pdf') {
-            previewAreaElement.innerHTML = `<a href="${fileObject.dataUrl}" target="_blank" title="Abrir PDF: ${fileObject.name}"><i class="material-icons">picture_as_pdf</i> Ver ${fileObject.name}</a>`;
-        } else {
-            previewAreaElement.innerHTML = `<p title="${fileObject.name}"><i class="material-icons">attach_file</i> Anexo: ${fileObject.name}</p>`;
-        }
-    }
+    // ================================================
+    // BUSCA E RENDERIZAÇÃO DOS DADOS
+    // ================================================
+    async fetchAndRenderTickets() {
+        const { data, error } = await supabase
+            .from('chamado')
+            .select(`*, tipo_ocorrencia(nome), fornecedor(nome), chamado_anexo(*)`)
+            .eq('condominio_id', this.state.condoId)
+            .order('created_at', { ascending: false });
 
-    // --- Funções de Lógica de Negócio (Async devido ao localForage) ---
-    async function loadAndInitializeTickets() {
-        if (typeof loadTickets !== 'function' || typeof saveTickets !== 'function') {
-            console.error("ERRO CRÍTICO: Funções loadTickets/saveTickets não encontradas (dados.js).");
-            alert("Erro crítico ao carregar funções de dados. A página pode não funcionar corretamente.");
-            return;
-        }
+        if (error) { console.error("Erro ao buscar chamados:", error); return; }
+        
+        this.state.tickets = data;
+        this.renderAllTabs();
+    },
 
-        allTickets = await loadTickets(); // Usa o loadTickets assíncrono
-        console.log("Chamados carregados do localForage:", allTickets.length);
+    renderAllTabs() {
+        const statuses = ['PENDENTE', 'EM ANDAMENTO', 'CONCLUIDO', 'ARQUIVADO'];
+        const counts = { PENDENTE: 0, 'EM ANDAMENTO': 0, CONCLUIDO: 0, ARQUIVADO: 0 };
 
-        const newTicketJSON = sessionStorage.getItem('newTicketData');
-        if (newTicketJSON) {
-            try {
-                const newTicketData = JSON.parse(newTicketJSON);
-                const newId = `ch_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-                const ticketToAdd = {
-                    ...newTicketData, id: newId,
-                    createdAt: newTicketData.createdAt ? new Date(newTicketData.createdAt) : new Date(),
-                    proposalAttachment: null, beforeServicePhoto: null, afterServicePhoto: null,
-                    technicalDocumentation: null, serviceOrderPhoto: null // Init new fields
-                };
-                allTickets.push(ticketToAdd);
-                console.log("Novo chamado adicionado via sessionStorage:", ticketToAdd);
-                await saveTickets(allTickets); // Salva com await
-                sessionStorage.removeItem('newTicketData');
-            } catch (e) {
-                console.error("Erro ao processar dados do novo chamado:", e);
-                sessionStorage.removeItem('newTicketData');
-            }
-        }
-        renderAllTickets();
-        await checkAndArchiveConcludedTickets();
-    }
+        statuses.forEach(status => {
+            const pane = this.utils.getById(`tab-${status}`);
+            if (pane) pane.innerHTML = '';
+        });
 
-    function findTicketIndex(ticketId) {
-        return allTickets.findIndex(t => t.id === ticketId);
-    }
-
-    async function moveTicketStatus(ticketId, newStatus, extraData = {}) {
-        const index = findTicketIndex(ticketId);
-        if (index > -1) {
-            allTickets[index].status = newStatus;
-            Object.assign(allTickets[index], extraData);
-            if (newStatus === 'Concluido' && !allTickets[index].completedAt) {
-                allTickets[index].completedAt = new Date();
-            }
-            if (newStatus === 'Arquivado' && !allTickets[index].archivedAt) {
-                allTickets[index].archivedAt = new Date();
-            }
-            await saveTickets(allTickets);
-            renderAllTickets();
-        } else {
-            console.error(`Chamado ${ticketId} não encontrado para mover.`);
-        }
-    }
-
-    async function saveProposalValue(ticketId, value) {
-        const index = findTicketIndex(ticketId);
-        if (index === -1) return;
-        const numValue = (value === '' || value === null || isNaN(parseFloat(value))) ? null : parseFloat(value);
-        if (allTickets[index].proposalValue !== numValue) {
-            allTickets[index].proposalValue = numValue;
-            await saveTickets(allTickets);
-        }
-    }
-
-    async function handleAttachment(ticketId, file, fieldName, previewAreaElement) {
-        if (!file) return;
-        const index = findTicketIndex(ticketId);
-        if (index === -1) { alert("Erro: Chamado não encontrado para anexar."); return; }
-
-        previewAreaElement.innerHTML = '<p>Carregando anexo...</p>';
-        previewAreaElement.classList.add('visible');
-
-        try {
-            const fileData = await readFileData(file);
-            if (!fileData) {
-                alert("Arquivo inválido. Selecione uma imagem ou PDF.");
-                previewAreaElement.innerHTML = `<p>Falha. Selecione imagem ou PDF.</p>`;
-                return;
-            }
-            const maxSize = 5 * 1024 * 1024; // 5MB
-            if (fileData.size > maxSize) {
-                alert(`Arquivo muito grande (${(fileData.size / (1024*1024)).toFixed(1)}MB). Limite: 5MB.`);
-                previewAreaElement.innerHTML = `<p>Arquivo grande (Max: 5MB).</p>`;
-                return;
-            }
-            allTickets[index][fieldName] = fileData;
-            await saveTickets(allTickets);
-            renderFilePreview(fileData, previewAreaElement);
-            alert("Anexo salvo com sucesso!");
-        } catch (e) {
-            console.error(`Erro ao manusear anexo para ${fieldName}:`, e);
-            alert("Ocorreu um erro ao processar o anexo.");
-            const previousAttachment = allTickets[index][fieldName];
-            renderFilePreview(previousAttachment, previewAreaElement); // Reverte para o anterior se houver
-        }
-    }
-
-    async function handleCompleteOrCancelWork(ticketId) {
-        const cardElement = document.querySelector(`.ticket-card[data-ticket-id="${ticketId}"]`);
-        if (!cardElement) return;
-        const selectedOption = cardElement.querySelector(`input[name="completion-${ticketId}"]:checked`);
-        if (!selectedOption) { alert("Selecione 'Obra concluída' ou 'Obra cancelada'."); return; }
-        const status = selectedOption.value;
-        const descriptionId = `completion-desc-${ticketId}-${status}`;
-        const description = cardElement.querySelector(`#${descriptionId}`)?.value.trim() || '';
-        if (!description) { alert(`Adicione uma descrição para '${selectedOption.nextElementSibling.textContent}'.`); return; }
-
-        const updateData = {
-            completionStatus: status, completionDescription: description,
-            completedAt: status === 'concluida' ? new Date() : null,
-            archivedReason: status === 'cancelada' ? 'Obra Cancelada' : null
-        };
-        await moveTicketStatus(ticketId, status === 'concluida' ? 'Concluido' : 'Arquivado', updateData);
-    }
-
-    async function handleDirectCancelTicket(ticketId, originStatus = 'Desconhecido') {
-         if (confirm(`Tem certeza que deseja CANCELAR este chamado?\nID: ${ticketId}\nOrigem: ${originStatus}`)) {
-             const updateData = {
-                 archivedReason: `Cancelado pelo Usuário (Status: ${originStatus})`,
-                 completionStatus: null, completionDescription: null, completedAt: null
-             };
-             await moveTicketStatus(ticketId, 'Arquivado', updateData);
-         }
-    }
-
-    async function saveFinalDescription(ticketId, description) {
-        const index = findTicketIndex(ticketId);
-        if (index === -1) return;
-        const trimmedDesc = description.trim();
-        const currentValue = allTickets[index].finalDescription || null;
-        const newValue = trimmedDesc === '' ? null : trimmedDesc;
-        if (currentValue !== newValue) {
-            allTickets[index].finalDescription = newValue;
-            await saveTickets(allTickets);
-        }
-    }
-
-    async function checkAndArchiveConcludedTickets() {
-        const now = new Date();
-        let changed = false;
-        const ARCHIVE_DELAY_MS = 3 * 24 * 60 * 60 * 1000; // 3 dias
-
-        allTickets.forEach((ticket, index) => {
-            if (ticket.status === 'Concluido' && ticket.completionStatus === 'concluida' && ticket.completedAt) {
-                const completedDate = new Date(ticket.completedAt);
-                if (!isNaN(completedDate.getTime()) && (now.getTime() > (completedDate.getTime() + ARCHIVE_DELAY_MS))) {
-                    allTickets[index].status = 'Arquivado';
-                    allTickets[index].archivedAt = new Date();
-                    allTickets[index].archivedReason = 'Finalizado (Arquivamento Automático)';
-                    changed = true;
-                }
+        this.state.tickets.forEach(ticket => {
+            const status = ticket.status.toUpperCase();
+            const pane = this.utils.getById(`tab-${status}`);
+            if (pane) {
+                const card = this.createTicketCard(ticket);
+                pane.appendChild(card);
+                if (counts.hasOwnProperty(status)) counts[status]++;
             }
         });
-        if (changed) {
-            await saveTickets(allTickets);
-            renderAllTickets();
-        }
-        return changed;
-    }
 
-    // --- Funções de Renderização ---
-    function createTicketCard(ticket) {
+        statuses.forEach(status => {
+            const pane = this.utils.getById(`tab-${status}`);
+            const countSpan = document.querySelector(`.tab-count[data-count-for="${status}"]`);
+            if (countSpan) countSpan.textContent = counts[status];
+            if (pane && counts[status] === 0) {
+                pane.innerHTML = '<p class="status-message">Nenhum chamado neste status.</p>';
+            }
+        });
+    },
+
+    createTicketCard(ticket) {
         const card = document.createElement('div');
-        card.className = 'ticket-card';
+        const priorityClass = (ticket.prioridade || 'baixo').toLowerCase().replace('é', 'e');
+        card.className = `ticket-card priority-${priorityClass}`;
         card.dataset.ticketId = ticket.id;
+        card.innerHTML = `
+            <div class="card-header"><h4 class="card-title">${ticket.tipo_ocorrencia?.nome || 'Serviço Geral'}</h4><span class="priority-badge badge-${priorityClass}">${ticket.prioridade}</span></div>
+            <div class="card-body"><p>${ticket.descricao}</p></div>
+            <div class="card-footer"><span>${this.utils.formatDate(ticket.created_at)}</span><span>#${ticket.id ? ticket.id.substring(0, 8) : 'N/A'}...</span></div>`;
+        card.addEventListener('click', () => this.openDetailModal(ticket.id));
+        return card;
+    },
 
-        let basicInfoHtml = `
-            <div class="ticket-header">
-                <span class="ticket-occurrence">${getOccurrenceName(ticket.occurrence)}</span>
-                <span class="ticket-priority ${ticket.priority}">${ticket.priority}</span>
-            </div>
-            <div class="ticket-info"><i class="material-icons">business</i> <span>${ticket.condoName || 'N/A'}</span></div>
-            <div class="ticket-info"><i class="material-icons">location_on</i> <span>${ticket.location || 'N/A'}</span></div>
-            <div class="ticket-info"><i class="material-icons">description</i> <span>${ticket.description || 'N/A'}</span></div>
-            <div class="ticket-info"><i class="material-icons">event</i> <span>Criado: ${formatDate(ticket.createdAt)}</span></div>`;
+    // ================================================
+    // LÓGICA DO MODAL DE DETALHES E AÇÕES
+    // ================================================
+    openDetailModal(ticketId) {
+        const ticket = this.state.tickets.find(t => t.id === ticketId);
+        if (!ticket) return;
 
-        let supplierInfoHtml = `<div class="supplier-info">
-            <p><strong>Fornecedor:</strong> ${ticket.supplierName || 'Não selecionado'}</p>
-            ${ticket.supplierId && ticket.supplierPhone ? `<p><strong>Contato:</strong> ${formatPhone(ticket.supplierPhone)}</p>` : ''}
+        this.state.currentTicketId = ticketId;
+        const modalBody = this.utils.getById('modal-ticket-body');
+        const modalFooter = this.utils.getById('modal-ticket-footer');
+
+        const attachmentsHtml = (type) => {
+            const files = ticket.chamado_anexo.filter(a => a.tipo_anexo === type);
+            return files.length > 0
+                ? files.map(a => `<li class="attachment-item"><a href="${a.file_url}" target="_blank">${a.file_name || 'Ver anexo'}</a></li>`).join('')
+                : '<li>Nenhum anexo.</li>';
+        };
+
+        modalBody.innerHTML = `
+            <div class="detail-section">
+                <h4 class="detail-title">Informações Gerais</h4>
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Sistema:</span><span class="detail-value">${ticket.tipo_ocorrencia?.nome || 'N/A'}</span></div>
+                    <div class="detail-item"><span class="detail-label">Fornecedor:</span><span class="detail-value">${ticket.fornecedor?.nome || 'Não definido'}</span></div>
+                    <div class="detail-item"><span class="detail-label">Localização:</span><span class="detail-value">${ticket.localizacao}</span></div>
+                    <div class="detail-item"><span class="detail-label">Prioridade:</span><span class="detail-value">${ticket.prioridade}</span></div>
+                </div>
+                <div class="detail-item"><span class="detail-label">Descrição Inicial:</span><div class="detail-value">${ticket.descricao}</div></div>
             </div>`;
 
-        let stageContentHtml = '';
-        let actionsHtml = '';
-
+        let footerHtml = '';
         switch (ticket.status) {
-            case 'Pendente':
-                stageContentHtml = `
-                    <div class="input-section">
-                        <label for="proposal-value-${ticket.id}">Valor Proposta R$ (Opcional):</label>
-                        <input type="number" id="proposal-value-${ticket.id}" class="proposal-input" step="0.01" min="0" placeholder="0.00" value="${ticket.proposalValue === null || ticket.proposalValue === undefined ? '' : ticket.proposalValue.toFixed(2)}">
-                    </div>
-                    <div class="input-section attachment-section">
-                        <label for="proposal-file-${ticket.id}">Anexar Proposta:</label>
-                        <input type="file" id="proposal-file-${ticket.id}" class="proposal-attachment-input" accept="image/*,application/pdf">
-                        <div class="proposal-attachment-preview service-order-preview ${ticket.proposalAttachment ? 'visible' : ''}">
-                            </div>
-                    </div>`;
-                actionsHtml = `
-                    <button class="btn btn-danger cancel-direct-btn" title="Cancelar Chamado"><i class="material-icons">cancel</i> Cancelar</button>
-                    <button class="btn btn-primary start-btn" title="Iniciar Atendimento"><i class="material-icons">play_arrow</i> Iniciar Atendimento</button>`;
-                break;
-
-            case 'Em Andamento':
-                const isConcluidaChecked = ticket.completionStatus === 'concluida';
-                const isCanceladaChecked = ticket.completionStatus === 'cancelada';
-                stageContentHtml = `
-                    <div class="input-section">
-                        <label>Status da Obra:</label>
-                        <div class="completion-options">
-                            <div>
-                                <input type="radio" id="comp-concluida-${ticket.id}" name="completion-${ticket.id}" value="concluida" ${isConcluidaChecked ? 'checked' : ''}>
-                                <label for="comp-concluida-${ticket.id}">Obra já concluída</label>
-                                <textarea id="completion-desc-${ticket.id}-concluida" class="completion-description ${!isConcluidaChecked ? 'hidden' : ''}" placeholder="Descrição da conclusão...">${isConcluidaChecked ? (ticket.completionDescription || '') : ''}</textarea>
-                            </div>
-                            <div>
-                                <input type="radio" id="comp-cancelada-${ticket.id}" name="completion-${ticket.id}" value="cancelada" ${isCanceladaChecked ? 'checked' : ''}>
-                                <label for="comp-cancelada-${ticket.id}">Obra cancelada</label>
-                                <textarea id="completion-desc-${ticket.id}-cancelada" class="completion-description ${!isCanceladaChecked ? 'hidden' : ''}" placeholder="Motivo do cancelamento...">${isCanceladaChecked ? (ticket.completionDescription || '') : ''}</textarea>
-                            </div>
+            case 'PENDENTE':
+                modalBody.innerHTML += `<div class="detail-section"><h4 class="detail-title">Orçamentos</h4><ul class="attachment-list">${attachmentsHtml('proposta')}</ul></div>`;
+                footerHtml = `
+                    <div class="action-form">
+                        <h4 class="detail-title">Ações Pendentes</h4>
+                        <div class="form-group"><label>Valor da Proposta (R$)</label><input type="number" id="proposta-valor" step="0.01" placeholder="Ex: 150.50" value="${ticket.proposta_valor || ''}"></div>
+                        <div class="form-group"><label>Anexar Orçamento</label><input type="file" id="proposta-anexo"></div>
+                        <div class="action-buttons">
+                            <button class="btn btn-danger" id="archive-btn">Arquivar Chamado</button>
+                            <button class="btn btn-primary" id="continue-btn">Aprovar e Iniciar</button>
                         </div>
                     </div>`;
-                actionsHtml = `
-                     <button class="btn btn-danger cancel-direct-btn" title="Cancelar Chamado Diretamente"><i class="material-icons">cancel</i> Cancelar</button>
-                     <button class="btn btn-success finish-step-btn" title="Finalizar Etapa Atual" ${!(isConcluidaChecked || isCanceladaChecked) ? 'disabled' : ''}><i class="material-icons">check_circle</i> Finalizar Etapa</button>`;
                 break;
-
-            case 'Concluido':
-                stageContentHtml = `
-                    <div class="ticket-info"><i class="material-icons">task_alt</i> <span>Concluído em: ${formatDate(ticket.completedAt)}</span></div>
-                    ${ticket.completionDescription ? `<div class="ticket-info"><p><strong>Descrição da Conclusão:</strong> ${ticket.completionDescription}</p></div>` : ''}
-                    <div class="input-section attachment-section">
-                        <label for="before-service-photo-${ticket.id}">Foto Pré-Serviço:</label>
-                        <input type="file" id="before-service-photo-${ticket.id}" class="before-service-photo-input" accept="image/*">
-                        <div class="before-service-photo-preview service-order-preview ${ticket.beforeServicePhoto ? 'visible' : ''}"></div>
-
-                        <label for="after-service-photo-${ticket.id}">Foto Pós-Serviço:</label>
-                        <input type="file" id="after-service-photo-${ticket.id}" class="after-service-photo-input" accept="image/*">
-                        <div class="after-service-photo-preview service-order-preview ${ticket.afterServicePhoto ? 'visible' : ''}"></div>
-
-                        <label for="tech-doc-${ticket.id}">Documentação Técnica:</label>
-                        <input type="file" id="tech-doc-${ticket.id}" class="tech-doc-input" accept="application/pdf">
-                        <div class="tech-doc-preview service-order-preview ${ticket.technicalDocumentation ? 'visible' : ''}"></div>
-                        
-                        <label for="os-${ticket.id}">Ordem de Serviço:</label>
-                        <input type="file" id="os-${ticket.id}" class="service-order-input" accept="image/*,application/pdf">
-                        <div class="service-order-preview os-file-preview ${ticket.serviceOrderPhoto ? 'visible' : ''}"></div>
-                        
-                        <label for="final-desc-${ticket.id}">Descrição Final (Opcional):</label>
-                        <textarea id="final-desc-${ticket.id}" class="final-description-input" placeholder="Adicione notas finais...">${ticket.finalDescription || ''}</textarea>
+            case 'EM ANDAMENTO':
+                modalBody.innerHTML += `<div class="detail-section"><h4 class="detail-title">Anexos Pré-Obra</h4><ul class="attachment-list">${attachmentsHtml('pre_obra')}</ul></div>`;
+                footerHtml = `
+                    <div class="action-form">
+                        <h4 class="detail-title">Registrar Andamento</h4>
+                        <div class="form-group"><label>Descrição da Situação Atual</label><textarea id="andamento-desc" rows="3" placeholder="Descreva a situação da obra...">${ticket.andamento_descricao || ''}</textarea></div>
+                        <div class="form-group"><label>Fotos Pré-Obra</label><input type="file" id="pre-obra-anexo" multiple></div>
+                        <div class="action-buttons">
+                            <button class="btn btn-danger" id="archive-btn">Arquivar Chamado</button>
+                            <button class="btn btn-primary" id="continue-btn">Finalizar Serviço</button>
+                        </div>
                     </div>`;
-                if (ticket.completedAt) {
-                    const archiveDate = new Date(new Date(ticket.completedAt).getTime() + 3 * 24 * 60 * 60 * 1000);
-                    actionsHtml = `<div class="auto-archive-info">Arquivamento automático: ${formatDate(archiveDate)}</div>`;
-                }
                 break;
-
-            case 'Arquivado':
-                let archivedDetailsHtml = `<div class="archived-reason"><i class="material-icons">inventory_2</i><span>Arquivado em: ${formatDate(ticket.archivedAt)}</span></div>`;
-                if (ticket.archivedReason) archivedDetailsHtml += `<div class="ticket-info"><p><strong>Motivo:</strong> ${ticket.archivedReason}</p></div>`;
-                if (ticket.proposalValue) archivedDetailsHtml += `<div class="ticket-info"><p><strong>Valor Proposta:</strong> R$ ${ticket.proposalValue.toFixed(2)}</p></div>`;
-                if (ticket.proposalAttachment) {
-                    archivedDetailsHtml += `<div class="ticket-info attachment-display"><strong>Proposta Anexada:</strong> <span class="attachment-preview-archived" data-type="proposalAttachment"></span></div>`;
-                }
-                if (ticket.completionDescription) {
-                    archivedDetailsHtml += `<div class="ticket-info"><p><strong>Detalhes ${ticket.completionStatus === 'cancelada' ? 'Cancelamento' : 'Conclusão'}:</strong> ${ticket.completionDescription}</p></div>`;
-                }
-                if (ticket.beforeServicePhoto) {
-                    archivedDetailsHtml += `<div class="ticket-info attachment-display"><strong>Foto Pré-Serviço:</strong> <span class="attachment-preview-archived" data-type="beforeServicePhoto"></span></div>`;
-                }
-                if (ticket.afterServicePhoto) {
-                    archivedDetailsHtml += `<div class="ticket-info attachment-display"><strong>Foto Pós-Serviço:</strong> <span class="attachment-preview-archived" data-type="afterServicePhoto"></span></div>`;
-                }
-                if (ticket.technicalDocumentation) {
-                    archivedDetailsHtml += `<div class="ticket-info attachment-display"><strong>Doc. Técnica:</strong> <span class="attachment-preview-archived" data-type="technicalDocumentation"></span></div>`;
-                }
-                if (ticket.serviceOrderPhoto) {
-                    archivedDetailsHtml += `<div class="ticket-info attachment-display"><strong>Ordem de Serviço:</strong> <span class="attachment-preview-archived" data-type="serviceOrderPhoto"></span></div>`;
-                }
-                if (ticket.finalDescription) archivedDetailsHtml += `<div class="ticket-info"><p><strong>Descrição Final:</strong> ${ticket.finalDescription}</p></div>`;
-                stageContentHtml = archivedDetailsHtml;
+            case 'CONCLUIDO':
+                 modalBody.innerHTML += `<div class="detail-section"><h4 class="detail-title">Anexos de Finalização</h4><ul class="attachment-list">${attachmentsHtml('pos_obra')}</ul></div>`;
+                 footerHtml = `
+                    <div class="action-form">
+                        <h4 class="detail-title">Finalização</h4>
+                        <div class="form-group"><label>Descrição Pós-Obra / Relatório Final</label><textarea id="pos-obra-desc" rows="3" placeholder="Descreva o serviço realizado...">${ticket.conclusao_descricao || ''}</textarea></div>
+                        <div class="form-group"><label>Situação da Obra</label><select id="conclusao-status"><option value="FINALIZADO">Finalizado</option><option value="CANCELADO">Cancelado</option></select></div>
+                        <div class="form-group"><label>Anexar Nota Fiscal / Fotos Finais</label><input type="file" id="pos-obra-anexo" multiple></div>
+                        <div class="action-buttons"><button class="btn btn-primary" id="continue-btn">Confirmar e Arquivar</button></div>
+                    </div>`;
                 break;
-            default:
-                stageContentHtml = `<p style="color: red;">Erro: Status desconhecido (${ticket.status})</p>`;
+            case 'ARQUIVADO':
+                modalBody.innerHTML += `<div class="detail-section"><h4 class="detail-title">Histórico de Anexos</h4><ul class="attachment-list">${ticket.chamado_anexo.map(a => `<li><a href="${a.file_url}" target="_blank">${a.file_name} (${a.tipo_anexo})</a></li>`).join('') || '<li>Nenhum anexo.</li>'}</ul></div>`;
+                footerHtml = `<p class="status-message">Este chamado está arquivado.</p>`;
+                break;
         }
+        modalFooter.innerHTML = footerHtml;
 
-        card.innerHTML = basicInfoHtml + supplierInfoHtml + stageContentHtml + `<div class="ticket-actions">${actionsHtml}</div>`;
-        addCardEventListeners(card, ticket); // Adiciona listeners e preenche previews
-        return card;
-    }
+        this.addFooterEventListeners(ticket);
+        this.utils.toggleModal(true);
+    },
+    
+    addFooterEventListeners(ticket) {
+        const archiveBtn = this.utils.getById('archive-btn');
+        const continueBtn = this.utils.getById('continue-btn');
 
-    function addCardEventListeners(card, ticket) {
-        const ticketId = ticket.id;
-
-        if (ticket.status === 'Pendente') {
-            card.querySelector(`#proposal-value-${ticketId}`)?.addEventListener('blur', (e) => saveProposalValue(ticketId, e.target.value));
-            const proposalFileInput = card.querySelector(`#proposal-file-${ticketId}`);
-            const proposalPreviewArea = card.querySelector('.proposal-attachment-preview');
-            if (proposalFileInput && proposalPreviewArea) {
-                proposalFileInput.addEventListener('change', (e) => {
-                    if (e.target.files && e.target.files[0]) {
-                        handleAttachment(ticketId, e.target.files[0], 'proposalAttachment', proposalPreviewArea);
-                    }
-                });
-                if (ticket.proposalAttachment) renderFilePreview(ticket.proposalAttachment, proposalPreviewArea);
-            }
-            card.querySelector('.start-btn')?.addEventListener('click', () => moveTicketStatus(ticketId, 'Em Andamento'));
-            card.querySelector('.cancel-direct-btn')?.addEventListener('click', () => handleDirectCancelTicket(ticketId, 'Pendente'));
-        } else if (ticket.status === 'Em Andamento') {
-            const radioButtons = card.querySelectorAll(`input[name="completion-${ticketId}"]`);
-            const finishStepBtn = card.querySelector('.finish-step-btn');
-            radioButtons.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    const isConcluida = e.target.value === 'concluida' && e.target.checked;
-                    const isCancelada = e.target.value === 'cancelada' && e.target.checked;
-                    card.querySelector(`#completion-desc-${ticketId}-concluida`)?.classList.toggle('hidden', !isConcluida);
-                    card.querySelector(`#completion-desc-${ticketId}-cancelada`)?.classList.toggle('hidden', !isCancelada);
-                    if(finishStepBtn) finishStepBtn.disabled = !(isConcluida || isCancelada);
-                });
-            });
-            finishStepBtn?.addEventListener('click', () => handleCompleteOrCancelWork(ticketId));
-            card.querySelector('.cancel-direct-btn')?.addEventListener('click', () => handleDirectCancelTicket(ticketId, 'Em Andamento'));
-        } else if (ticket.status === 'Concluido') {
-            // Foto Pré-Serviço
-            const beforePhotoInput = card.querySelector(`#before-service-photo-${ticketId}`);
-            const beforePhotoPreview = card.querySelector('.before-service-photo-preview');
-            if(beforePhotoInput && beforePhotoPreview) {
-                beforePhotoInput.addEventListener('change', (e) => e.target.files && e.target.files[0] && handleAttachment(ticketId, e.target.files[0], 'beforeServicePhoto', beforePhotoPreview));
-                if(ticket.beforeServicePhoto) renderFilePreview(ticket.beforeServicePhoto, beforePhotoPreview);
-            }
-            // Foto Pós-Serviço
-            const afterPhotoInput = card.querySelector(`#after-service-photo-${ticketId}`);
-            const afterPhotoPreview = card.querySelector('.after-service-photo-preview');
-            if(afterPhotoInput && afterPhotoPreview) {
-                afterPhotoInput.addEventListener('change', (e) => e.target.files && e.target.files[0] && handleAttachment(ticketId, e.target.files[0], 'afterServicePhoto', afterPhotoPreview));
-                if(ticket.afterServicePhoto) renderFilePreview(ticket.afterServicePhoto, afterPhotoPreview);
-            }
-            // Documentação Técnica
-            const techDocInput = card.querySelector(`#tech-doc-${ticketId}`);
-            const techDocPreview = card.querySelector('.tech-doc-preview');
-            if(techDocInput && techDocPreview) {
-                techDocInput.addEventListener('change', (e) => e.target.files && e.target.files[0] && handleAttachment(ticketId, e.target.files[0], 'technicalDocumentation', techDocPreview));
-                if(ticket.technicalDocumentation) renderFilePreview(ticket.technicalDocumentation, techDocPreview);
-            }
-            // Ordem de Serviço (existente, mas garantindo consistência)
-            const osInput = card.querySelector(`#os-${ticketId}`);
-            const osPreview = card.querySelector('.os-file-preview');
-            if (osInput && osPreview) {
-                 osInput.addEventListener('change', (e) => e.target.files && e.target.files[0] && handleAttachment(ticketId, e.target.files[0], 'serviceOrderPhoto', osPreview));
-                 if(ticket.serviceOrderPhoto) renderFilePreview(ticket.serviceOrderPhoto, osPreview);
-            }
-            card.querySelector(`#final-desc-${ticketId}`)?.addEventListener('blur', (e) => saveFinalDescription(ticketId, e.target.value));
-        } else if (ticket.status === 'Arquivado') {
-            card.querySelectorAll('.attachment-preview-archived').forEach(span => {
-                const fieldName = span.dataset.type;
-                if (ticket[fieldName]) {
-                    renderFilePreview(ticket[fieldName], span);
-                } else {
-                    span.innerHTML = "<span>N/A</span>";
-                }
-            });
+        if (archiveBtn) archiveBtn.addEventListener('click', () => this.updateTicketStatus(ticket.id, 'ARQUIVADO'));
+        if (continueBtn) {
+            const handler = this.statusHandlers[ticket.status];
+            if (handler) continueBtn.addEventListener('click', () => handler.call(this, ticket.id));
         }
-    }
-
-    function renderAllTickets() {
-        Object.values(listContainers).forEach(container => { if(container) container.innerHTML = ''; });
-        const fragments = { pendente: document.createDocumentFragment(), andamento: document.createDocumentFragment(), concluido: document.createDocumentFragment(), arquivado: document.createDocumentFragment() };
-        let counts = { Pendente: 0, 'Em Andamento': 0, Concluido: 0, Arquivado: 0 };
-
-        allTickets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-        allTickets.forEach(ticket => {
-            const card = createTicketCard(ticket);
-            let targetFragment, countKey = ticket.status;
-            switch(ticket.status) {
-                case 'Pendente': targetFragment = fragments.pendente; break;
-                case 'Em Andamento': targetFragment = fragments.andamento; break;
-                case 'Concluido': targetFragment = fragments.concluido; break;
-                case 'Arquivado': targetFragment = fragments.arquivado; break;
-                default: return;
-            }
-            if (targetFragment) {
-                targetFragment.appendChild(card);
-                if (counts.hasOwnProperty(countKey)) counts[countKey]++;
-            }
-        });
-
-        for (const statusKey in fragments) {
-            const container = listContainers[statusKey];
-            let countKeyMapped = statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
-            if (statusKey === 'andamento') countKeyMapped = 'Em Andamento';
-            const count = counts[countKeyMapped] || 0;
-
-            if (container) {
-                if (count > 0) {
-                    container.appendChild(fragments[statusKey]);
-                } else {
-                    let statusDisplayName = statusKey === 'andamento' ? 'em andamento' : (statusKey === 'concluido' ? 'concluídos' : (statusKey === 'arquivado' ? 'arquivados' : statusKey));
-                    container.innerHTML = `<div class="status-message">Nenhum chamado ${statusDisplayName}.</div>`;
-                }
-            }
+    },
+    
+    statusHandlers: {
+        'PENDENTE': async function(ticketId) {
+            const proposta_valor = this.utils.getById('proposta-valor').value;
+            const fileInput = this.utils.getById('proposta-anexo');
+            await this.uploadFile(fileInput.files[0], ticketId, 'proposta');
+            await this.updateTicketStatus(ticketId, 'EM ANDAMENTO', { proposta_valor: proposta_valor || null });
+        },
+        'EM ANDAMENTO': async function(ticketId) {
+            const andamento_descricao = this.utils.getById('andamento-desc').value;
+            const fileInput = this.utils.getById('pre-obra-anexo');
+            for (const file of fileInput.files) await this.uploadFile(file, ticketId, 'pre_obra');
+            await this.updateTicketStatus(ticketId, 'CONCLUIDO', { andamento_descricao });
+        },
+        'CONCLUIDO': async function(ticketId) {
+            const conclusao_descricao = this.utils.getById('pos-obra-desc').value;
+            const conclusao_status = this.utils.getById('conclusao-status').value;
+            const fileInput = this.utils.getById('pos-obra-anexo');
+            for (const file of fileInput.files) await this.uploadFile(file, ticketId, 'pos_obra');
+            await this.updateTicketStatus(ticketId, 'ARQUIVADO', { conclusao_descricao, conclusao_status, completed_at: new Date().toISOString() });
         }
-        updateTabCounts(counts);
-    }
+    },
 
-    function updateTabCounts(counts) { /* ... (mantido como antes) ... */
-        tabButtons.forEach(button => {
-            const tabKey = button.dataset.tab;
-            let countKey = tabKey.charAt(0).toUpperCase() + tabKey.slice(1);
-            if (tabKey === 'andamento') countKey = 'Em Andamento';
+    async updateTicketStatus(ticketId, newStatus, additionalData = {}) {
+        const { error } = await supabase.from('chamado').update({ status: newStatus, ...additionalData }).eq('id', ticketId);
+        if (error) {
+            console.error("Erro ao atualizar status:", error);
+            alert("Falha ao atualizar o chamado.");
+        } else {
+            this.utils.toggleModal(false);
+            await this.fetchAndRenderTickets();
+        }
+    },
 
-            const count = counts[countKey] || 0;
-            const countSpan = button.querySelector('.tab-count');
-            if (countSpan) {
-                 countSpan.textContent = count > 0 ? `(${count})` : '';
-            }
+    async uploadFile(file, ticketId, fileType) {
+        if (!file) return;
+        const filePath = `${this.state.condoId}/${ticketId}/${fileType}-${Date.now()}-${file.name}`;
+        const { error: uploadError } = await supabase.storage.from('chamado-anexos').upload(filePath, file);
+        if (uploadError) {
+            console.error('Erro no upload:', uploadError);
+            alert(`Falha ao enviar o anexo: ${uploadError.message}`);
+            return;
+        }
+        const { data: { publicUrl } } = supabase.storage.from('chamado-anexos').getPublicUrl(filePath);
+        const { error: insertError } = await supabase.from('chamado_anexo').insert({
+            chamado_id: ticketId, tipo_anexo: fileType, file_url: publicUrl, file_name: file.name
         });
-    }
+        if(insertError) console.error("Erro ao salvar anexo no banco:", insertError);
+    },
 
-    // --- Configuração Inicial de Event Listeners ---
-    tabButtons.forEach(button => { /* ... (mantido como antes) ... */
-        button.addEventListener('click', () => {
-            const targetTab = button.dataset.tab;
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            tabPanes.forEach(pane => pane.classList.remove('active'));
-            button.classList.add('active');
-            const targetPane = document.getElementById(`${targetTab}-list`);
-            if (targetPane) {
-                targetPane.classList.add('active');
-            }
+    async generateReport() {
+        const archivedTickets = this.state.tickets.filter(t => t.status === 'ARQUIVADO');
+        if (archivedTickets.length === 0) {
+            alert("Não há chamados arquivados para gerar um relatório.");
+            return;
+        }
+        
+        alert("Gerando relatório... Isso pode levar alguns segundos.");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 15;
+
+        doc.setFontSize(18);
+        doc.text(`Relatório de Chamados Arquivados`, 14, y);
+        y += 10;
+
+        archivedTickets.forEach((ticket, index) => {
+            if (y > 270) { doc.addPage(); y = 15; }
+            doc.setFontSize(14);
+            doc.text(`${index + 1}. Chamado #${ticket.id.substring(0,8)} - ${ticket.tipo_ocorrencia?.nome || 'Geral'}`, 14, y);
+            y += 7;
+            doc.setFontSize(10);
+            doc.text(`Status: ${ticket.conclusao_status || ticket.status}`, 14, y); y+=5;
+            doc.text(`Localização: ${ticket.localizacao}`, 14, y); y+=5;
+            doc.text(`Fornecedor: ${ticket.fornecedor?.nome || 'N/A'}`, 14, y); y+=5;
+            doc.text(`Data de Conclusão: ${this.utils.formatDate(ticket.completed_at)}`, 14, y); y+=5;
+            doc.setFontSize(12);
+            doc.text(`Descrição Final:`, 14, y); y+=5;
+            doc.setFontSize(10);
+            const descLines = doc.splitTextToSize(ticket.conclusao_descricao || ticket.descricao || 'Sem descrição final.', 180);
+            doc.text(descLines, 14, y);
+            y += (descLines.length * 4) + 5;
+            doc.line(14, y, 196, y); y+= 5;
         });
-    });
 
-    // --- Inicialização Async ---
-    async function initializePage() {
-        console.log("Inicializando página de chamados (v5)...");
-        await loadAndInitializeTickets(); // Função agora é async
-        // Inicia verificação periódica para arquivamento automático
-        const archiveCheckInterval = setInterval(async () => {
-            await checkAndArchiveConcludedTickets(); // Também async
-        }, 5 * 60 * 1000);
-
-        window.addEventListener('beforeunload', () => {
-            clearInterval(archiveCheckInterval);
-        });
+        doc.save(`relatorio_chamados_arquivados_${Date.now()}.pdf`);
     }
+};
 
-    initializePage().catch(error => {
-        console.error("Erro durante a inicialização da página de chamados:", error);
-        alert("Ocorreu um erro grave ao carregar a página de chamados. Verifique o console.");
-    });
-
-}); // Fim DOMContentLoaded
+// Ponto de entrada do script
+document.addEventListener('DOMContentLoaded', () => {
+    ChamadosPage.init();
+});

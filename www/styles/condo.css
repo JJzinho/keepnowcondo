@@ -90,10 +90,6 @@ body { font-family: 'Inter', sans-serif; background-color: var(--primary-backgro
 /* Adiciona sublinhado ao texto DENTRO do botão do nome do condomínio no hover */
 #show-more-btn-condo-name:hover #condo-name-display-button {
     text-decoration: underline;
-    /* A cor do sublinhado será a mesma do texto do span.
-       Se o texto do span mudar de cor no hover do botão, o sublinhado acompanhará.
-       Se quiser forçar uma cor específica para o sublinhado:
-       text-decoration-color: var(--info); /* Exemplo, se o texto for branco */
 }
 
 /* Card de Menu */
@@ -205,17 +201,8 @@ body { font-family: 'Inter', sans-serif; background-color: var(--primary-backgro
     margin: 0 10px; /* Evita que o título cole nos botões do header */
 }
 
-.modal-close-btn, .modal-edit-btn { /* Botões no header do modal */
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-}
 .modal-close-x { /* Botão X específico */
-    order: 3; /* Garante que fique à direita do título se .modal-edit-btn existir */
+    order: 3; /* Garante que fique à direita do título */
     margin-left: 10px;
     background: none;
     border: none;
@@ -240,186 +227,42 @@ body { font-family: 'Inter', sans-serif; background-color: var(--primary-backgro
     display: flex; /* Para alinhar ícone e texto */
     align-items: center; /* Para alinhar ícone e texto */
 }
-.modal-section-title i.material-icons { /* Estilo para ícones nos títulos de seção do modal */
+.modal-section-title i.material-icons {
     margin-right: 8px;
     font-size: 1.1em; /* Um pouco maior que o texto */
 }
 
-/* LINE 205: Removed empty ruleset .modal-row-content {} */
-
 .modal-row {
     display: flex;
     align-items: flex-start; /* Alinha ícone ao topo do conteúdo do campo */
-    margin-bottom: 16px; /* Aumenta um pouco o espaço se os labels tornarem mais alto */
+    margin-bottom: 16px; 
     font-size: 14px;
     color: var(--secondary-text);
 }
-.modal-row span:last-child:not(.material-icons):not(.info-icon) { /* Aplica ao texto de valor */
+.modal-row span:last-child:not(.material-icons):not(.info-icon) {
     color: var(--primary-text);
     margin-left: 5px;
     word-break: break-word; /* Quebra palavras longas */
 }
-.modal-row .info-icon { /* Ícone dentro de modal-row */
-    color: var(--orange); /* Cor laranja para ícones de informação */
-    margin-right: 10px; /* Um pouco mais de espaço para o ícone */
+.modal-row .info-icon {
+    color: var(--orange);
+    margin-right: 10px;
     font-size: 20px;
-    flex-shrink: 0; /* Para não ser esmagado */
-    margin-top: 5px; /* Pequeno ajuste para alinhar melhor com a primeira linha do label/input */
-}
-/* Para o conteúdo do input dentro do modal-row quando em modo de edição */
-.modal-row .modal-row-content.info-edit {
-    display: flex;
-    flex-direction: column; /* Para feedback abaixo do input */
-    width: 100%; /* Ocupa o espaço disponível */
-}
-
-
-/* Formulários dentro do Modal */
-.form-group { /* Usado para agrupar label e input se necessário, similar ao modal-row */
-    margin-bottom: 16px;
-}
-.form-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: var(--primary-text);
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 600;
-}
-
-/* LINES 244-245: Removed empty ruleset .form-control, .form-select {} */
-
-.form-control:focus, .form-select:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(75, 57, 239, 0.2); /* Sombra de foco azul */
-}
-.form-select { /* Estilo para setinha do select */
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2357636C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px; /* Espaço para a setinha */
-}
-
-/* Validação de CNPJ */
-#edit-modal-cnpj-row .modal-row-content { /* Para garantir que o ícone e feedback fiquem dentro do fluxo */
-    position: relative;
-    flex-grow: 1;
-}
-#cnpj-validation-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%); /* Centraliza verticalmente no input */
-    display: none; /* Escondido por padrão */
-    font-size: 18px; /* Tamanho do ícone */
-}
-#cnpj-validation-icon.valid-icon { color: var(--success); }
-#cnpj-validation-icon.invalid-icon { color: var(--error); }
-
-.cnpj-validation-feedback {
-    font-size: 0.8em;
-    padding-top: 4px;
-    display: block; /* Garante que fique abaixo do input */
-}
-.cnpj-validation-feedback.valid-feedback { color: var(--success); }
-.cnpj-validation-feedback.invalid-feedback { color: var(--error); }
-
-input.form-control.is-valid { border-color: var(--success); }
-input.form-control.is-invalid { border-color: var(--error); }
-
-
-/* Imagem preview no modal */
-#modal-image-preview {
-    max-width: 100px;
-    max-height: 80px;
-    margin-left: 0; /* Alinha com o ícone */
-    border: 1px solid #eee;
-    display: none; /* Escondido se não houver imagem */
-    border-radius: var(--ff-border-radius);
-    object-fit: cover;
-}
-
-
-/* Ações do Modal */
-.modal-actions {
-    display: flex;
-    flex-wrap: wrap; /* Permite que botões quebrem linha em telas pequenas */
-    justify-content: flex-end; /* Alinha à direita */
-    margin-top: 24px;
-    gap: 12px;
-}
-.btn { /* Estilo base para botões de ação do modal */
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-family: 'Inter Tight', sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
-}
-.btn:hover {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-.btn-secondary { /* Botão Cancelar/Secundário */
-    background-color: var(--secondary-text);
-    color: var(--info); /* Texto branco */
-}
-.btn-secondary:hover {
-    background-color: #495057; /* Cinza mais escuro */
-}
-.btn-primary { /* Botão Salvar/Primário */
-    background-color: var(--primary);
-    color: var(--info); /* Texto branco */
-}
-.btn-primary:hover {
-    background-color: #3a2dbd; /* Azul primário mais escuro */
-}
-.btn-success { /* Botão de Sucesso (se usado) */
-    background-color: var(--success);
-    color: white;
-}
-.btn-success:hover {
-    background-color: #43a047; /* Verde sucesso mais escuro */
-}
-
-/* Classe Utilitária */
-.hidden { display: none !important; }
-
-/* Mensagens de Status (se usadas fora de modais) */
-.status-message {
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    text-align: center;
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-}
-.status-success {
-    background-color: #e8f5e9;
-    color: var(--success);
-    border: 1px solid #c8e6c9;
-}
-.status-info {
-    background-color: #e3f2fd;
-    color: var(--primary);
-    border: 1px solid #bbdefb;
+    flex-shrink: 0;
+    margin-top: 2px; /* Pequeno ajuste */
 }
 
 /* Navbar (Menu Hamburger) */
 .navbar-container {
-    position: relative; /* Para o dropdown posicionar corretamente */
-    margin-left: auto; /* Empurra para a direita */
-    margin-right: 10px; /* Espaço da borda da app-bar */
+    position: relative;
+    margin-left: auto;
+    margin-right: 10px;
 }
 .navbar-toggle {
     background: none;
     border: none;
-    color: var(--info); /* Cor do ícone do menu (branco) */
-    font-size: 24px; /* Tamanho do ícone de menu */
+    color: var(--info);
+    font-size: 24px;
     cursor: pointer;
     padding: 5px;
     display: flex;
@@ -429,18 +272,16 @@ input.form-control.is-invalid { border-color: var(--error); }
 .navbar-dropdown {
     position: absolute;
     right: 0;
-    top: 100%; /* Abaixo do botão de toggle */
-    background-color: var(--secondary-background); /* Fundo branco */
+    top: 100%;
+    background-color: var(--secondary-background);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 200px;
-    z-index: 1000; /* Acima de outros conteúdos */
-    display: none; /* Escondido por padrão */
-    overflow: hidden; /* Para bordas arredondadas */
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
 }
-.navbar-dropdown.show {
-    display: block;
-}
+.navbar-dropdown.show { display: block; }
 .navbar-item {
     display: flex;
     align-items: center;
@@ -448,31 +289,23 @@ input.form-control.is-invalid { border-color: var(--error); }
     color: var(--primary-text);
     text-decoration: none;
     transition: background-color 0.2s ease;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Linha sutil entre itens */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
-.navbar-item:last-child {
-    border-bottom: none;
-}
-.navbar-item:hover {
-    background-color: #f5f5f5; /* Cinza claro no hover */
-}
-.navbar-item i.material-icons { /* Ícones dentro do dropdown */
+.navbar-item:last-child { border-bottom: none; }
+.navbar-item:hover { background-color: #f5f5f5; }
+.navbar-item i.material-icons {
     margin-right: 12px;
-    color: var(--primary); /* Cor primária para ícones do menu */
+    color: var(--primary);
 }
-.navbar-item.disabled { /* Item de menu desabilitado */
+.navbar-item.disabled {
     color: #aaa;
     cursor: not-allowed;
 }
-.navbar-item.disabled:hover {
-    background-color: transparent; /* Sem efeito de hover */
-}
-.navbar-item.disabled i.material-icons {
-    color: #aaa; /* Ícone também cinza */
-}
+.navbar-item.disabled:hover { background-color: transparent; }
+.navbar-item.disabled i.material-icons { color: #aaa; }
 
 
-.notification-badge { /* Badge de notificação no menu */
+.notification-badge {
     background-color: var(--error);
     color: white;
     border-radius: 50%;
@@ -482,262 +315,132 @@ input.form-control.is-invalid { border-color: var(--error); }
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: auto; /* Empurra para a direita do texto do item */
+    margin-left: auto;
 }
 
-/* Configuração de Localização na PÁGINA PRINCIPAL (dentro do modal) */
-/* Os estilos para #location-config-in-modal e seus filhos
-   são definidos em location_config.css e já são incluídos.
-   Apenas precisamos de um container para a área de *exibição* da configuração. */
-
-#modal-location-config-container { /* Container para a EXIBIÇÃO da configuração no modal */
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid var(--alternate);
-}
-
-.location-config-display-area { /* Área onde o HTML da config será renderizado */
+/* --- ESTILOS PARA EXIBIÇÃO DA CONFIGURAÇÃO DE LOCALIZAÇÃO (NOVO) --- */
+.location-config-display-area {
     font-size: 0.9em;
-    color: var(--secondary-text);
     padding: 10px;
-    background-color: #f9f9f9; /* Fundo sutil para a área de display */
+    background-color: #f9f9f9;
     border-radius: var(--ff-border-radius);
-    max-height: 200px; /* Limita altura e adiciona scroll se necessário */
+    max-height: 250px;
     overflow-y: auto;
+    border: 1px solid #e9ecef;
 }
-.location-config-display-area h5 { /* Títulos de categoria na exibição */
+.pavimento-display-group {
+    margin-bottom: 1rem;
+}
+.pavimento-display-group h4 {
     font-weight: bold;
     color: var(--primary-text);
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-size: 1em; /* Mesmo tamanho do texto ao redor ou um pouco maior */
+    margin: 0 0 5px 0;
+    font-size: 1em;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 3px;
 }
-.location-config-display-area h5:first-child {
-    margin-top: 0;
+.sublocal-display-list {
+    list-style-type: none;
+    padding-left: 10px;
 }
-.location-config-display-area ul {
-    list-style-type: disc; /* Ou none, se preferir */
-    padding-left: 20px; /* Indentação para itens da lista */
-    margin-bottom: 10px;
+.sublocal-display-list > li {
+    margin-bottom: 8px;
 }
-.location-config-display-area li {
-    margin-bottom: 3px;
+.sublocal-display-list strong { /* Nome do sublocal */
+    color: #333;
 }
-.location-config-display-area li strong { /* Nomes de áreas */
-    color: var(--primary-text);
+.equipamento-display-list {
+    list-style-type: ' - '; /* Pequeno traço antes do item */
+    padding-left: 20px;
+    margin-top: 4px;
+    color: var(--secondary-text);
 }
+.equipamento-display-list li {
+    margin-bottom: 2px;
+}
+/* ------------------------------------------------------------------- */
 
 
-/* Ajustes Responsivos */
-@media (max-width: 600px) {
-    .modal-container {
-        width: 95%; /* Modal um pouco mais largo em telas pequenas */
-        padding: 15px;
-    }
-    .modal-title {
-        font-size: 18px;
-    }
-    .modal-row {
-        flex-wrap: wrap; /* Permite quebra de linha se o conteúdo for muito grande */
-    }
-    .modal-row .info-icon {
-        margin-bottom: 4px; /* Espaço se o texto quebrar abaixo */
-    }
-    .btn { /* Botões do modal um pouco menores */
-        padding: 8px 16px;
-        font-size: 13px;
-    }
-    .form-actions {
-        flex-direction: column; /* Empilha botões de ação em telas muito pequenas */
-    }
-    .form-actions .btn {
-        width: 100%; /* Botões ocupam largura total */
-    }
-
-    /* Ajuste para o nome do condomínio/botão em telas pequenas */
-    #show-more-btn-condo-name {
-        font-size: 1rem !important; /* Reduz um pouco o tamanho da fonte do botão principal */
-        padding: 8px 15px !important;
-    }
-}
-/* ... (seu CSS existente) ... */
-
-.modal-row .modal-field-content {
-    flex-grow: 1; /* Permite que o conteúdo do campo ocupe o espaço restante */
-    display: flex;
-    flex-direction: column; /* Empilha label e input/display */
-}
-
-/* Estilo para os labels no modo de edição dentro do modal */
-.form-label-modal-edit {
-    font-family: 'Inter', sans-serif;
-    font-size: 13px; /* Um pouco menor para diferenciar do valor */
-    color: var(--primary-text); /* Cor do texto primário para destaque */
-    margin-bottom: 4px; /* Espaço entre o label e o input/display */
-    display: block;
-    font-weight: 500; /* Um pouco menos de peso que o .form-label geral */
-}
-
-/* Garante que o input/display ocupe a largura total dentro do modal-field-content */
-.modal-field-content .info-display,
-.modal-field-content .form-control.info-edit,
-.modal-field-content .modal-row-content-input.info-edit { /* Para o caso especial do CNPJ */
-    width: 100%;
-}
-.modal-field-content .info-display {
-    padding-top: 3px; /* Pequeno ajuste para alinhar com o input quando o label não está visível */
-     color: var(--primary-text); /* Garante que o valor exibido tenha a cor primária */
-     word-break: break-word;
-}
-
-
-/* Ajuste específico para o campo de imagem para o label ficar acima */
-.modal-row .modal-field-content #edit-modal-photo-file {
-    margin-top: 4px; /* Espaço após o label da imagem */
-}
-.modal-row .modal-field-content #modal-image-preview.info-display {
-    margin-bottom: 8px; /* Espaço abaixo da imagem preview quando em modo display */
-}
-
-
-/* Ajuste para o input de CNPJ dentro do novo agrupamento */
-#edit-modal-cnpj-row .modal-row-content-input { /* Classe interna para o input e feedback do CNPJ */
-    position: relative;
-    flex-grow: 1;
-}
-#edit-modal-cnpj-row .modal-row-content-input input.form-control {
-    width: 100%; /* Garante que o input ocupe o espaço */
-}
-
-
-/* Oculta os labels de edição por padrão (JavaScript controla a visibilidade) */
-.form-label-modal-edit.hidden {
-    display: none !important;
-}
 .guide-btn {
     background: none;
     border: none;
-    color: var(--primary); /* Or a distinct guide color like #757575 */
-    font-size: 20px; /* Slightly larger for easier tapping */
-    padding: 0 8px; /* Give it some space */
+    color: var(--primary);
+    font-size: 20px;
+    padding: 0 8px;
     cursor: pointer;
     vertical-align: middle;
-    margin-left: 8px; /* Space from the main button/text */
-    line-height: 1; /* Ensure icon is centered */
+    margin-left: 8px;
+    line-height: 1;
 }
+.guide-btn:hover { color: var(--orange); }
+.guide-btn i.material-icons { font-size: inherit; }
 
-.guide-btn:hover {
-    color: var(--orange); /* Highlight on hover */
-}
-
-.guide-btn i.material-icons {
-    font-size: inherit; /* Make icon size same as button font-size */
-}
-
-/* Adjustments for specific button placements */
 .condo-name-container-with-guide {
     display: flex;
     align-items: center;
-    justify-content: center; /* Keeps main button centered */
+    justify-content: center;
 }
-
 .menu-item {
-    /* display: flex; */ /* Already exists and is fine */
-    /* align-items: center; */ /* Already exists */
-    justify-content: space-between; /* This will push guide-btn to the end */
-    padding-right: 10px; /* Ensure some padding if guide button is very close to edge */
+    justify-content: space-between;
+    padding-right: 10px;
 }
-
 .menu-item-content-wrapper {
     display: flex;
     align-items: center;
-    flex-grow: 1; /* Allows text to take up available space */
-    overflow: hidden; /* Prevents text from pushing guide button out if too long */
-}
-
-.menu-item .menu-item-text {
-    /* flex-grow: 1; */ /* Already exists */
-    white-space: normal; /* Allow text to wrap if necessary */
-    overflow: visible;
-    text-overflow: clip;
-    margin-right: 5px; /* Space before the guide button if text is long */
+    flex-grow: 1;
+    overflow: hidden;
 }
 
 .menu-item .guide-btn {
-    flex-shrink: 0; /* Prevent guide button from shrinking */
-    margin-left: 5px; /* Minimal space from text content */
+    flex-shrink: 0;
+    margin-left: 5px;
 }
 
-/* Guide Modal Specific Styles (can reuse much of .modal-overlay and .modal-container) */
 #guide-modal .modal-container {
-    max-width: 500px; /* Slightly smaller for guide content */
+    max-width: 500px;
     max-height: 80vh;
 }
-
-#guide-modal .modal-header {
-    padding: 12px 20px; /* Adjust padding */
-}
-#guide-modal #guide-modal-title {
-    font-size: 1.1rem; /* Title size for guide */
-    font-weight: 600;
-    text-align: left;
-}
-
-#guide-modal #guide-modal-body {
-    padding: 15px 20px;
-    font-size: 0.9em;
-    line-height: 1.6;
-    color: var(--secondary-text);
-}
-
-#guide-modal #guide-modal-body strong {
-    color: var(--primary-text);
-    font-weight: 600;
-}
-
-#guide-modal #guide-modal-body ul {
-    list-style-position: inside;
-    padding-left: 5px;
-    margin-top: 5px;
-}
-#guide-modal #guide-modal-body li {
-    margin-bottom: 5px;
-}
+#guide-modal .modal-header { padding: 12px 20px; }
+#guide-modal #guide-modal-title { font-size: 1.1rem; font-weight: 600; text-align: left; }
+#guide-modal #guide-modal-body { padding: 15px 20px; font-size: 0.9em; line-height: 1.6; color: var(--secondary-text); }
+#guide-modal #guide-modal-body strong { color: var(--primary-text); font-weight: 600; }
+#guide-modal #guide-modal-body ul { list-style-position: inside; padding-left: 5px; margin-top: 5px; }
+#guide-modal #guide-modal-body li { margin-bottom: 5px; }
 
 
-/* Ensure the app-bar-logo does not get an accidental guide button if structure changes */
-.app-bar-logo-link .guide-btn {
-    display: none;
-}
-/* Estilo para o botão de edição ao lado do nome do condomínio */
-/*
-  Estilo para o botão que é APENAS o ícone da caneta.
-*/
 #edit-condo-btn {
-    /* Remove o estilo de botão padrão */
     background-color: transparent;
     border: none;
     padding: 0;
-  
-    /* Define o tamanho da área clicável do ícone */
     width: 28px;
     height: 28px;
     cursor: pointer;
     margin-left: 10px;
-  
-    /* O ícone da caneta azul como imagem de fundo */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230d6efd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'%3E%3C/path%3E%3Cpath d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'%3E%3C/path%3E%3C/svg%3E");
-    
-    /* Ajustes para o ícone preencher a área do botão */
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    
-    /* Efeito visual opcional ao passar o mouse */
     transition: opacity 0.2s ease;
   }
   
-  /* Efeito ao passar o mouse por cima */
-  #edit-condo-btn:hover {
-    opacity: 0.7; /* Deixa o ícone um pouco mais transparente */
-  }
+#edit-condo-btn:hover { opacity: 0.7; }
+
+/* Adicionado para garantir que o modal de informações não seja afetado */
+#info-modal .form-label-modal-edit, #info-modal .modal-row-content-input {
+    display: none;
+}
+#info-modal.edit-mode .form-label-modal-edit, #info-modal.edit-mode .modal-row-content-input {
+    display: block;
+}
+#info-modal.edit-mode .info-display {
+    display: none;
+}
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+    .modal-container {
+        width: 95%;
+        padding: 15px;
+    }
+    .modal-title { font-size: 18px; }
+}
