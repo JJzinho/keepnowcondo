@@ -31,10 +31,9 @@ async function checkCondoStatusAndRedirect() {
 
         // Redireciona com base na resposta
         if (data) {
-  window.location.replace('./inicio.html');
+        window.location.replace('./inicio.html'); 
         } else {
-            window.location.replace('./cadastro_condo.html'); // Exemplo de página para cadastrar o condomínio
-        }
+        window.location.replace('./pages/cadastro.html');        }
     } catch (error) {
         console.error('Erro na verificação de status:', error.message);
         alert('Ocorreu um erro ao verificar seus dados. Por favor, tente fazer o login novamente.');
