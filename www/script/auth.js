@@ -28,8 +28,9 @@ async function checkCondoStatusAndRedirect() {
         if (error) throw error;
 
         if (data) {
-            window.location.replace('./inicio.html'); // Possui condomínio
-        } else {
+        window.location.replace('inicio.html');
+        } 
+        else {
             window.location.replace('./pages/cadastro.html'); // Não possui, vai para cadastro de condomínio
         }
     } catch (error) {

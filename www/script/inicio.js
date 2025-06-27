@@ -1,5 +1,8 @@
 // script/inicio.js
+
 import { supabase } from './supabaseClient.js';
+// NOVO: Importa as funções do nosso sistema de loading centralizado.
+import { showLoading, hideLoading } from './ui.js';
 
 /**
  * Guarda o ID do condomínio selecionado no sessionStorage e redireciona.
@@ -10,9 +13,8 @@ function navigateToCondo(condoId) {
         console.error("ID do condomínio é inválido.");
         return;
     }
-    // Armazenamos o ID na sessão do navegador para a próxima página saber qual condomínio carregar.
     sessionStorage.setItem('selectedCondoId', condoId);
-    window.location.href = './condo.html'; // Redireciona para o painel principal
+    window.location.href = './condo.html';
 }
 
 /**
@@ -30,7 +32,7 @@ function renderCondoList(condos) {
     const container = document.getElementById('condo-list-container');
     if (!container) return;
 
-    container.innerHTML = ''; // Limpa a mensagem de "carregando"
+    container.innerHTML = ''; 
 
     if (!condos || condos.length === 0) {
         container.innerHTML = '<p>Nenhum condomínio encontrado para seu usuário.</p>';
@@ -40,7 +42,6 @@ function renderCondoList(condos) {
     condos.forEach(condo => {
         const condoItem = document.createElement('div');
         condoItem.className = 'condo-item';
-        // Adicionamos o ID do condomínio ao elemento para referência
         condoItem.dataset.condoId = condo.id;
 
         condoItem.innerHTML = `
@@ -50,30 +51,28 @@ function renderCondoList(condos) {
             </div>
             <span class="material-icons condo-arrow">play_arrow</span>
         `;
-
-        // Adiciona o evento de clique para navegar para o condomínio selecionado
+        
         condoItem.addEventListener('click', () => navigateToCondo(condo.id));
         
         container.appendChild(condoItem);
     });
 }
 
-
 /**
  * Função principal que roda quando a página carrega.
  */
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Proteção: Garante que o usuário está logado
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-        window.location.replace('/www/index.html');
+        window.location.replace('/www/index.html'); // ou a página de login correta
         return;
     }
 
-    // 2. Associa a função ao botão de adicionar
     document.getElementById('add-condo-btn').addEventListener('click', addCondo);
 
-    // 3. Busca e renderiza a lista de condomínios
+    // NOVO: Mostra a tela de loading antes de buscar os dados.
+    showLoading();
+
     try {
         const { data, error } = await supabase.rpc('get_user_condos');
         if (error) throw error;
@@ -82,5 +81,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Erro ao buscar lista de condomínios:', error.message);
         const container = document.getElementById('condo-list-container');
         if (container) container.innerHTML = '<p style="color: red;">Falha ao carregar condomínios.</p>';
+    } finally {
+        // NOVO: Garante que a tela de loading seja escondida ao final,
+        // tanto em caso de sucesso quanto de falha.
+        hideLoading();
     }
 });
