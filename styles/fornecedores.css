@@ -1,0 +1,158 @@
+:root {
+    --primary: #4B39EF;
+    --primary-background: #F1F4F8;
+    --secondary-background: #FFFFFF;
+    --text-primary: #14181B;
+    --text-secondary: #57636C;
+    --border-color: #D9DEE4;
+    --orange: #FF7000;
+    --success: #28a745;
+    --danger: #dc3545;
+    --info: #FFFFFF;
+    --ff-border-radius: 6px;
+    --spacing-unit: 1rem;
+    --app-bar-height: 50px; 
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--primary-background);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.fornecedores-admin-container {
+    padding: calc(var(--spacing-unit) * 1.5);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Card de Gerenciamento */
+.occurrences-management-card, .lista-fornecedores-card {
+    background-color: var(--secondary-background);
+    padding: calc(var(--spacing-unit) * 1.25);
+    border-radius: var(--ff-border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+    margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.occurrences-management-card h2, #suppliers-management-section > h2 {
+    font-size: 1.4rem; color: var(--primary);
+    margin-top: 0; margin-bottom: calc(var(--spacing-unit) * 1.25);
+    padding-bottom: calc(var(--spacing-unit) * 0.5);
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+#suppliers-management-section > h2 {
+    font-size: 1.6rem;
+    border: none;
+}
+
+.form-group { margin-bottom: var(--spacing-unit); }
+.form-group label {
+    display: block; margin-bottom: 6px; font-weight: 500;
+    font-size: 0.9rem; color: var(--text-primary); text-align: left;
+}
+.form-group input[type="text"], .form-group input[type="tel"], .form-group select {
+    width: 100%; padding: calc(var(--spacing-unit) * 0.7);
+    border: 1px solid var(--border-color);
+    border-radius: var(--ff-border-radius);
+    font-size: 0.95rem; background-color: #fdfdfd;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+.form-group input[type="text"]:focus, .form-group input[type="tel"]:focus, .form-group select:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(75, 57, 239, 0.15);
+}
+.form-group.form-check { display: flex; align-items: center; padding-top: calc(var(--spacing-unit) * 0.5); }
+.form-group input[type="checkbox"] {
+    width: 18px; height: 18px;
+    margin-right: calc(var(--spacing-unit) * 0.5);
+    accent-color: var(--primary); flex-shrink: 0;
+}
+.form-check-label { font-weight: normal; color: var(--text-primary); font-size: 0.9rem; cursor: pointer; margin-bottom: 0; }
+.form-actions {
+    margin-top: calc(var(--spacing-unit) * 1.5); display: flex;
+    flex-wrap: wrap; gap: calc(var(--spacing-unit) * 0.75);
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: calc(var(--spacing-unit) * 0.7) calc(var(--spacing-unit) * 1.4);
+    border: none; border-radius: var(--ff-border-radius);
+    cursor: pointer; font-size: 0.9rem; font-weight: 600;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px; line-height: 1.2;
+}
+.btn i.material-icons { font-size: 1.2em; }
+.btn-primary { background-color: var(--primary); color: var(--info); }
+.btn-primary:hover { background-color: #3a2dbd; }
+.btn-secondary { background-color: var(--text-secondary); color: var(--info); }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-danger { background-color: var(--danger); color: var(--info); }
+.btn-danger:hover { background-color: #c82333; }
+.btn-success { background-color: var(--success); color: var(--info); }
+.btn-success:hover { background-color: #218838; }
+
+.lista-fornecedores-card h3 {
+    font-size: 1.3rem; color: var(--primary);
+    margin-top: 0; margin-bottom: var(--spacing-unit);
+    padding-bottom: calc(var(--spacing-unit) * 0.5);
+    border-bottom: 1px solid var(--border-color);
+}
+.add-supplier-button-container {
+    margin-top: calc(var(--spacing-unit) * 1.5);
+    text-align: center;
+}
+#open-add-supplier-modal-btn i.material-icons { margin-right: 8px; }
+
+/* Modal */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1050; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s linear; padding: 15px; }
+.modal-overlay.hidden { display: none !important; }
+.modal-overlay:not(.hidden) { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+.modal-container { background-color: var(--secondary-background); border-radius: var(--ff-border-radius); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 600px; max-height: 90vh; display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.3s ease; opacity: 0; }
+.modal-overlay:not(.hidden) .modal-container { transform: scale(1); opacity: 1; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.25); border-bottom: 1px solid var(--border-color); }
+.modal-title { font-size: 1.25rem; color: var(--primary); margin: 0; font-weight: 600; }
+.modal-close-x { background: none; border: none; font-size: 1.8rem; color: var(--text-secondary); cursor: pointer; padding: 0; line-height: 1; }
+.modal-close-x:hover { color: var(--danger); }
+.modal-body { padding: calc(var(--spacing-unit) * 1.25); overflow-y: auto; }
+#form-fornecedor .form-actions { padding-top: var(--spacing-unit); border-top: 1px solid var(--border-color); }
+
+/* Seção de Ocorrências */
+.occurrences-fieldset { border: 1px solid var(--border-color); padding: var(--spacing-unit); margin-top: calc(var(--spacing-unit) * 1.5); margin-bottom: var(--spacing-unit); border-radius: var(--ff-border-radius); }
+.occurrences-fieldset legend { font-weight: 600; color: var(--primary); padding: 0 0.75em; font-size: 1.1rem; }
+.custom-occurrence-input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.custom-occurrence-input-group input[type="text"] { flex-grow: 1; }
+.all-occurrences-display-area { margin-top: 10px; padding: 15px; background-color: var(--primary-background); border: 1px solid var(--border-color); border-radius: var(--ff-border-radius); min-height: 60px; max-height: 200px; overflow-y: auto; }
+.all-occurrences-display-area ul { list-style-type: none; padding: 0; margin: 0; }
+.all-occurrences-display-area li { padding: 8px 10px; background-color: var(--secondary-background); border: 1px solid #e0e0e0; border-radius: 4px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+.all-occurrences-display-area li:last-child { margin-bottom: 0; }
+.remove-global-occurrence-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 1.2rem; padding: 0 5px; line-height: 1; }
+
+/* Tabela de Fornecedores */
+#suppliers-list-container { overflow-x: auto; }
+#suppliers-list-container table { width: 100%; border-collapse: collapse; margin-top: var(--spacing-unit); }
+#suppliers-list-container th, #suppliers-list-container td { border: 1px solid var(--border-color); padding: calc(var(--spacing-unit) * 0.75); text-align: left; font-size: 0.9rem; vertical-align: middle; }
+#suppliers-list-container th { background-color: #e9ecef; color: var(--text-primary); font-weight: 600; white-space: nowrap;}
+#suppliers-list-container .actions-cell { text-align: center; white-space: nowrap; }
+#suppliers-list-container .actions-cell .btn { margin: 2px; padding: calc(var(--spacing-unit) * 0.5) calc(var(--spacing-unit) * 0.75); font-size: 0.8rem; }
+.empty-list-message { text-align: center; color: var(--text-secondary); padding: var(--spacing-unit); font-style: italic; border: 1px dashed var(--border-color); border-radius: var(--ff-border-radius); margin-top: var(--spacing-unit); background-color: var(--primary-background); }
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .fornecedores-admin-container { padding: calc(var(--spacing-unit) * 0.75); }
+    #suppliers-management-section > h2, .occurrences-management-card h2 { font-size: 1.3rem; }
+    .lista-fornecedores-card h3, .occurrences-fieldset legend { font-size: 1.15rem; }
+}
+@media (max-width: 480px) {
+    .fornecedores-admin-container { padding: calc(var(--spacing-unit) * 0.5); }
+    .custom-occurrence-input-group { flex-direction: column; align-items: stretch; }
+    .custom-occurrence-input-group input[type="text"] { margin-bottom: 8px; }
+}

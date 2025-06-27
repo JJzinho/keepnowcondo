@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Meus Documentos</title>
+    <link rel="stylesheet" href="../styles/documentos.css">
+    <link rel="stylesheet" href="../styles/app-bar.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-bar">
+        <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
+            <i class="material-icons">arrow_back</i>
+        </button>
+         <a href="../condo.html" class="app-bar-logo-link">
+             <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo">
+         </a>
+         <h1 class="app-bar-title" style="display: none;"></h1>
+         <div class="app-bar-nav-container">
+              <div class="navbar-container">
+                  <button class="navbar-toggle" id="navbar-toggle">
+                      <i class="material-icons">menu</i>
+                  </button>
+                  <div class="navbar-dropdown" id="navbar-dropdown">
+                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                          <i class="material-icons">account_circle</i>
+                          <span>Perfil</span>
+                      </a>
+                      <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
+                          <i class="material-icons">notifications</i>
+                          <span>Notificações</span>
+                          <span class="notification-badge" style="display: none;"></span>
+                      </a>
+                      <a href="./configuracoes.html" class="navbar-item">
+                          <i class="material-icons">settings</i>
+                          <span>Configurações</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+    </div>
+
+    <!-- Container Principal -->
+    <main class="document-manager-container">
+        <h1 class="app-title">Gerenciar Documentos</h1>
+
+        <!-- Secção do Botão de Relatório de Histórico Geral -->
+        <div class="history-report-section">
+             <button id="general-history-report-btn" class="report-btn">
+                <i class="material-icons">summarize</i> Gerar Relatório de Alterações
+            </button>
+        </div>
+
+        <!-- Navegação por Abas -->
+        <div class="tabs-navigation">
+            <button class="tab-link active" data-tab="expiring-docs">Com Vencimento</button>
+            <button class="tab-link" data-tab="non-expiring-docs">Sem Vencimento</button>
+        </div>
+
+        <!-- Conteúdo da Aba "Com Vencimento" -->
+        <div id="expiring-docs" class="tab-content active">
+            <div class="add-page-controls">
+                <input type="text" id="new-page-name-expiring" class="new-page-name-input" placeholder="Nome da Nova Pasta">
+                <button class="add-page-btn-tab" data-target-tab="expiring">
+                    <i class="material-icons">create_new_folder</i> Criar Pasta
+                </button>
+            </div>
+            <div id="pages-container-expiring" class="pages-container"></div>
+        </div>
+
+        <!-- Conteúdo da Aba "Sem Vencimento" -->
+        <div id="non-expiring-docs" class="tab-content">
+            <div class="add-page-controls">
+                <input type="text" id="new-page-name-non-expiring" class="new-page-name-input" placeholder="Nome da Nova Pasta">
+                <button class="add-page-btn-tab" data-target-tab="non-expiring">
+                    <i class="material-icons">create_new_folder</i> Criar Pasta
+                </button>
+            </div>
+            <div id="pages-container-non-expiring" class="pages-container"></div>
+        </div>
+    </main>
+
+    <!-- Template para cada item de pasta -->
+    <template id="page-template">
+        <div class="page-item-container">
+            <div class="page-section-compact">
+                <div class="doc-info">
+                    <i class="material-icons doc-icon">folder</i>
+                    <div class="doc-text">
+                        <h2 class="page-title">Nome da Pasta</h2>
+                        <span class="doc-filename">Nenhum documento</span>
+                    </div>
+                </div>
+                <div class="doc-actions">
+                    <span class="status-indicator-circle"></span>
+                    <button class="action-btn history-btn" title="Ver Histórico da Pasta"><i class="material-icons">history</i></button>
+                    <button class="action-btn edit-btn" title="Editar Detalhes"><i class="material-icons">edit</i></button>
+                    <button class="action-btn delete-btn" title="Excluir Pasta"><i class="material-icons">delete</i></button>
+                </div>
+            </div>
+            <div class="details-content">
+                <div class="upload-section">
+                    <label>Substituir Documento:</label>
+                    <button class="upload-doc-btn"><i class="material-icons">upload_file</i> Escolher Arquivo</button>
+                </div>
+                <div class="date-inputs">
+                     <div class="start-date-group">
+                         <label>Data de Expedição</label>
+                         <input type="date" class="start-date">
+                     </div>
+                     <div class="end-date-group">
+                         <label>Data de Validade</label>
+                         <input type="date" class="end-date">
+                     </div>
+                </div>
+                <button class="save-doc-btn" disabled><i class="material-icons">save</i> Salvar Alterações</button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Modal de Visualização de Documento -->
+    <div id="documentViewerModal" class="document-viewer-modal hidden">
+        <div class="document-viewer-content">
+            <div class="document-viewer-header">
+                <h3 id="modalDocumentTitle">Visualizador</h3>
+                <div>
+                    <button id="download-doc-btn" class="action-btn" title="Baixar Documento"><i class="material-icons">download</i></button>
+                    <button id="closeDocumentViewerModalBtn" class="close-btn">&times;</button>
+                </div>
+            </div>
+            <div class="document-viewer-body">
+                <div id="doc-content-wrapper">
+                    <img id="modal-image-display" src="" alt="Documento" style="display:none;">
+                    <canvas id="modal-pdf-canvas" style="display:none;"></canvas>
+                </div>
+            </div>
+            <div id="modal-pdf-controls" class="document-viewer-controls" style="display:none;">
+                <button id="prev-page">Anterior</button>
+                <span>Página: <span id="page-num"></span> / <span id="page-count"></span></span>
+                <button id="next-page">Próxima</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Seleção de Origem do Arquivo -->
+    <div id="file-source-modal" class="action-sheet-overlay hidden">
+        <div class="action-sheet-content">
+            <h4>Escolha a Origem do Arquivo</h4>
+            <button id="source-camera" class="action-sheet-btn"><i class="material-icons">photo_camera</i> Tirar Foto</button>
+            <button id="source-gallery" class="action-sheet-btn"><i class="material-icons">photo_library</i> Galeria</button>
+            <button id="source-browse" class="action-sheet-btn"><i class="material-icons">folder_open</i> Procurar no Dispositivo</button>
+            <button id="source-cancel" class="action-sheet-btn cancel-btn">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal para exibir o Histórico de Alterações -->
+    <div id="history-modal" class="history-modal-overlay hidden">
+        <div class="history-modal-content">
+            <div class="history-modal-header">
+                <h3 id="history-modal-title">Histórico de Alterações</h3>
+                <button id="history-modal-close-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="history-modal-body">
+                <ul id="history-list">
+                    <!-- Logs serão inseridos aqui pelo JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input de arquivo oculto para a função "Procurar" -->
+    <input type="file" id="hidden-file-input" class="hidden" accept="image/*,application/pdf">
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script>
+    <script src="../script/documentos.js" type="module"></script>
+
+</body>
+</html>

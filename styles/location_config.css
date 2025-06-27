@@ -1,0 +1,284 @@
+/* www/styles/location_config.css */
+
+#location-config-wrapper {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.location-config-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; 
+}
+
+.location-action-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    flex-grow: 1; 
+}
+.location-action-btn.secondary {
+    background-color: #FF7000;
+}
+.location-action-btn:hover {
+    background-color: #0069d9;
+}
+.location-action-btn.secondary:hover {
+    background-color: #FF7000;
+}
+
+.empty-state-msg {
+    text-align: center;
+    color: #6c757d;
+    padding: 1.5rem;
+    font-size: 1rem;
+    font-style: italic;
+    background-color: #fff;
+    border-radius: 6px;
+}
+
+/* --- Lista de Pavimentos (Tela Principal) --- */
+#pavimentos-list-container {
+    margin-top: 1rem;
+}
+.pavimento-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 12px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+.pavimento-list-item-name {
+    font-weight: 500;
+    color: #333;
+}
+.pavimento-list-item-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    margin-left: 8px;
+}
+.pavimento-list-item-actions button:hover {
+    color: #007bff;
+}
+.pavimento-list-item-actions .delete-btn:hover {
+    color: #dc3545;
+}
+
+/* --- Modal Genérico --- */
+.location-modal-backdrop {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh; /* Usa a viewport toda */
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    padding: 1rem; 
+    box-sizing: border-box;
+}
+.location-modal-backdrop:not(.hidden) {
+    opacity: 1;
+    pointer-events: auto;
+}
+.location-modal-content {
+    background-color: #fff;
+    padding: 0; /* Removido para ter controle total */
+    border-radius: 8px;
+    width: 100%;
+    max-width: 700px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Evita que conteúdo vaze antes de rolar */
+}
+.location-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #dee2e6;
+    flex-shrink: 0;
+}
+.location-modal-header h4 { margin: 0; font-size: 1.2rem; }
+.location-modal-header .close-modal-btn { font-size: 1.75rem; cursor: pointer; background: none; border: none; }
+
+.location-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.location-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* --- Modal de Configuração de Pavimento --- */
+#pavimento-modal-sublocais-container {
+    margin-top: 1rem;
+}
+.sublocal-accordion {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+.sublocal-accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #f8f9fa;
+}
+.sublocal-accordion-header .sublocal-name-input {
+    flex-grow: 1;
+    border: 1px solid transparent;
+    padding: 4px;
+    font-weight: 500;
+    background-color: transparent;
+}
+.sublocal-accordion-header .sublocal-name-input:focus {
+    border-color: #ced4da;
+    background-color: #fff;
+}
+.sublocal-accordion-header .toggle-icon {
+    transition: transform 0.3s;
+}
+.sublocal-accordion-header .toggle-icon.open {
+    transform: rotate(90deg);
+}
+
+.sublocal-accordion-body {
+    padding: 1rem;
+    border-top: 1px solid #e0e0e0;
+    display: none; /* Inicia fechado */
+}
+.sublocal-accordion-body.open {
+    display: block; /* Mostra quando aberto */
+}
+.add-sublocal-btn {
+    background: none;
+    border: 1px dashed #007bff;
+    color: #007bff;
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-weight: 500;
+}
+
+/* --- Tabela de Equipamentos (Dentro do Modal) --- */
+.equipamentos-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.75rem;
+}
+.equipamentos-table th, .equipamentos-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #f1f3f5;
+    font-size: 0.9rem;
+}
+.equipamentos-table th { font-weight: 600; }
+.equipamento-name-input, .equipamento-qty-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.equipamento-qty-input { max-width: 80px; text-align: center; }
+.equipamentos-table .delete-btn { font-size: 1.2rem; }
+.add-equipamento-btn {
+    font-size: 0.85rem;
+    color: #007bff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    font-weight: 500;
+}
+
+
+/* --- Modal de Pré-definidos --- */
+.predefined-pavimento { margin-bottom: 1.5rem; }
+.predefined-pavimento-header { display: flex; align-items: center; gap: 10px; margin-bottom: 0.75rem; }
+.predefined-pavimento-header input[type="checkbox"] { width: 20px; height: 20px; accent-color: #007bff; }
+.predefined-pavimento-header label { font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+.predefined-sublocais-list {
+    padding-left: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+.predefined-sublocal { display: flex; align-items: center; gap: 8px; }
+.predefined-sublocal input[type="checkbox"] { width: 16px; height: 16px; }
+.predefined-sublocal label { font-size: 1rem; cursor: pointer; }
+
+
+/* --- Responsividade --- */
+@media (max-width: 600px) {
+    .location-action-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+    .location-config-actions {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .equipamentos-table thead { display: none; }
+    .equipamentos-table, .equipamentos-table tbody, .equipamentos-table tr, .equipamentos-table td {
+        display: block;
+        width: 100%;
+    }
+    .equipamentos-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        padding: 0.5rem;
+    }
+    .equipamentos-table td {
+        border: none;
+        padding: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .equipamentos-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    .equipamento-name-input { text-align: right; }
+    .equipamento-qty-input { max-width: 60px; }
+    .equipamentos-table td:last-child { justify-content: flex-end; }
+    .equipamentos-table td:last-child::before { display: none; }
+}

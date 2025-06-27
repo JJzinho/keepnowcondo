@@ -1,0 +1,121 @@
+/* www/styles/animations.css */
+
+/* --- Transições de Página --- */
+body.is-fading-out {
+    opacity: 0 !important;
+    transition: opacity 0.3s ease-out;
+}
+
+body.is-fading-in {
+    opacity: 0;
+    animation: bodyFadeInAnimation 0.5s ease-in forwards;
+    /* animation-delay: 0.1s; */ /* Opcional: pequeno delay */
+}
+
+@keyframes bodyFadeInAnimation {
+    to {
+        opacity: 1;
+    }
+}
+
+/* --- Conteúdo de Modal Escalonado --- */
+.stagger-modal-item {
+    opacity: 0;
+    transform: translateX(-25px); /* Começa um pouco à esquerda */
+    transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+}
+
+.stagger-modal-item.is-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* --- Animação de Fechamento de Modal (para o Guia) --- */
+.modal-overlay.is-closing .modal-container {
+    animation: modalContentCloseAnimation 0.3s ease-in forwards;
+}
+
+@keyframes modalContentCloseAnimation {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+    }
+}
+
+/* Outras animações que você já pode ter (como .card-entrance, .scroll-reveal) podem permanecer aqui */
+.content-fade-in {
+    animation: fadeInAnimation 0.75s ease-in-out forwards;
+    opacity: 0;
+}
+@keyframes fadeInAnimation {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animated-hover-lift {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+.animated-hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+.card-entrance {
+    animation: cardEntranceAnimation 0.5s ease-out forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+@keyframes cardEntranceAnimation {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animated-button-press {
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+}
+.animated-button-press:active {
+    transform: scale(0.97);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.navbar-dropdown.animated-dropdown {
+    opacity: 0;
+    transform: translateY(-10px);
+    visibility: hidden;
+    transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out, visibility 0s 0.25s;
+}
+.navbar-dropdown.animated-dropdown.show {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+    transition-delay: 0s;
+}
+.notification-badge.pulsate {
+    animation: pulseBadgeAnimation 1.5s infinite ease-in-out;
+}
+@keyframes pulseBadgeAnimation {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 89, 99, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 89, 99, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 89, 99, 0); }
+}
+.tab-content.animated-tab-pane {
+    animation: tabFadeInAnimation 0.4s ease-in-out forwards;
+    opacity: 0;
+}
+.tab-content.animated-tab-pane.active {
+    opacity: 1;
+}
+@keyframes tabFadeInAnimation {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(35px);
+    transition: opacity 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition-delay: 0.1s;
+}
+.scroll-reveal.scroll-reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="./styles/index.css">
+    <link rel="stylesheet" href="./styles/loading.css">
+    <link rel="icon" href="data:,">
+    <title>Login Keepnow</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form id="signup-form">
+                <h1>Crie sua conta</h1>
+                <input type="text" id="signup-name" placeholder="Nome" required>
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Senha" required minlength="6">
+                <button type="submit">Cadastrar</button>
+                <p id="signup-error" class="error-message"></p>
+            </form>
+        </div>
+        <div class="form-container sign-in">
+            <form id="login-form">
+                <h1>Entrar</h1>
+                <input type="email" id="login-email" placeholder="Email" required>
+                <input type="password" id="login-password" placeholder="Senha" required>
+                <a href="#">Esqueceu a senha?</a>
+                <button type="submit">Entrar</button>
+                <p id="login-error" class="error-message"></p>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Bem-vindo de volta!</h1>
+                    <p>Já possui uma conta? Faça o login para acessar o sistema.</p>
+                    <button class="hidden" id="login">Entrar</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Olá, Boas vindas!</h1>
+                    <p>Ainda não tem uma conta? Cadastre-se e comece a usar agora mesmo.</p>
+                    <button class="hidden" id="register">Cadastre-se</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="./script/supabaseClient.js"></script>
+    <script type="module" src="./script/index.js"></script>
+</body>
+</html>

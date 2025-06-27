@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeepNow - Cadastrar Condomínio</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/app-bar.css">
+    <link rel="stylesheet" href="../styles/cadastro.css">
+    <link rel="stylesheet" href="../styles/location_config.css">
+</head>
+<body>
+
+    <div class="app-bar">
+        <a href="../inicio.html" class="app-bar-back-button">
+            <span class="material-icons">arrow_back</span>
+        </a>
+        <h1 class="app-bar-title" id="page-title">Cadastrar Novo Condomínio</h1>
+    </div>
+
+    <main class="form-container">
+        <form id="condo-form" novalidate>
+
+            <fieldset>
+                <legend>Dados do Condomínio</legend>
+                <div class="photo-upload-container">
+                    <img id="photo-preview" src="https://sdmntprcentralus.oaiusercontent.com/files/00000000-7334-61f5-8321-7908be2dfdca/raw?se=2025-06-26T21%3A55%3A08Z&sp=r&sv=2024-08-04&sr=b&scid=bf7c5ce2-0d59-56af-ba3d-5220fc9a386f&skoid=0da8417a-a4c3-4a19-9b05-b82cee9d8868&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-26T19%3A20%3A20Z&ske=2025-06-27T19%3A20%3A20Z&sks=b&skv=2024-08-04&sig=Hzw3zUDp5Ag82NtK%2BrgcKHjch2R04xbjvhWTLTIWpAU%3D" alt="Pré-visualização da foto">
+                    <button type="button" id="select-photo-btn" class="select-photo-btn">
+                        <span class="material-icons">photo_camera</span>
+                        Alterar Foto
+                    </button>
+                    <input type="file" id="photo-input" hidden accept="image/*">
+                </div>
+                <div class="input-group"><label for="nome">Nome do Condomínio*</label><input type="text" id="nome" required></div>
+                <div class="input-group"><label for="cnpj">CNPJ*</label><input type="text" id="cnpj" placeholder="00.000.000/0000-00" required><small id="cnpj-error" class="error-message"></small></div>
+            </fieldset>
+            <fieldset>
+                <legend>Endereço</legend>
+                <div class="input-group"><label for="cep">CEP*</label><div class="input-with-button"><input type="text" id="cep" placeholder="00000-000" required><button type="button" id="cep-search-btn" class="search-btn"><span class="material-icons">search</span></button></div><small id="cep-error" class="error-message"></small></div>
+                <div class="input-group"><label for="endereco">Endereço</label><input type="text" id="endereco"></div>
+                <div class="input-group"><label for="bairro">Bairro</label><input type="text" id="bairro"></div>
+                <div class="input-group"><label for="cidade">Cidade</label><input type="text" id="cidade"></div>
+            </fieldset>
+            <fieldset>
+                <legend>Contato</legend>
+                <div class="input-group"><label for="telefone_condo">Telefone (Condomínio)</label><input type="tel" id="telefone_condo" placeholder="+55 (00) 00000-0000"></div>
+                <div class="input-group"><label for="telefone_sindico">Telefone (Síndico)</label><input type="tel" id="telefone_sindico" placeholder="+55 (00) 00000-0000"></div>
+            </fieldset>
+            <fieldset>
+                <legend>Informações Adicionais</legend>
+                <div class="input-group"><label for="unidades">Nº de Unidades</label><input type="number" id="unidades" min="0"></div>
+                <div class="input-group"><label for="moradores">Nº de Moradores (Aprox.)</label><input type="number" id="moradores" min="0"></div>
+                <div class="input-group"><label for="torres">Nº de Torres/Blocos</label><input type="number" id="torres" min="0"></div>
+            </fieldset>
+            <fieldset>
+                <legend>Administradora (Opcional)</legend>
+                <div class="input-group"><label for="admin_nome">Nome da Administradora</label><input type="text" id="admin_nome"></div>
+                <div class="input-group"><label for="admin_telefone">Telefone da Administradora</label><input type="tel" id="admin_telefone" placeholder="+55 (00) 00000-0000"></div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Configuração de Localização</legend>
+                <div id="location-config-wrapper">
+                    <div class="location-config-actions">
+                        <button type="button" id="add-pavimento-btn" class="location-action-btn">
+                            <span class="material-icons">add_business</span> Adicionar Pavimento
+                        </button>
+                        <button type="button" id="add-predefined-btn" class="location-action-btn secondary">
+                            <span class="material-icons">playlist_add_check</span> Usar Modelo
+                        </button>
+                    </div>
+
+                    <div id="pavimentos-list-container">
+                        <p id="no-pavimentos-msg" class="empty-state-msg">Nenhum pavimento adicionado.</p>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="submit-container">
+                <button type="submit" class="submit-button" id="submit-btn">Cadastrar Condomínio</button>
+                <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Aguarde...</p>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <div id="predefined-locations-modal" class="location-modal-backdrop hidden">
+        <div class="location-modal-content">
+            <div class="location-modal-header">
+                <h4>Adicionar Locais a partir de um Modelo</h4>
+                <button type="button" class="close-modal-btn">&times;</button>
+            </div>
+            <div class="location-modal-body" id="predefined-modal-body"></div>
+        </div>
+    </div>
+
+    <div id="pavimento-config-modal" class="location-modal-backdrop hidden">
+        <div class="location-modal-content">
+            <div class="location-modal-header">
+                <h4 id="pavimento-modal-title">Configurar Pavimento</h4>
+                <button type="button" class="close-modal-btn">&times;</button>
+            </div>
+            <div class="location-modal-body">
+                <div class="input-group">
+                    <label for="pavimento-modal-name">Nome do Pavimento</label>
+                    <input type="text" id="pavimento-modal-name" placeholder="Ex: Térreo, Garagem, Lazer...">
+                </div>
+                <hr>
+                <h5>Sublocais</h5>
+                <div id="pavimento-modal-sublocais-container">
+                    </div>
+                <button type="button" id="pavimento-modal-add-sublocal" class="add-sublocal-btn">
+                    + Adicionar Sublocal
+                </button>
+            </div>
+            <div class="location-modal-footer">
+                <button type="button" id="pavimento-modal-save-btn" class="location-action-btn">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/imask"></script>
+    <script type="module" src="../script/supabaseClient.js"></script>
+    <script type="module" src="../script/location_config.js"></script>
+    <script type="module" src="../script/cadastro.js"></script>
+</body>
+</html>

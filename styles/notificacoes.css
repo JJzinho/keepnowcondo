@@ -1,0 +1,215 @@
+/* www/styles/notificacoes.css */
+:root {
+    --ff-primary: #4B39EF;
+    --ff-secondary-text: #6c757d;
+    --ff-primary-text: #212529;
+    --ff-warning: #ffc107; /* Amarelo */
+    --ff-danger: #dc3545; /* Vermelho */
+    --ff-info: #1E88E5; /* Azul para informativo */
+    --ff-success: #43A047; /* Verde para OK/concluído */
+    --ff-attention: #FFB300; /* Laranja/Ambar para chamados pendentes */
+    --ff-archive: #546E7A; /* Cinza azulado para arquivar */
+
+    --ff-background: #ffffff;
+    --ff-body-background: #f4f7f9;
+    --ff-border-color: #dee2e6;
+    --ff-border-radius: 8px;
+    --ff-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --ff-spacing-unit: 1rem;
+    --white: #FFFFFF;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--ff-body-background);
+    color: var(--ff-primary-text);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.notifications-container {
+    max-width: 900px;
+    margin: calc(var(--ff-spacing-unit) * 1.5) auto;
+    padding: var(--ff-spacing-unit);
+}
+
+.page-title-notifications {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--ff-primary);
+    margin-bottom: calc(var(--ff-spacing-unit) * 1.5); /* Reduzido um pouco */
+}
+
+.notification-section { /* Container principal da lista unificada */
+    background-color: var(--ff-background);
+    border-radius: var(--ff-border-radius);
+    box-shadow: var(--ff-box-shadow);
+    padding: calc(var(--ff-spacing-unit) * 1.25);
+    margin-bottom: calc(var(--ff-spacing-unit) * 1.5);
+}
+
+/* Estilos para filtros (opcional, se for adicionar) */
+.notification-filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: var(--ff-spacing-unit);
+    padding-bottom: var(--ff-spacing-unit);
+    border-bottom: 1px solid var(--ff-border-color);
+}
+.notification-filters select {
+    padding: 8px 12px;
+    border-radius: var(--ff-border-radius);
+    border: 1px solid var(--ff-border-color);
+    background-color: var(--ff-background);
+    font-size: 0.9rem;
+    flex-grow: 1;
+}
+
+
+.notification-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.notification-item {
+    display: flex;
+    /* justify-content: space-between; */ /* Ajustado para melhor controle com ícone */
+    align-items: flex-start; /* Alinha ícone ao topo do conteúdo */
+    padding: calc(var(--ff-spacing-unit) * 0.9) calc(var(--ff-spacing-unit) * 0.75);
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+    gap: calc(var(--ff-spacing-unit) * 0.75); /* Espaço entre ícone e conteúdo */
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item:hover {
+    background-color: #f9f9f9;
+}
+
+.notification-item .item-icon {
+    font-size: 1.8rem; /* Tamanho do ícone */
+    margin-top: 2px; /* Ajuste fino vertical */
+    flex-shrink: 0;
+}
+/* Cores dos ícones baseadas no tipo de notificação */
+.notification-item.type-document .item-icon { color: var(--ff-info); }
+.notification-item.type-checklist .item-icon { color: var(--ff-success); }
+.notification-item.type-ticket .item-icon { color: var(--ff-attention); }
+
+
+.notification-item .item-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.notification-item .item-main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline; /* Alinha título e detalhe pela base */
+    gap: 10px;
+    width: 100%;
+}
+
+
+.notification-item .item-title {
+    font-weight: 600; /* Título mais forte */
+    color: var(--ff-primary-text);
+    font-size: 1rem;
+    /* white-space: nowrap; */ /* Removido para permitir quebra se necessário */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px; /* Pequeno espaço antes do contexto */
+}
+
+.notification-item .item-detail { /* Data de vencimento, status do chamado */
+    font-size: 0.85rem; /* Um pouco menor */
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-align: right; /* Alinha à direita */
+}
+
+.notification-item .item-context { /* Pasta, Sistema, Local do Chamado */
+    font-size: 0.8rem;
+    color: var(--ff-secondary-text);
+    margin-top: 0px;
+}
+
+/* Cores específicas para o item-detail baseado no status */
+.notification-item.status-expired .item-detail,
+.notification-item.status-overdue .item-detail {
+    color: var(--ff-danger);
+    font-weight: bold;
+}
+.notification-item.status-expiring-soon .item-detail,
+.notification-item.status-pending-attention .item-detail {
+    color: var(--ff-warning);
+    font-weight: bold;
+}
+.notification-item.status-archive-ready .item-detail {
+    color: var(--ff-archive);
+    font-weight: 500;
+}
+
+
+.empty-list-message {
+    text-align: center;
+    color: var(--ff-secondary-text);
+    padding: var(--ff-spacing-unit);
+    font-style: italic;
+    background-color: var(--ff-body-background);
+    border-radius: calc(var(--ff-border-radius) / 2);
+    border: 1px dashed var(--ff-border-color);
+}
+
+#notification-count-badge {
+    background-color: var(--ff-danger);
+    color: var(--white);
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+
+/* Responsividade */
+@media (max-width: 600px) {
+    body {
+        padding-top: 0px;
+    }
+    .page-title-notifications {
+        font-size: 1.4rem;
+    }
+    .notification-section {
+        padding: var(--ff-spacing-unit);
+    }
+
+    .notification-item .item-main-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .notification-item .item-detail {
+        margin-left: 0;
+        margin-top: 4px;
+        align-self: flex-start;
+        text-align: left;
+    }
+    .notification-item .item-icon {
+        font-size: 1.6rem; /* Ícone um pouco menor no mobile */
+    }
+    .notification-item .item-title {
+        font-size: 0.95rem;
+    }
+}

@@ -1,0 +1,446 @@
+/* www/styles/index.css */
+:root {
+    --primary: #4B39EF;
+    --primary-background: #F1F4F8;
+    --secondary-background: #FFFFFF;
+    --info: #FFFFFF; /* Cor do texto para botões primários, por exemplo */
+    --orange: #FF7000;
+    --orange-light: #FF6F00;
+    --orange-lighter: #FF9A00;
+    --error: #FF5963;
+    --alternate: #E0E3E7;
+    --primary-text: #14181B;
+    --secondary-text: #57636C;
+    --success: #4CAF50;
+    --danger: #dc3545;
+    --ff-border-radius: 6px; /* Mantido o nome da variável, mas pode ser renomeado se preferir */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background-color: var(--primary-background); line-height: 1.5; }
+
+/* Estilos da App Bar (geralmente em app-bar.css, mas incluído aqui para referência se não estiver separado) */
+.app-bar {
+    background-color: var(--primary);
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alinha itens à direita por padrão */
+    padding: 0 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative; /* Para posicionamento absoluto do logo */
+}
+
+.app-bar .menu-button { /* Se você tiver um botão de menu geral */
+    background: none;
+    border: none;
+    color: var(--info); /* --info geralmente é branco, bom para fundos escuros */
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 1; /* Para garantir que esteja clicável */
+}
+
+.app-bar .logo { /* Logo centralizado */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 65px; /* Pode ser maior que a barra para efeito de sobreposição */
+    top: -5px; /* Ajuste para centralizar verticalmente e/ou sobrepor */
+}
+
+/* Imagem e Nome do Condomínio */
+.condo-image {
+    width: 271px; /* Largura original */
+    max-width: 90%; /* Responsividade */
+    height: 130px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 10px auto;
+    display: block;
+}
+
+/* O div que centraliza o botão do nome do condomínio já tem text-align: center inline no HTML. */
+/* O estilo inline no botão #show-more-btn-condo-name define seu tamanho de fonte e padding. */
+
+/* Estilo para o botão .button e .button-primary (usado pelo nome do condomínio) */
+.button {
+    padding: 8px 16px;
+    border-radius: 16px;
+    border: none;
+    color: var(--info); /* Cor do texto padrão para botões (branco) */
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px; /* Tamanho base, pode ser sobrescrito por estilo inline */
+    font-weight: 600; /* Adicionado para consistência com títulos */
+    cursor: pointer;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button-primary {
+    background-color: var(--orange);
+}
+.button-primary:hover {
+    background-color: #3a2dbd; /* Um tom mais escuro de --primary */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Adiciona sublinhado ao texto DENTRO do botão do nome do condomínio no hover */
+#show-more-btn-condo-name:hover #condo-name-display-button {
+    text-decoration: underline;
+}
+
+/* Card de Menu */
+.menu-card {
+    background-color: var(--secondary-background);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin: 16px; /* Espaçamento consistente */
+    padding: 16px;
+}
+
+.menu-item {
+    width: 95%;
+    max-width: 300px;
+    height: 50px;
+    background-color: var(--secondary-background);
+    border-radius: 16px;
+    border: 1px solid var(--orange-light);
+    margin: 10px auto; /* Centraliza e dá espaço entre itens */
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none; /* Remove sublinhado de links */
+}
+
+.menu-item:hover {
+    background-color: #f8f9fa; /* Um cinza bem claro no hover */
+}
+
+.menu-item-icon {
+    width: 20px;
+    height: 20px;
+    background-color: var(--primary); /* Usando a cor primária para o ícone */
+    border-radius: 50%;
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+.menu-item-text {
+    font-family: 'Inter', sans-serif;
+    color: var(--orange-light); /* Cor laranja para o texto do menu */
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 15px;
+    flex-grow: 1;
+    text-align: left;
+    padding-right: 10px; /* Espaço para não colar na borda */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Estilos do Modal (reutilizáveis) */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0s 0.2s linear;
+}
+.modal-overlay:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease;
+}
+
+.modal-container {
+    background-color: var(--secondary-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+    opacity: 0;
+}
+.modal-overlay:not(.hidden) .modal-container {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--alternate);
+}
+
+.modal-title {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    flex-grow: 1;
+    color: var(--primary-text);
+    margin: 0 10px; /* Evita que o título cole nos botões do header */
+}
+
+.modal-close-x { /* Botão X específico */
+    order: 3; /* Garante que fique à direita do título */
+    margin-left: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem; /* 24px */
+    cursor: pointer;
+    color: var(--secondary-text); /* Cor mais sutil */
+}
+.modal-close-x:hover {
+    color: var(--primary-text); /* Cor mais escura no hover */
+}
+
+
+.modal-section-title {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--primary);
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--alternate);
+    display: flex; /* Para alinhar ícone e texto */
+    align-items: center; /* Para alinhar ícone e texto */
+}
+.modal-section-title i.material-icons {
+    margin-right: 8px;
+    font-size: 1.1em; /* Um pouco maior que o texto */
+}
+
+.modal-row {
+    display: flex;
+    align-items: flex-start; /* Alinha ícone ao topo do conteúdo do campo */
+    margin-bottom: 16px; 
+    font-size: 14px;
+    color: var(--secondary-text);
+}
+.modal-row span:last-child:not(.material-icons):not(.info-icon) {
+    color: var(--primary-text);
+    margin-left: 5px;
+    word-break: break-word; /* Quebra palavras longas */
+}
+.modal-row .info-icon {
+    color: var(--orange);
+    margin-right: 10px;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 2px; /* Pequeno ajuste */
+}
+
+/* Navbar (Menu Hamburger) */
+.navbar-container {
+    position: relative;
+    margin-left: auto;
+    margin-right: 10px;
+}
+.navbar-toggle {
+    background: none;
+    border: none;
+    color: var(--info);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.navbar-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: var(--secondary-background);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+}
+.navbar-dropdown.show { display: block; }
+.navbar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--primary-text);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.navbar-item:last-child { border-bottom: none; }
+.navbar-item:hover { background-color: #f5f5f5; }
+.navbar-item i.material-icons {
+    margin-right: 12px;
+    color: var(--primary);
+}
+.navbar-item.disabled {
+    color: #aaa;
+    cursor: not-allowed;
+}
+.navbar-item.disabled:hover { background-color: transparent; }
+.navbar-item.disabled i.material-icons { color: #aaa; }
+
+
+.notification-badge {
+    background-color: var(--error);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+/* --- ESTILOS PARA EXIBIÇÃO DA CONFIGURAÇÃO DE LOCALIZAÇÃO (NOVO) --- */
+.location-config-display-area {
+    font-size: 0.9em;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: var(--ff-border-radius);
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+}
+.pavimento-display-group {
+    margin-bottom: 1rem;
+}
+.pavimento-display-group h4 {
+    font-weight: bold;
+    color: var(--primary-text);
+    margin: 0 0 5px 0;
+    font-size: 1em;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 3px;
+}
+.sublocal-display-list {
+    list-style-type: none;
+    padding-left: 10px;
+}
+.sublocal-display-list > li {
+    margin-bottom: 8px;
+}
+.sublocal-display-list strong { /* Nome do sublocal */
+    color: #333;
+}
+.equipamento-display-list {
+    list-style-type: ' - '; /* Pequeno traço antes do item */
+    padding-left: 20px;
+    margin-top: 4px;
+    color: var(--secondary-text);
+}
+.equipamento-display-list li {
+    margin-bottom: 2px;
+}
+/* ------------------------------------------------------------------- */
+
+
+.guide-btn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 20px;
+    padding: 0 8px;
+    cursor: pointer;
+    vertical-align: middle;
+    margin-left: 8px;
+    line-height: 1;
+}
+.guide-btn:hover { color: var(--orange); }
+.guide-btn i.material-icons { font-size: inherit; }
+
+.condo-name-container-with-guide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.menu-item {
+    justify-content: space-between;
+    padding-right: 10px;
+}
+.menu-item-content-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.menu-item .guide-btn {
+    flex-shrink: 0;
+    margin-left: 5px;
+}
+
+#guide-modal .modal-container {
+    max-width: 500px;
+    max-height: 80vh;
+}
+#guide-modal .modal-header { padding: 12px 20px; }
+#guide-modal #guide-modal-title { font-size: 1.1rem; font-weight: 600; text-align: left; }
+#guide-modal #guide-modal-body { padding: 15px 20px; font-size: 0.9em; line-height: 1.6; color: var(--secondary-text); }
+#guide-modal #guide-modal-body strong { color: var(--primary-text); font-weight: 600; }
+#guide-modal #guide-modal-body ul { list-style-position: inside; padding-left: 5px; margin-top: 5px; }
+#guide-modal #guide-modal-body li { margin-bottom: 5px; }
+
+
+#edit-condo-btn {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    margin-left: 10px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%230d6efd' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'%3E%3C/path%3E%3Cpath d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'%3E%3C/path%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: opacity 0.2s ease;
+  }
+  
+#edit-condo-btn:hover { opacity: 0.7; }
+
+/* Adicionado para garantir que o modal de informações não seja afetado */
+#info-modal .form-label-modal-edit, #info-modal .modal-row-content-input {
+    display: none;
+}
+#info-modal.edit-mode .form-label-modal-edit, #info-modal.edit-mode .modal-row-content-input {
+    display: block;
+}
+#info-modal.edit-mode .info-display {
+    display: none;
+}
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+    .modal-container {
+        width: 95%;
+        padding: 15px;
+    }
+    .modal-title { font-size: 18px; }
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Notificações</title>
+    <link rel="stylesheet" href="../styles/app-bar.css">
+    <link rel="stylesheet" href="../styles/notificacoes.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+    <div class="app-bar">
+        <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
+            <i class="material-icons">arrow_back</i>
+        </button>
+         <h1 class="app-bar-title" style="display: none;"></h1>
+         <div class="app-bar-nav-container">
+              <div class="navbar-container">
+                  <button class="navbar-toggle" id="navbar-toggle">
+                      <i class="material-icons">menu</i>
+                  </button>
+                  <div class="navbar-dropdown" id="navbar-dropdown">
+                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                          <i class="material-icons">account_circle</i>
+                          <span>Perfil</span>
+                      </a>
+                      <a href="./notificacoes.html" class="navbar-item active">
+                          <i class="material-icons">notifications</i>
+                          <span>Notificações</span>
+                          <span class="notification-badge" id="notification-count-badge" style="display: none;"></span>
+                      </a>
+                      <a href="./configuracoes.html" class="navbar-item">
+                          <i class="material-icons">settings</i>
+                          <span>Configurações</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
+    </div>
+
+    <main class="notifications-container">
+        <h1 class="page-title-notifications">Central de Notificações</h1>
+
+        <div id="unified-notifications-section" class="notification-section">
+            <div id="unified-notifications-list" class="notification-list">
+                <p class="empty-list-message">Nenhuma notificação no momento.</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="../capacitor.js"></script>
+    <script src="../script/dados.js"></script>
+    <script src="../script/notificacoes.js"></script>
+    <script>
+        const navbarToggle = document.getElementById('navbar-toggle');
+        const navbarDropdown = document.getElementById('navbar-dropdown');
+        if (navbarToggle && navbarDropdown) {
+            navbarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navbarDropdown.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (navbarToggle && navbarDropdown && !navbarToggle.contains(e.target) && !navbarDropdown.contains(e.target)) {
+                    navbarDropdown.classList.remove('show');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Inter+Tight:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/configuracoes.css">
+    <link rel="stylesheet" href="../styles/app-bar.css">
+</head>
+<body>
+    <div class="app-bar">
+        <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
+            <i class="material-icons">arrow_back</i>
+        </button>
+    
+        <a href="../condo.html" class="app-bar-logo-link">
+            <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo">
+        </a>
+        <div class="app-bar-nav-container">
+            <div class="navbar-container">
+                <button class="navbar-toggle" id="navbar-toggle">
+                    <i class="material-icons">menu</i>
+                </button>
+                <div class="navbar-dropdown" id="navbar-dropdown">
+                    <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                        <i class="material-icons">account_circle</i>
+                        <span>Perfil</span>
+                    </a>
+                    <a href="./notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
+                        <i class="material-icons">notifications</i>
+                        <span>Notificações</span>
+                        <span class="notification-badge" style="display: none;"></span>
+                    </a>
+                    <a href="./configuracoes.html" class="navbar-item"> 
+                        <i class="material-icons">settings</i>
+                        <span>Configurações</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="profile-container">
+        <h2 class="profile-section-title">Configurações da Conta</h2>
+
+        <a href="#" class="profile-action-card" onclick="alert('Mudar dados Pessoais (Não implementado)')">
+             <i class="material-icons">person</i>
+             <span class="profile-action-text">Mudar dados Pessoais (Não implementado)</span>
+             <i class="material-icons profile-action-icon">chevron_right</i>
+         </a>
+
+        <a href="./cadastro.html?mode=edit&from=config" class="profile-action-card">
+            <i class="material-icons">apartment</i>
+            <span class="profile-action-text">Editar Informações do Condomínio</span>
+             <i class="material-icons profile-action-icon">chevron_right</i>
+        </a>
+
+        <div class="profile-action-card" onclick="alert('Mudar plano (Não implementado)')">
+            <i class="material-icons">paid</i>
+            <span class="profile-action-text">Mudar plano</span>
+            <i class="material-icons profile-action-icon">chevron_right</i>
+        </div>
+
+
+        <div class="profile-action-card" onclick="alert('Ajuda e Suporte (Não implementado)')" style="margin-top: 1rem;">
+            <i class="material-icons">help_outline</i>
+            <span class="profile-action-text">Ajuda e Suporte</span>
+            <i class="material-icons profile-action-icon">chevron_right</i>
+        </div>
+
+        <div class="profile-action-card" onclick="handleLogout()">
+            <i class="material-icons">exit_to_app</i>
+            <span class="profile-action-text">Sair</span>
+            <i class="material-icons profile-action-icon">chevron_right</i>
+        </div>
+        </div>
+
+    <script>
+        // Função de Logout (exemplo)
+        function handleLogout() {
+            if (confirm("Tem certeza que deseja sair?")) {
+                window.location.href = '../index.html'; // Redireciona para a página de login
+            }
+        }
+
+        // Função de confirmação de exclusão (mantida caso queira reativar ou usar em outro lugar)
+        // function confirmDeleteAccount() {
+        //     if (confirm("Tem certeza que deseja excluir sua conta permanentemente? Esta ação não pode ser desfeita.")) {
+        //         alert("Conta excluída (simulação).");
+        //         // window.location.href = '../login.html';
+        //     }
+        // }
+
+        // Navbar Toggle Script
+        const navbarToggle = document.getElementById('navbar-toggle');
+        const navbarDropdown = document.getElementById('navbar-dropdown');
+        if (navbarToggle && navbarDropdown) {
+            navbarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navbarDropdown.classList.toggle('show');
+            });
+            document.addEventListener('click', (e) => {
+                if (navbarToggle && navbarDropdown && !navbarToggle.contains(e.target) && !navbarDropdown.contains(e.target)) {
+                    navbarDropdown.classList.remove('show');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

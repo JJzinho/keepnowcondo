@@ -1,0 +1,188 @@
+/* Estilos Padrão da Barra de Aplicativos (ex: em styles/app-bar.css) */
+:root {
+    /* Defina a cor primária e outras variáveis ​​se ainda não tiver feito globalmente */
+    --primary: #4B39EF;
+    --white: #FFFFFF;
+    --error: #FF5963; /* Exemplo de cor de erro para o badge */
+    --primary-text: #14181B; /* Adicionado para consistência nos itens do menu */
+    --secondary-background: #FFFFFF; /* Fundo do dropdown */
+    --ff-border-radius: 8px; /* Raio da borda */
+    
+    --app-bar-height: 80px;
+    
+    /* AJUSTE: O tamanho da logo agora não precisa ser diferente da barra */
+    --app-bar-logo-height: 45px; 
+
+    --app-bar-z-index: 1000; /* Garante que fique no topo */
+}
+
+.app-bar {
+    background-color: var(--primary);
+    height: var(--app-bar-height);
+    display: flex;
+    align-items: center; /* Isso irá alinhar a logo verticalmente */
+    padding: 0 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    
+    top: 0;
+    bottom: 10px;
+    z-index: var(--app-bar-z-index);
+    color: var(--white);
+    
+    padding-top: 30px; 
+}
+
+/* Botão Voltar (Esquerda) */
+.app-bar-back-button {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    margin-right: auto; /* Empurra a logo e outros itens para o centro/direita */
+    line-height: 1; 
+}
+.app-bar-back-button i { vertical-align: middle; }
+
+/* Logo (Centro) */
+/* AJUSTE: Simplificamos drasticamente este seletor */
+.app-bar-logo-link {
+    /* Removemos 'position: absolute' e todo o cálculo de 'top' e 'left'. */
+    /* Agora, a logo é um item flex como os outros e será alinhada automaticamente. */
+    height: var(--app-bar-logo-height); /* Usamos uma altura que cabe dentro da barra */
+}
+
+.app-bar-logo {
+    height: 100%;
+    display: block;
+}
+
+/* Título (Centro - opcional) */
+.app-bar-title {
+    position: absolute;
+    left: 60px;
+    right: 60px;
+    text-align: center;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--white);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Contêiner de Navegação (Direita) */
+.app-bar-nav-container {
+    margin-left: auto; /* Empurra para a direita */
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Itens/Botões de Navegação Individuais */
+.app-bar-nav-item,
+.navbar-toggle {
+    background: none;
+    border: none;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+    line-height: 1;
+}
+
+.app-bar-nav-item i,
+.navbar-toggle i {
+    font-size: 24px;
+    vertical-align: middle;
+}
+
+/* Badge de Notificação */
+.app-bar-notification-badge {
+    background-color: var(--error);
+    color: var(--white);
+    border-radius: 50%;
+    padding: 1px 5px;
+    font-size: 0.7em;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(40%, -40%);
+    min-width: 16px;
+    text-align: center;
+    line-height: 1.4;
+    font-weight: bold;
+}
+
+/* --- Estilos para Navbar Dropdown --- */
+.navbar-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: var(--secondary-background, #FFFFFF);
+    border-radius: var(--ff-border-radius, 8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    z-index: calc(var(--app-bar-z-index) + 10);
+    display: none;
+    overflow: hidden;
+}
+
+.navbar-dropdown.show {
+    display: block;
+}
+
+.navbar-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: var(--primary-text, #14181B);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.navbar-item:last-child {
+    border-bottom: none;
+}
+
+.navbar-item:hover {
+    background-color: #f5f5f5;
+}
+
+.navbar-item i.material-icons {
+    margin-right: 12px;
+    color: var(--primary, #4B39EF);
+}
+
+.navbar-item.disabled {
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.navbar-item.disabled:hover {
+    background-color: transparent;
+}
+
+.navbar-item.disabled i.material-icons {
+    color: #aaa;
+}
+
+.notification-badge {
+    background-color: var(--error, #FF5963);
+    color: var(--white, #FFFFFF);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
