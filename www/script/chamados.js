@@ -35,7 +35,7 @@ const ChamadosPage = {
         this.state.condoId = sessionStorage.getItem('selectedCondoId');
         if (!this.state.condoId) {
             alert("Condomínio não selecionado!");
-            window.location.replace('/www/inicio.html');
+            window.location.replace('./pages/inicio.html');
             return;
         }
 

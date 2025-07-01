@@ -214,7 +214,7 @@ const submitForm = async (event) => {
             alert('Condomínio cadastrado com sucesso!');
         }
 
-        window.location.href = '../inicio.html';
+        window.location.href = './pages/inicio.html';
 
     } catch (error) {
         console.error('Erro ao salvar condomínio:', error);
@@ -258,7 +258,7 @@ const loadCondoDataForEdit = async (id) => {
     } catch (error) {
         console.error('Erro ao carregar dados do condomínio:', error);
         alert('Não foi possível carregar os dados para edição.');
-        window.location.href = '../inicio.html';
+        window.location.href = './pages/inicio.html';
     }
 };
 

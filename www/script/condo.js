@@ -175,7 +175,7 @@ function setupEditButton(condoId) {
     const editButton = document.getElementById('edit-condo-btn');
     if (editButton) {
         editButton.addEventListener('click', () => {
-            window.location.href = `./pages/cadastro.html?id=${condoId}`;
+            window.location.href = `cadastro.html?id=${condoId}`;
         });
     } else {
         console.warn('Elemento com id "edit-condo-btn" não foi encontrado na página.');
@@ -194,7 +194,7 @@ async function initializeCondoPage() {
     const selectedCondoId = sessionStorage.getItem('selectedCondoId');
     if (!selectedCondoId) {
         alert('Nenhum condomínio selecionado. Redirecionando...');
-        window.location.replace('./inicio.html');
+        window.location.replace('./pages/inicio.html');
         return;
     }
 

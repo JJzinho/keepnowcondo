@@ -14,7 +14,7 @@ function navigateToCondo(condoId) {
         return;
     }
     sessionStorage.setItem('selectedCondoId', condoId);
-    window.location.href = './condo.html';
+    window.location.href = './pages/condo.html';
 }
 
 /**
