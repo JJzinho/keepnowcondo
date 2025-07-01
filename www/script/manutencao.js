@@ -440,8 +440,7 @@ const ManutencaoPage = {
     },
 
     // ================================================
-    // SETUP DE EVENTOS E INICIALIZAÇÃO
-    // ================================================
+
     setupEventListeners() {
         const s = this.utils.getById;
         s('create-ticket-btn-manutencao')?.addEventListener('click', () => this.openTicketModal());
