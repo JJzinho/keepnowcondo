@@ -372,7 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
     function loadAllKnownOccurrenceTypes() {
         let storedTypes = utils.loadData(STORAGE_KEYS.OCCURRENCE_TYPES, null);
         let initialTypes;

@@ -214,7 +214,7 @@ const submitForm = async (event) => {
             alert('Condomínio cadastrado com sucesso!');
         }
 
-        window.location.href = './inicio.html';
+        window.location.href = './pages/inicio.html';
 
     } catch (error) {
         console.error('Erro ao salvar condomínio:', error);
