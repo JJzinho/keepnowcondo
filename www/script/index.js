@@ -23,9 +23,6 @@ if (loginBtn) {
     });
 }
 
-/**
- * Função que verifica se o usuário já tem um condomínio cadastrado e o redireciona.
- */
 async function checkCondoStatusAndRedirect() {
     console.log("Verificando status do condomínio do usuário...");
     try {
@@ -39,7 +36,7 @@ async function checkCondoStatusAndRedirect() {
         // Redireciona com base na resposta
         if (data) {
             // TRUE: Usuário já tem condomínio, vai para a lista de condomínios.
-            window.location.replace('/inicio.html');
+            window.location.replace('./pages/inicio.html');
         } else {
             // FALSE: Usuário novo, precisa cadastrar o primeiro condomínio.
             window.location.replace('./pages/cadastro.html');
@@ -105,11 +102,8 @@ if (loginForm) {
     });
 }
 
-// --- LISTENER GLOBAL DE AUTENTICAÇÃO ---
-// É executado sempre que o estado de autenticação muda (login, logout).
 supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN') {
-        // Este evento é disparado após um login ou cadastro bem-sucedido.
         checkCondoStatusAndRedirect();
     }
 });

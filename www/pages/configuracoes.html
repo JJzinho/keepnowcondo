@@ -63,7 +63,6 @@
             <i class="material-icons profile-action-icon">chevron_right</i>
         </div>
 
-
         <div class="profile-action-card" onclick="alert('Ajuda e Suporte (Não implementado)')" style="margin-top: 1rem;">
             <i class="material-icons">help_outline</i>
             <span class="profile-action-text">Ajuda e Suporte</span>
@@ -78,22 +77,13 @@
         </div>
 
     <script>
-        // Função de Logout (exemplo)
+
         function handleLogout() {
             if (confirm("Tem certeza que deseja sair?")) {
                 window.location.href = '../index.html'; // Redireciona para a página de login
             }
         }
 
-        // Função de confirmação de exclusão (mantida caso queira reativar ou usar em outro lugar)
-        // function confirmDeleteAccount() {
-        //     if (confirm("Tem certeza que deseja excluir sua conta permanentemente? Esta ação não pode ser desfeita.")) {
-        //         alert("Conta excluída (simulação).");
-        //         // window.location.href = '../login.html';
-        //     }
-        // }
-
-        // Navbar Toggle Script
         const navbarToggle = document.getElementById('navbar-toggle');
         const navbarDropdown = document.getElementById('navbar-dropdown');
         if (navbarToggle && navbarDropdown) {

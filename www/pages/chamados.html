@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciamento de Chamados</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Inter+Tight:wght@500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"
     <link rel="stylesheet" href="../styles/app-bar.css">
     <link rel="stylesheet" href="../styles/chamados.css">
 </head>
@@ -45,8 +45,6 @@
             <div id="tab-ARQUIVADO" class="tab-pane"></div>
         </div>
     </main>
-
-    <!-- Modal para Detalhes e Ações do Chamado -->
     <div id="ticket-detail-modal" class="modal-overlay hidden">
         <div class="modal-container">
             <div class="modal-header">
@@ -54,10 +52,8 @@
                 <button type="button" class="modal-close-x">&times;</button>
             </div>
             <div class="modal-body" id="modal-ticket-body">
-                <!-- Conteúdo dinâmico será injetado aqui -->
             </div>
             <div class="modal-footer" id="modal-ticket-footer">
-                <!-- Ações dinâmicas serão injetadas aqui -->
             </div>
         </div>
     </div>
@@ -66,6 +62,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script type="module" src="../script/supabaseClient.js"></script>
     <script type="module" src="../script/chamados.js"></script>
+     <link rel="stylesheet" href="../styles/global.css">
     <script>
         const navbarToggle = document.getElementById('navbar-toggle');
         const navbarDropdown = document.getElementById('navbar-dropdown');
