@@ -194,7 +194,7 @@ async function initializeCondoPage() {
     const selectedCondoId = sessionStorage.getItem('selectedCondoId');
     if (!selectedCondoId) {
         alert('Nenhum condomínio selecionado. Redirecionando...');
-        window.location.replace('./pages/inicio.html');
+        window.location.replace('./inicio.html');
         return;
     }
 

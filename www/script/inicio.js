@@ -14,15 +14,14 @@ function navigateToCondo(condoId) {
         return;
     }
     sessionStorage.setItem('selectedCondoId', condoId);
-    window.location.href = './pages/condo.html';
+window.location.href = './condo.html';
 }
 
 /**
  * Redireciona para a página de cadastro de um novo condomínio.
  */
 function addCondo() {
-    window.location.href = './pages/cadastro.html';
-}
+window.location.href = './cadastro.html';}
 
 /**
  * Renderiza a lista de condomínios na tela.
