@@ -40,10 +40,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-         <receiver android:name="com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher" android:exported="false" />
-        <receiver android:name="com.capacitorjs.plugins.localnotifications.NotificationDismissReceiver" android:exported="false" />
-
-
     </application>
 
 </manifest>

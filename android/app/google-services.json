@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "963416235390",
+    "project_id": "keepnowcondo-a136f",
+    "storage_bucket": "keepnowcondo-a136f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:963416235390:android:84f6405c13c0c9cf62a72f",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgdxXg9o9UoiSYuOIfdBnxhZDC3XkjY1U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

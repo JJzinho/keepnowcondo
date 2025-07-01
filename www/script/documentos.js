@@ -1,7 +1,92 @@
 // www/script/documentos.js
 
 import { supabase } from './supabaseClient.js';
-const { Camera, Browser } = window.Capacitor?.Plugins ?? {};
+// Adiciona referência aos plugins do Capacitor
+const { Camera, Browser, PushNotifications } = window.Capacitor?.Plugins ?? {};
+
+// --- NOVA FUNÇÃO: REGISTRAR PARA NOTIFICAÇÕES ---
+const registerPushNotifications = async () => {
+    // Verifica se o plugin está disponível
+    if (!PushNotifications) {
+        console.log("Push Notifications plugin não disponível.");
+        return;
+    }
+
+    try {
+        // Verifica se a permissão já foi concedida
+        let permStatus = await PushNotifications.checkPermissions();
+
+        // Se a permissão ainda não foi solicitada, pede ao usuário
+        if (permStatus.receive === 'prompt') {
+            permStatus = await PushNotifications.requestPermissions();
+        }
+
+        // Se a permissão não for concedida, encerra a função
+        if (permStatus.receive !== 'granted') {
+            console.warn('Permissão para notificações não concedida pelo usuário.');
+            return;
+        }
+
+        // Registra o dispositivo para receber notificações (remotas)
+        await PushNotifications.register();
+        console.log("Dispositivo registrado para notificações push.");
+
+    } catch (error) {
+        console.error("Erro ao registrar para notificações push:", error);
+    }
+};
+
+// --- NOVA FUNÇÃO: VERIFICAR E NOTIFICAR SOBRE VENCIDOS ---
+const checkAndNotifyForExpiredDocuments = async (folders) => {
+    if (!PushNotifications) return;
+
+    // Garante que só prosseguirá se tiver permissão
+    const permStatus = await PushNotifications.checkPermissions();
+    if (permStatus.receive !== 'granted') {
+        return;
+    }
+
+    const expiredDocs = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    folders.forEach(folder => {
+        if (folder.categoria === 'expiring') {
+            const versions = (folder.documento_versao || []).sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at));
+            const currentDocument = versions[0] || null;
+
+            if (currentDocument?.end_date) {
+                const endDate = new Date(currentDocument.end_date);
+                if (endDate < today) {
+                    expiredDocs.push({
+                        folderName: folder.nome,
+                        docName: currentDocument.file_name || 'Documento sem nome'
+                    });
+                }
+            }
+        }
+    });
+
+    if (expiredDocs.length > 0) {
+        try {
+            await PushNotifications.schedule({
+                notifications: [
+                    {
+                        id: 1, // ID estático para sobrepor notificações antigas e não acumular
+                        title: "Documentos Vencidos!",
+                        body: `Você possui ${expiredDocs.length} documento(s) vencido(s). Verifique o app.`,
+                        largeBody: `Os seguintes documentos estão vencidos: ${expiredDocs.map(d => d.docName).join(', ')}.`,
+                        schedule: { at: new Date(Date.now() + 1000 * 2) }, // Envia em 2 segundos
+                    }
+                ]
+            });
+            console.log("Notificação de documento vencido agendada.");
+        } catch (error) {
+            console.error("Erro ao agendar notificação:", error);
+        }
+    }
+};
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- ESTADO GLOBAL E ELEMENTOS DO DOM ---
@@ -18,7 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- VERIFICAÇÃO INICIAL ---
     if (!selectedCondoId) {
         alert("Nenhum condomínio selecionado. Redirecionando...");
-        window.location.href = '../inicio.html';
+        // Correção de bug de navegação discutido anteriormente
+        window.location.href = './inicio.html';
         return;
     }
 
@@ -64,13 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rpcError) throw rpcError;
         },
         getHistory: async (folderId) => {
-            // A função RPC foi atualizada no SQL para lidar com ambos os casos
             const { data, error } = await supabase.rpc('get_document_history', { p_pasta_id: folderId });
             if (error) throw error;
             return data;
         },
          getGeneralHistory: async () => {
-            // Criamos uma nova RPC para o relatório geral
             const { data, error } = await supabase.rpc('get_document_history_for_condo', { p_condo_id: selectedCondoId });
             if (error) throw error;
             return data;
@@ -82,6 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
         async loadAndDisplay() {
             try {
                 const folders = await Db.getFolders();
+
+                // --- NOVA CHAMADA: VERIFICAR E NOTIFICAR ---
+                await checkAndNotifyForExpiredDocuments(folders);
+
                 const expiringContainer = document.getElementById('pages-container-expiring');
                 const nonExpiringContainer = document.getElementById('pages-container-non-expiring');
                 expiringContainer.innerHTML = '';
@@ -412,4 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CARGA INICIAL ---
     UI.loadAndDisplay();
+    
+    // --- NOVA CHAMADA: TENTA REGISTRAR PARA NOTIFICAÇÕES AO CARREGAR A PÁGINA ---
+    registerPushNotifications();
 });
