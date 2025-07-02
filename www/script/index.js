@@ -39,7 +39,7 @@ async function checkCondoStatusAndRedirect() {
             window.location.replace('./pages/inicio.html');
         } else {
             // FALSE: Usuário novo, precisa cadastrar o primeiro condomínio.
-            window.location.replace('./pages/cadastro.html');
+            window.location.replace('./cadastro.html');
         }
     } catch (error) {
         console.error('Erro na verificação de status do usuário:', error.message);
@@ -74,7 +74,7 @@ if (signUpForm) {
             console.error('Erro de cadastro:', error);
         } else {
             // O listener onAuthStateChange será acionado automaticamente
-            alert('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta e aguarde o redirecionamento.');
+            alert('Cadastro realizado com sucesso! Aguarde o redirecionamento.');
         }
     });
 }

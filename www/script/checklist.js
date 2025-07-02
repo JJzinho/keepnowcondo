@@ -58,6 +58,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             } else { return null; }
             return date.toISOString().split('T')[0];
+        },
+        showRealizacaoPrompt: async (activity) => {
+            const dataRealizacao = prompt("Informe a data da realização da atividade (formato: yyyy-mm-dd):");
+            if (!dataRealizacao) return;
+            const novaData = utils.calculateNextDeadline(
+                activity.periodicidade.includes('dia') || activity.periodicidade.includes('mes') || activity.periodicidade.includes('ano') ? 'Customizado' : activity.periodicidade,
+                activity.periodicidade,
+                new Date(dataRealizacao)
+            );
+            if (!novaData) return alert("Não foi possível calcular a nova data.");
+            const atualizada = await db.updateActivity(activity.id, { proximo_vencimento: novaData });
+            if (atualizada) {
+                const index = state.activities.findIndex(a => a.id === activity.id);
+                if (index !== -1) {
+                    state.activities[index] = atualizada;
+                    ui.renderChecklistItems();
+                }
+            }
         }
     };
 
@@ -67,41 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         addActivity: async (data) => (await supabase.from('checklist_activity').insert([data]).select('*, tipo_ocorrencia(id, nome)').single()).data,
         updateActivity: async (id, data) => (await supabase.from('checklist_activity').update(data).eq('id', id).select('*, tipo_ocorrencia(id, nome)').single()).data,
         deleteActivity: async (id) => !(await supabase.from('checklist_activity').delete().eq('id', id)).error,
-
-        seedPredefinedData: async () => {
-            console.log("Seeding predefined data...");
-            const { activities: predefinedActivities, occurrenceTypes: predefinedOccurrences } = getPredefinedChecklistData();
-            
-            const existingOccKeys = new Set(state.occurrenceTypes.map(o => o.chave));
-            const newOccsToInsert = predefinedOccurrences.filter(po => !existingOccKeys.has(po.key)).map(po => ({ condominio_id: state.condoId, chave: po.key, nome: po.name }));
-            if (newOccsToInsert.length > 0) {
-                await supabase.from('tipo_ocorrencia').insert(newOccsToInsert);
-                state.occurrenceTypes = await db.fetchOccurrenceTypes();
-            }
-
-            const occMap = new Map(state.occurrenceTypes.map(o => [o.chave, o.id]));
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            const initialDueDate = yesterday.toISOString().split('T')[0];
-
-            const activitiesToInsert = predefinedActivities.map(activity => ({
-                condominio_id: state.condoId,
-                tipo_ocorrencia_id: occMap.get(activity.occurrence) || null,
-                titulo: activity.titulo,
-                descricao: activity.description,
-                norma_tecnica: activity.norm,
-                equipe_responsavel: activity.team,
-                tipo_manutencao: activity.type,
-                periodicidade: activity.period === 'Customizado' ? activity.customPeriod : activity.period,
-                proximo_vencimento: initialDueDate,
-            })).filter(act => act.tipo_ocorrencia_id);
-
-            if (activitiesToInsert.length > 0) {
-                const { error } = await supabase.from('checklist_activity').insert(activitiesToInsert);
-                if (error) console.error("Error seeding activities:", error);
-            }
-            console.log("Seeding complete. All initial activities are set to overdue.");
-        },
     };
 
     const ui = {
@@ -148,8 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div class="checklist-item-actions">
                         <button class="btn btn-edit-activity"><i class="material-icons">edit</i> Editar</button>
-                        <button class="btn btn-remove-activity"><i class="material-icons">delete</i> Remover</button>
-                        <button class="btn btn-abrir-chamado"><i class="material-icons">${isOverdue ? 'notification_important' : 'bug_report'}</i> ${isOverdue ? "Abrir Chamado (Vencida)" : "Abrir Chamado"}</button>
+                        <button class="btn btn-info"><i class="material-icons">check_circle</i> Já realizei</button>
+                        ${activity.equipe_responsavel !== 'Local' ? `<button class="btn btn-abrir-chamado"><i class="material-icons">${isOverdue ? 'notification_important' : 'bug_report'}</i> ${isOverdue ? "Abrir Chamado (Vencida)" : "Abrir Chamado"}</button>` : ''}
                     </div>
                 </div>`;
             
@@ -159,13 +142,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                  itemDiv.querySelector('.toggle-details-btn-checklist i').textContent = expandableContent.classList.contains('hidden') ? 'expand_more' : 'expand_less';
             };
             itemDiv.querySelector('.btn-edit-activity').onclick = (e) => { e.stopPropagation(); handlers.openEditModal(activity); };
-            itemDiv.querySelector('.btn-remove-activity').onclick = (e) => { e.stopPropagation(); handlers.removeActivity(activity.id, activity.titulo); };
-            itemDiv.querySelector('.btn-abrir-chamado').onclick = (e) => { e.stopPropagation(); handlers.redirectToTicketCreation(activity.id); };
+            itemDiv.querySelector('.btn-abrir-chamado')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                handlers.redirectToTicketCreation(activity.id);
+            });
+            itemDiv.querySelector('.btn-info')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                utils.showRealizacaoPrompt(activity);
+            });
+
             return itemDiv;
         }
     };
 
     const handlers = {
+        openEditModal: (activity) => {
+            handlers.openModal(activity);
+        },
         openModal: (activity = null) => {
             const isEditing = activity !== null;
             state.currentEditingActivityId = isEditing ? activity.id : null;
