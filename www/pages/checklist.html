@@ -59,8 +59,6 @@
                     <select id="filter-periodicidade" class="form-control form-select">
                         <option value="">Todas</option>
                         <option value="Diaria">Diária</option>
-                        <option value="Segunda a sexta">Segunda a Sexta</option>
-                        <option value="Segunda a sábado">Segunda a Sábado</option>
                         <option value="Semanal">Semanal</option>
                         <option value="Quinzenal">Quinzenal</option>
                         <option value="Mensal">Mensal</option>
@@ -97,7 +95,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="titulo-checklist">Título da Atividade</label>
-                        <input type="text" id="titulo-checklist" required>
+                        <input type="text" id="titulo-checklist" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="occurrence-checklist">Sistema</label>
@@ -142,8 +140,6 @@
                         <select id="period-checklist" class="form-control form-select" required>
                             <option value="">Selecione</option>
                             <option value="Diaria">Diária</option>
-                            <option value="Segunda a sexta">Segunda a Sexta</option>
-                            <option value="Segunda a sábado">Segunda a Sábado</option>
                             <option value="Semanal">Semanal</option>
                             <option value="Quinzenal">Quinzenal</option>
                             <option value="Mensal">Mensal</option>
@@ -155,7 +151,7 @@
                             <option value="Customizado">Customizado</option>
                         </select>
                         <input type="text" id="customPeriod-checklist" class="custom-period-input form-control"
-                               placeholder="Ex: 7 dias, 2 meses, 1 ano">
+                               placeholder="Ex: 7 dias, 2 meses, 1 ano" style="display: none; margin-top: 8px;">
                     </div>
                 </div>
                 <div class="form-actions">
@@ -166,82 +162,10 @@
         </div>
     </div>
 
-    <div id="imageViewerModal" class="modal image-viewer hidden">
-        <div class="modal-content image-viewer-content">
-            <img id="modalImageViewer" src="" alt="Visualização Ampliada">
-            <button class="image-viewer-close modal-dynamic-close" data-modal-id="imageViewerModal">&times;</button>
-        </div>
-    </div>
-
-    <div id="ticketModalChecklist" class="modal-overlay hidden">
-        <div class="modal-container">
-            <button class="modal-close-x modal-dynamic-close" data-modal-id="ticketModalChecklist">&times;</button>
-            <h2 class="modal-title">Criar Chamado Corretivo</h2>
-            <form id="ticketFormChecklist">
-                <input type="hidden" id="ticketAssociatedActivityIdChecklist">
-                <div class="form-group">
-                    <label class="form-label" for="occurrence-type-chamado-checklist">Sistema</label>
-                    <select class="form-select" id="occurrence-type-chamado-checklist" required>
-                        <option value="" selected disabled>Selecione...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="ticket-location-category-chamado-checklist">Localização (Categoria)</label>
-                    <select class="form-select" id="ticket-location-category-chamado-checklist" required>
-                        <option value="" selected disabled>Carregando categorias...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="ticket-location-area-chamado-checklist">Área Específica / Local no Pavimento</label>
-                    <select class="form-select" id="ticket-location-area-chamado-checklist" required disabled>
-                        <option value="" selected disabled>Selecione a Categoria Primeiro...</option>
-                    </select>
-                    <input type="text" class="form-control hidden" id="ticket-area-custom-chamado-checklist" placeholder="Especifique outra área/localização" style="margin-top: 8px;">
-                </div>
-                <div id="equipment-section-chamado-checklist" class="form-group hidden">
-                    <label class="form-label">Equipamentos na Área <span class="optional-label">(Opcional)</span></label>
-                    <div id="equipment-list-chamado-checklist" class="equipment-list-box">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="description-chamado-checklist">Descrição</label>
-                    <textarea class="form-control" id="description-chamado-checklist" placeholder="Descreva o problema ou a solicitação" required rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="priority-chamado-checklist">Prioridade</label>
-                    <select class="form-select" id="priority-chamado-checklist" required>
-                        <option value="" selected disabled>Selecione...</option>
-                        <option value="Baixo">Baixo</option>
-                        <option value="Média">Média</option>
-                        <option value="Alta">Alta</option>
-                        <option value="Urgência">Urgência</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary modal-dynamic-close" data-modal-id="ticketModalChecklist">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Próximo</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="previewModalChecklist" class="modal-overlay hidden">
-        <div class="modal-container">
-            <button class="modal-close-x modal-dynamic-close" data-modal-id="previewModalChecklist">&times;</button>
-            <h2 class="modal-title">Pré-visualização do Chamado</h2>
-            <div class="preview-container">
-                </div>
-            <div class="whatsapp-section">
-                </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" id="back-to-form-btn-chamado-checklist-btn">Voltar</button>
-                <button type="button" class="btn btn-primary" id="confirm-ticket-btn-chamado-checklist-btn">Confirmar Chamado</button>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../script/preloaded_activities.js"></script> 
-    <script src="../script/checklist.js"></script>
+    <script type="module" src="../script/supabaseClient.js"></script>
+    <script type="module" src="../script/preloaded_activities.js"></script> 
+    <script type="module" src="../script/checklist.js"></script>
+    <script type="module" src="../script/PushNotificationManager.js"></script>
     <script>
         const navbarToggle = document.getElementById('navbar-toggle');
         const navbarDropdown = document.getElementById('navbar-dropdown');

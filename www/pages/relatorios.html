@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios</title>
+    <link rel="stylesheet" href="../styles/app-bar.css">
+    <link rel="stylesheet" href="../styles/relatorios.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="app-bar">
+        <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
+            <i class="material-icons">arrow_back</i>
+        </button>
+        <h1 class="app-bar-title">Central de Relatórios</h1>
+    </div>
+
+    <div class="container">
+        <h1>Gerar Relatórios</h1>
+        <p>Selecione um dos relatórios disponíveis para gerar, salvar e compartilhar.</p>
+
+        <div class="report-card">
+            <div class="report-info">
+                <i class="material-icons report-icon">checklist</i>
+                <div class="report-text">
+                    <h3>Plano de Gestão de Atividades</h3>
+                    <p>Gera um relatório completo em PDF com todas as atividades do checklist, seus status e próximos vencimentos.</p>
+                </div>
+            </div>
+            <button id="generate-checklist-report-btn" class="btn btn-primary">
+                <i class="material-icons">picture_as_pdf</i> Gerar PDF
+            </button>
+        </div>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <script type="module" src="../script/supabaseClient.js"></script>
+    <script type="module" src="../script/relatorios.js"></script>
+</body>
+</html>

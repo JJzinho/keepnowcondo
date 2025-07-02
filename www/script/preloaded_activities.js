@@ -1,196 +1,176 @@
 // www/script/preloaded_activities.js
 
+/**
+ * Este arquivo contém a lógica para fornecer uma lista de atividades de manutenção
+ * pré-definidas, extraídas do arquivo CSV (convertido do XLSX) fornecido.
+ * Ele serve como uma "semente" de dados para novos condomínios.
+ */
+
+// Lista de tipos de ocorrência/sistemas que serão criados no banco de dados.
 const PREDEFINED_OCCURRENCE_TYPES_LIST = [
-    { key: "Hidrossanitario", name: "Sistema Hidrossanitário" },
-    { key: "ProtecaoIncendio", name: "Sistema de Proteção e Combate Contra Incêndio" },
-    { key: "InstalacoesEletricas", name: "Sistema de Instalações Elétricas" },
-    { key: "Climatizacao", name: "Climatização" },
-    { key: "InstalacoesGas", name: "Instalações de Gás" },
-    { key: "Impermeabilizacoes", name: "Impermeabilizações" },
-    { key: "SistemasCivis", name: "Sistemas Civis (Estrutura, Contenção, Divisórias)" },
-    { key: "Esquadrias", name: "Esquadrias (Portas, Janelas)" },
-    { key: "Revestimentos", name: "Revestimentos (Pisos, Fachadas, Pintura)" },
-    { key: "Forros", name: "Forros" },
-    { key: "Vidros", name: "Vidros e Guarda-corpos" },
-    { key: "CoberturaTelhado", name: "Cobertura / Telhado" },
-    { key: "Logistica", name: "Logística (Estacionamento, Garagens, Heliponto)" },
-    { key: "PaisagismoLazer", name: "Paisagismo e Lazer" },
-    { key: "Pavimentacao", name: "Pavimentação" },
-    { key: "TelecomunicacoesCabeamento", name: "Sistemas de Telecomunicações e Cabeamentos" },
-    { key: "Decoracao", name: "Decoração e Mobiliário" },
-    { key: "Elevador", name: "Elevador" },
-    { key: "Gerador", name: "Gerador" },
-    { key: "SegurancaEletronica", name: "Segurança Eletrônica (CFTV, Alarmes, Cerca)" },
-    { key: "Outros", name: "Geral / Outros" }
+    { key: "hidrossanitario", name: "Sistema Hidrossanitário" },
+    { key: "protecao_incendio", name: "Sistema de Proteção e Combate a Incêndio" },
+    { key: "instalacoes_eletricas", name: "Sistema de Instalações Elétricas" },
+    { key: "climatizacao", name: "Climatização" },
+    { key: "instalacoes_gas", name: "Instalações de Gás" },
+    { key: "impermeabilizacoes", name: "Impermeabilizações" },
+    { key: "sistemas_civis", name: "Sistemas Civis (Estrutura, Contenção)" },
+    { key: "esquadrias", name: "Esquadrias (Portas, Janelas)" },
+    { key: "revestimentos", name: "Revestimentos (Pisos, Fachadas, Pintura)" },
+    { key: "forros", name: "Forros" },
+    { key: "vidros", name: "Vidros e Guarda-corpos" },
+    { key: "cobertura", name: "Cobertura / Telhado" },
+    { key: "logistica", name: "Logística (Garagens, Estacionamento)" },
+    { key: "paisagismo_lazer", name: "Paisagismo e Lazer" },
+    { key: "pavimentacao", name: "Pavimentação" },
+    { key: "telecomunicacoes", name: "Telecomunicações e Cabeamento" },
+    { key: "decoracao", name: "Decoração e Mobiliário" },
+    { key: "outros", name: "Geral / Outros" }
 ];
 
-// Helper function to map PDF "Sistema" to occurrence keys
-function mapSystemToOccurrenceKey(pdfSystem) {
-    const systemStr = String(pdfSystem).toLowerCase().trim();
-    if (systemStr.includes("hidrossanitário")) return "Hidrossanitario";
-    if (systemStr.includes("proteção e combate contra incêndio")) return "ProtecaoIncendio";
-    if (systemStr.includes("instalações elétricas")) return "InstalacoesEletricas";
-    if (systemStr.includes("climatização")) return "Climatizacao";
-    if (systemStr.includes("instalações de gás")) return "InstalacoesGas";
-    if (systemStr.includes("impermeabilizações")) return "Impermeabilizacoes";
-    if (systemStr.includes("sistemas civis")) return "SistemasCivis";
-    if (systemStr.includes("esquadrias")) return "Esquadrias";
-    if (systemStr.includes("revestimentos")) return "Revestimentos";
-    if (systemStr.includes("forros")) return "Forros";
-    if (systemStr.includes("vidros")) return "Vidros";
-    if (systemStr.includes("cobertura")) return "CoberturaTelhado";
-    if (systemStr.includes("logística")) return "Logistica";
-    if (systemStr.includes("paisagismo e lazer")) return "PaisagismoLazer";
-    if (systemStr.includes("pavimentação")) return "Pavimentacao";
-    if (systemStr.includes("telecomunicações e cabeamentos")) return "TelecomunicacoesCabeamento";
-    if (systemStr.includes("decoração")) return "Decoracao";
-    return "Outros"; // Default
+// Mapeia o texto do CSV para uma chave única do sistema.
+function mapSystemToOccurrenceKey(csvSystem) {
+    const systemStr = String(csvSystem).toLowerCase().trim();
+    if (systemStr.includes("hidrossanitário")) return "hidrossanitario";
+    if (systemStr.includes("incêndio")) return "protecao_incendio";
+    if (systemStr.includes("elétricas")) return "instalacoes_eletricas";
+    if (systemStr.includes("climatização")) return "climatizacao";
+    if (systemStr.includes("gás")) return "instalacoes_gas";
+    if (systemStr.includes("impermeabilizaç")) return "impermeabilizacoes";
+    if (systemStr.includes("sistemas civis")) return "sistemas_civis";
+    if (systemStr.includes("esquadrias")) return "esquadrias";
+    if (systemStr.includes("revestimentos")) return "revestimentos";
+    if (systemStr.includes("forros")) return "forros";
+    if (systemStr.includes("vidros")) return "vidros";
+    if (systemStr.includes("cobertura")) return "cobertura";
+    if (systemStr.includes("logística")) return "logistica";
+    if (systemStr.includes("paisagismo")) return "paisagismo_lazer";
+    if (systemStr.includes("pavimentação")) return "pavimentacao";
+    if (systemStr.includes("telecomunicações")) return "telecomunicacoes";
+    if (systemStr.includes("decoração")) return "decoracao";
+    return "outros";
 }
 
-// Helper function to map PDF "Responsável" to team types
-function mapTeamResponsibility(pdfTeam) {
-    const teamStr = String(pdfTeam).toLowerCase();
+// Mapeia o texto do CSV para um tipo de equipe padrão.
+function mapTeamResponsibility(csvTeam) {
+    const teamStr = String(csvTeam).toLowerCase();
     if (teamStr.includes("especializada")) return "Especializada";
     if (teamStr.includes("capacitada") || teamStr.includes("qualificado")) return "Capacitada";
-    if (teamStr.includes("local")) return "Local";
-    return "Local"; // Default
+    return "Local";
 }
 
-// Helper function to map PDF "Periodicidade" to dropdown values
-function mapPeriod(pdfPeriod) {
-    const periodStr = String(pdfPeriod).trim().toLowerCase();
+// Mapeia a periodicidade do CSV para um valor padrão do sistema.
+function mapPeriod(csvPeriod) {
+    const periodStr = String(csvPeriod).toLowerCase();
     const mapping = {
-        "diariamente": "Diaria",
-        "0. diariamente": "Diaria",
-        "semanal": "Semanal",
-        "1. semanal": "Semanal",
-        "quinzenal": "Quinzenal",
-        "2. quinzenal": "Quinzenal",
-        "mensal": "Mensal",
-        "3. mensal": "Mensal",
-        "bimestral": "Bimestral",
-        "4. bimestral": "Bimestral",
-        "trimestral": "Trimestral",
-        "5. trimestral": "Trimestral",
-        "semestral": "Semestral",
-        "6. semestral": "Semestral",
-        "anual": "Anual",
-        "7. anual": "Anual",
-        "bienal": "Bienal",
-        "8. bienal": "Bienal",
-        "trienal": "Customizado",
-        "9. trienal": "Customizado",
-        "quinquenal": "Customizado",
-        "10. quinquenal": "Customizado",
-        "0. sempre que necessário": "Customizado"
+        "diaria": "Diaria", "semanal": "Semanal", "quinzenal": "Quinzenal",
+        "mensal": "Mensal", "bimestral": "Bimestral", "trimestral": "Trimestral",
+        "semestral": "Semestral", "anual": "Anual", "bienal": "Bienal",
+        "necessário": "Customizado", "trienal": "Customizado", "quinquenal": "Customizado"
     };
-    return mapping[periodStr] || "Customizado"; // Default to custom if not found
+    for (const key in mapping) {
+        if (periodStr.includes(key)) return mapping[key];
+    }
+    return "Customizado"; // Default if no match
 }
 
-// Helper function to get custom period value from PDF "Periodicidade"
-function getCustomPeriodValue(pdfPeriod) {
-    const periodStr = String(pdfPeriod).trim().toLowerCase();
+// Extrai o valor customizado da periodicidade do CSV.
+function getCustomPeriodValue(csvPeriod) {
+    const periodStr = String(csvPeriod).toLowerCase();
+    if (periodStr.includes("necessário")) return "Conforme necessidade";
     if (periodStr.includes("trienal")) return "3 anos";
     if (periodStr.includes("quinquenal")) return "5 anos";
-    if (periodStr.includes("sempre que necessário")) return "Conforme necessidade";
     return "";
 }
 
 
-const RAW_PRELOADED_ACTIVITIES_DATA = [
-    // Page 1 Activities
-    { pdfId: "A16", pdfPeriod: "6. SEMESTRAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "ÁGUA FRIA", pdfAtividade: "Abrir e fechar completamente os registros dos subsolos e cobertura (barrilete) de modo a evitar emperramentos e os mantendo em condições de manobra. Verifique as estanqueidade dos componentes (ex.: registros)", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "A1.7", pdfPeriod: "7. ANUAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "ÁGUA FRIA", pdfAtividade: "Verificar as tubulações de água potável para detectar obstruções, perda de estanqueidade e sua fixação, recuperar sua integridade onde necessário. Limpeza os arejadores (bicos removíveis) das torneiras, crivos dos chuveiros.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    { pdfId: "A17", pdfPeriod: "7. ANUAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "ÁGUA FRIA", pdfAtividade: "Verificar e, se necessário, substituir os vedantes (courinhos) das torneiras, misturadores e registros de pressão para garantir a vedação e evitar vazamentos", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "A10.5", pdfPeriod: "5. TRIMESTRAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "SISTEMA DE REUSO", pdfAtividade: "Limpar os reservatórios de água não potável e realizar eventual manutenção do revestimento impermeável. Fazer a limpeza e manutenção do filtro. Limpeza com esguicho de água.", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "A3.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "ESGOTO E DRENAGEM", pdfAtividade: "Verificar e limpar os ralos, canaletas e grelhas do sistema de esgoto", pdfResponsavel: "Equipe de manutenção local" },
-    
-    // Page 2 Activities
-    { pdfId: "A5.1", pdfPeriod: "1. SEMANAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "IRRIGAÇÃO", pdfAtividade: "Verificar o funcionamento dos dispositivos de irrigação", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "A6.6", pdfPeriod: "6. SEMESTRAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "LOUÇAS E METAIS", pdfAtividade: "Verificar vazamento das bolsas de ligação do vaso sanitário. Limpar aeradores (bicos removíveis) das torneiras. Verificar a estanqueidade da caixa de descarga.", pdfResponsavel: "Equipe de manutenção local/empresa especializada" },
+// --- INÍCIO DA LÓGICA DE PARSE DO CSV ---
 
-    // Page 3 Activities
-    { pdfId: "A9.1", pdfPeriod: "1. SEMANAL", pdfSystem: "SISTEMA HIDROSSANITÁRIO", pdfSubsistema: "RESERVAÇÃO DE ÁGUA", pdfAtividade: "Verificar o nível dos reservatórios, o funcionamento das torneiras de boia e a chave de boia para controle de nível", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "B1.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO", pdfSubsistema: "BOMBAS E TANQUES", pdfAtividade: "Acionar a bomba de incêndio por meio do dreno da tubulação ou da botoeira ao lado do hidrante. Observar orientações da companhia de seguros ou projeto.", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "B2.7", pdfPeriod: "7. ANUAL", pdfSystem: "SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO", pdfSubsistema: "EXTINTORES", pdfAtividade: "Verificar a validade e se necessário recarregar os extintores", pdfResponsavel: "Equipe de manutenção local/empresa especializada" },
+// Os dados brutos do seu arquivo CSV.
+const rawCsvData = `
+ID,Periodicidade,Sistema,Subsistema,Atividade,Responsável
+A1.6,SEMESTRAL,SISTEMA HIDROSSANITÁRIO,ÁGUA FRIA,"Abrir e fechar completamente os registros dos subsolos e cobertura (barrilete) de modo a evitar emperramentos e os mantendo em condições de manobra. Verifique as estanqueidade dos componentes (ex.: registros)",Equipe de manutenção local
+A1.7,ANUAL,SISTEMA HIDROSSANITÁRIO,ÁGUA FRIA,"Verificar as tubulações de água potável para detectar obstruções, perda de estanqueidade e sua fixação, recuperar sua integridade onde necessário. Limpeza os arejadores (bicos removíveis) das torneiras, crivos dos chuveiros.",Equipe de manutenção local/ empresa capacitada
+A1.7,ANUAL,SISTEMA HIDROSSANITÁRIO,ÁGUA FRIA,"Verificar e, se necessário, substituir os vedantes (courinhos) das torneiras, misturadores e registros de pressão para garantir a vedação e evitar vazamentos",Equipe de manutenção local
+A10.5,TRIMESTRAL,SISTEMA HIDROSSANITÁRIO,SISTEMA DE REUSO,"Limpar os reservatórios de água não potável e realizar eventual manutenção do revestimento impermeável.",Equipe de manutenção local
+A10.7,ANUAL,SISTEMA HIDROSSANITÁRIO,SISTEMA DE REÚSO,"Fazer a limpeza e manutenção do filtro. Limpeza com esguicho de água.",Equipe de manutenção local
+A11.3,MENSAL,SISTEMA HIDROSSANITÁRIO,SPA'S E BANHEIRAS,Fazer o teste de funcionamento conforme instruções do fornecedor.,Equipe de manutenção local/empresa especializada
+A11.5,TRIMESTRAL,SISTEMA HIDROSSANITÁRIO,SPA'S E BANHEIRAS,Limpeza dos dispositivos que impossibilitem a entrada de residuos na tubulação.,Equipe de manutenção local/empresa especializada
+A3.3,MENSAL,SISTEMA HIDROSSANITÁRIO,ESGOTO E DRENAGEM,Verificar e limpar os ralos, canaletas e grelhas do sistema de esgoto,Equipe de manutenção local
+B1.3,MENSAL,SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO,BOMBAS E TANQUES,"Acionar a bomba de incêndio por meio do dreno da tubulação ou da botoeira ao lado do hidrante. Devem ser observadas as orientações da companhia de seguros do edifício ou do projeto específico de instalações",Equipe de manutenção local
+B2.7,ANUAL,SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO,EXTINTORES,Verificar a validade e se necessário recarregar os extintores,Equipe de manutenção local/empresa especializada
+C4.3,MENSAL,SISTEMA DE INSTALAÇÕES ELÉTRICAS,GRUPO GERADOR,Fazer teste de funcionamento do sistema durante 15 minutos,Equipe de manutenção local
+Q1.0,DIARIAMENTE,PAISAGISMO E LAZER,PISCINAS,"Ligar o filtro, remover resíduos da água com o uso da peneira e aspirar o fundo do espelho d'água.",Equipe de manutenção local / empresa especializada
+J1.5,TRIMESTRAL,ESQUADRIAS,ESQUADRIA DE ALUMÍNIO,Efetuar limpeza geral das esquadrias e seus componentes.,Equipe de manutenção local
+L11.8,BIENAL,REVESTIMENTOS,PINTURA EXTERNA / TEXTURA,"Realizar inspeção para avaliar as condições quanto a descascamento, esfarelamento e perda de cor. Realizar repinturas se necessário.",Equipe de manutenção local / Empresa capacitada
+C1.7,ANUAL,SISTEMA DE INSTALAÇÕES ELÉTRICAS,QUADRO DE DISTRIBUIÇÃO,Verificar e, se necessário, reapertar as conexões do quadro de distribuição.,Equipe de manutenção local/ empresa capacitada
+G1.7,ANUAL,IMPERMEABILIZAÇÕES,PROTEÇÃO MECÂNICA,"Verificar a integridade da proteção mecânica (camada de acabamento), sinais de infiltração ou falha da impermeabilização.",Equipe de manutenção local/ empresa capacitada
+B7.3,MENSAL,SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO,SISTEMA DE ILUMINAÇÃO DE EMERGÊNCIA,"Verificar todas as lâmpadas e trocar as peças queimadas ou danificadas. Efetuar teste de funcionamento.",Equipe de manutenção local
+`;
 
-    // Page 4 Activities
-    { pdfId: "B6.1", pdfPeriod: "1. SEMANAL", pdfSystem: "SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO", pdfSubsistema: "SISTEMA DE HIDRANTES", pdfAtividade: "Verificar o nível dos reservatórios e o funcionamento das torneiras de boia e a chave de boia para controle do nível", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "B7.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMA DE PROTEÇÃO E COMBATE CONTRA INCÊNDIO", pdfSubsistema: "SISTEMA DE ILUMINAÇÃO DE EMERGÊNCIA", pdfAtividade: "Verificar todas as lâmpadas e trocar as peças queimadas ou danificadas. Efetuar teste de funcionamento.", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "C1.0", pdfPeriod: "0. DIARIAMENTE", pdfSystem: "SISTEMA DE INSTALAÇÕES ELÉTRICAS", pdfSubsistema: "QUADRO DE DISTRIBUIÇÃO", pdfAtividade: "Verificar o quadro sinóptico que monitora o funcionamento, pane das bombas e equipamentos", pdfResponsavel: "Equipe de manutenção local" },
-    
-    // Page 5 Activities
-    { pdfId: "C2.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMA DE INSTALAÇÕES ELÉTRICAS", pdfSubsistema: "TOMADAS, INTERRUPTORES E PONTOS DE LUZ", pdfAtividade: "Verificar as lâmpadas e luminárias de área externa e realizar limpeza e reparo onde necessário.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    { pdfId: "C4.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMA DE INSTALAÇÕES ELÉTRICAS", pdfSubsistema: "GRUPO GERADOR", pdfAtividade: "Fazer teste de funcionamento do sistema durante 15 minutos", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "C5.6", pdfPeriod: "6. SEMESTRAL", pdfSystem: "SISTEMA DE INSTALAÇÕES ELÉTRICAS", pdfSubsistema: "PLACAS FOTOVOLTAICAS", pdfAtividade: "Limpeza das placas", pdfResponsavel: "Equipe de manutenção local / Empresa capacitada" },
-    
-    // Page 6 Activities
-    { pdfId: "E1.3", pdfPeriod: "3. MENSAL", pdfSystem: "CLIMATIZAÇÃO", pdfSubsistema: "INSTALAÇÃO DE AR CONDICIONADO CENTRAL SPLIT", pdfAtividade: "Realizar limpeza dos componentes e filtros, mesmo em período de não utilização. Verificar e limpar as unidades condensadora e evaporadora.", pdfResponsavel: "Equipe de manutenção local / Empresa capacitada" },
-    { pdfId: "F1.3", pdfPeriod: "3. MENSAL", pdfSystem: "INSTALAÇÕES DE GÁS", pdfSubsistema: "MANGUEIRAS E ACESSÓRIOS", pdfAtividade: "Verificar as condições das mangueiras de ligação (validade e estado) e, se necessário, trocar.", pdfResponsavel: "Equipe de manutenção local/empresa especializada." },
+/**
+ * Analisa uma string CSV e a converte em um array de objetos.
+ * @param {string} csvText - O conteúdo do arquivo CSV.
+ * @returns {Array<object>}
+ */
+function parseCsv(csvText) {
+    const lines = csvText.trim().split('\n');
+    if (lines.length < 2) return [];
 
-    // Page 7 Activities
-    { pdfId: "G1.7", pdfPeriod: "7. ANUAL", pdfSystem: "IMPERMEABILIZAÇÕES", pdfSubsistema: "PROTEÇÃO MECÂNICA", pdfAtividade: "Verificar a integridade da proteção mecânica (camada de acabamento), sinais de infiltração ou falha da impermeabilização.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    { pdfId: "I10.7", pdfPeriod: "7. ANUAL", pdfSystem: "SISTEMAS CIVIS", pdfSubsistema: "CONTENÇÃO", pdfAtividade: "Verificar o aparecimento de manchas superficiais no concreto e sua descoloração. Testar a profundidade da carbonatação.", pdfResponsavel: "Equipe de manutenção local / empresa capacitada" },
-    
-    // Page 8 Activities
-    { pdfId: "J1.5", pdfPeriod: "5. TRIMESTRAL", pdfSystem: "ESQUADRIAS", pdfSubsistema: "ESQUADRIA DE ALUMÍNIO", pdfAtividade: "Efetuar limpeza geral das esquadrias e seus componentes.", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "J2.6", pdfPeriod: "6. SEMESTRAL", pdfSystem: "ESQUADRIAS", pdfSubsistema: "ESQUADRIAS DE FERRO E AÇO", pdfAtividade: "Verificar as esquadrias para identificação de pontos de oxidação e, se necessário, proceder reparos.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    
-    // Page 10 Activities
-    { pdfId: "L1.7", pdfPeriod: "7. ANUAL", pdfSystem: "REVESTIMENTOS", pdfSubsistema: "CERAMICA / PORCELANATO", pdfAtividade: "Verificar a eflorescência, manchas e presença de peças quebradas. Promover a revisão do sistema de rejuntamento quanto à presença de fissuras e pontos falhos.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    { pdfId: "L11.8", pdfPeriod: "8. BIENAL", pdfSystem: "REVESTIMENTOS", pdfSubsistema: "PINTURA EXTERNA / TEXTURA", pdfAtividade: "Realizar inspeção para avaliar as condições quanto a descascamento, esfarelamento e perda de cor. Realizar repinturas se necessário.", pdfResponsavel: "Equipe de manutenção local / Empresa capacitada" },
+    const headers = lines[0].split(',').map(h => h.trim());
+    const data = [];
 
-    // Page 15 Activities
-    { pdfId: "P1.3", pdfPeriod: "3. MENSAL", pdfSystem: "LOGÍSTICA", pdfSubsistema: "ESTACIONAMENTO, GARAGENS E HELIPONTO", pdfAtividade: "Verificar lâmpadas e luminárias, limpar e reparar. Verificar placas de sinalização.", pdfResponsavel: "Equipe de manutenção local" },
-    { pdfId: "Q1.0", pdfPeriod: "0. DIARIAMENTE", pdfSystem: "PAISAGISMO E LAZER", pdfSubsistema: "PISCINAS", pdfAtividade: "Ligar o filtro. Remover resíduos da água com peneira e aspirar o fundo.", pdfResponsavel: "Equipe de manutenção local / empresa especializada" },
-    
-    // Page 18 Activities
-    { pdfId: "T1.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMAS DE TELECOMUNICAÇÕES E CABEAMENTOS", pdfSubsistema: "SISTEMA DE TELEFONIA E DE INTERFONES", pdfAtividade: "Verificar o funcionamento conforme instruções do fornecedor.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    { pdfId: "T2.3", pdfPeriod: "3. MENSAL", pdfSystem: "SISTEMAS DE TELECOMUNICAÇÕES E CABEAMENTOS", pdfSubsistema: "SISTEMA DE CIRCUITO FECHADO DE TELEVISÃO - CFTV", pdfAtividade: "Verificar o funcionamento conforme instruções do fornecedor.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-    { pdfId: "S1", pdfPeriod: "0. DIARIAMENTE", pdfSystem: "DECORAÇÃO", pdfSubsistema: "ARMÁRIOS PLANEJADOS", pdfAtividade: "Limpeza sempre que necessário.", pdfResponsavel: "Equipe de manutenção local/ empresa capacitada" },
-];
-
-// Function to get both predefined activities and occurrence types
-function getPredefinedChecklistData(calculateNextDeadlineDateFn) {
-    if (typeof calculateNextDeadlineDateFn !== 'function') {
-        console.error("calculateNextDeadlineDateFn must be a function for getPredefinedChecklistData.");
-        // Fallback for deadline calculation if the function is not provided
-        calculateNextDeadlineDateFn = (period, customValue) => {
-            const today = new Date();
-            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        };
+    for (let i = 1; i < lines.length; i++) {
+        // Regex para lidar com valores entre aspas que podem conter vírgulas
+        const values = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g) || [];
+        const entry = {};
+        for (let j = 0; j < headers.length; j++) {
+            entry[headers[j]] = values[j] ? values[j].replace(/"/g, '').trim() : '';
+        }
+        data.push(entry);
     }
+    return data;
+}
 
-    const activities = RAW_PRELOADED_ACTIVITIES_DATA.map((item, index) => {
-        const period = mapPeriod(item.pdfPeriod);
-        const customPeriod = getCustomPeriodValue(item.pdfPeriod);
-        const occurrence = mapSystemToOccurrenceKey(item.pdfSystem);
-        let title = item.pdfAtividade;
-        let description = `Subsistema: ${item.pdfSubsistema}. Atividade original: ${item.pdfAtividade}`;
+const RAW_PRELOADED_ACTIVITIES_DATA = parseCsv(rawCsvData);
+
+// --- FIM DA LÓGICA DE PARSE DO CSV ---
+
+
+/**
+ * Função principal exportada.
+ * Processa os dados brutos e retorna uma estrutura limpa de atividades
+ * e tipos de ocorrência para serem usados pelo sistema.
+ * @returns {{activities: Array<object>, occurrenceTypes: Array<object>}}
+ */
+export function getPredefinedChecklistData() {
+    const activities = RAW_PRELOADED_ACTIVITIES_DATA.map(item => {
+        const period = mapPeriod(item.Periodicidade);
+        const customPeriod = getCustomPeriodValue(item.Periodicidade);
+        const occurrenceKey = mapSystemToOccurrenceKey(item.Sistema);
         
-        if (item.pdfAtividade.length > 80) {
-            const lastSpace = item.pdfAtividade.lastIndexOf(' ', 77);
-            title = (lastSpace > 0 ? item.pdfAtividade.substring(0, lastSpace) : item.pdfAtividade.substring(0, 77)) + '...';
+        if (!item.Atividade || !item.Subsistema) return null;
+
+        let title = item.Atividade;
+        if (title.length > 100) {
+            const lastSpace = title.lastIndexOf(' ', 97);
+            title = (lastSpace > 0 ? title.substring(0, lastSpace) : title.substring(0, 97)) + '...';
         }
         
         return {
-            id: `preload_${Date.now()}_${index}`,
             titulo: title,
-            occurrence: occurrence,
-            description: description,
-            norm: item.pdfId || 'N/A',
-            team: mapTeamResponsibility(item.pdfResponsavel),
+            occurrence: occurrenceKey,
+            description: `[${item.Subsistema}] ${item.Atividade}`,
+            norm: item.ID || 'N/A',
+            team: mapTeamResponsibility(item.Responsável),
             period: period,
             customPeriod: customPeriod,
             type: 'Preventiva',
-            created: new Date().toISOString(),
-            lastPerformed: null,
-            nextDeadlineDate: customPeriod === "Conforme necessidade" ? null : calculateNextDeadlineDateFn(period, customPeriod),
         };
-    });
+    }).filter(Boolean);
 
     return {
         activities: activities,
-        occurrenceTypes: [...PREDEFINED_OCCURRENCE_TYPES_LIST] // Return a copy
+        occurrenceTypes: [...PREDEFINED_OCCURRENCE_TYPES_LIST]
     };
 }

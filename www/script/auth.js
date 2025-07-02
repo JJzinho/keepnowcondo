@@ -44,7 +44,6 @@ async function checkCondoStatusAndRedirect() {
     }
 }
 
-
 // --- LÓGICA DE CADASTRO (SIGN UP) ---
 if (signUpForm) {
     signUpForm.addEventListener('submit', async (event) => {
@@ -105,7 +104,6 @@ if (loginForm) {
         // e chamará checkCondoStatusAndRedirect, que vai esconder o loading.
     });
 }
-
 
 // --- LISTENER GLOBAL DE AUTENTICAÇÃO ---
 // Escuta por eventos de login/logout para decidir o que fazer.
