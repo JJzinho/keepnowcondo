@@ -31,7 +31,7 @@ async function checkCondoStatusAndRedirect() {
 
         // Redireciona com base na resposta
         if (data) {
-        window.location.replace('../inicio.html'); 
+        window.location.replace('./inicio.html'); 
         } else {
         window.location.replace('./pages/cadastro.html');        }
     } catch (error) {
