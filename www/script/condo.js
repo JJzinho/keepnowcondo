@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient.js';
 // Variável para guardar os dados do condomínio em memória
 let currentCondoData = null;
 
-// --- FUNÇÕES DE FORMATAÇÃO (Sem alterações) ---
+// --- FUNÇÕES DE FORMATAÇÃO ---
 const cleanInputDisplay = (value) => ('' + value).replace(/\D/g, '');
 
 const formatCepDisplay = (cep) => {
@@ -44,7 +44,6 @@ const hideModalDisplay = (modal) => {
 function updateCondoDataOnUI(data) {
     if (!data) return;
 
-    // CORREÇÃO: Adicionadas verificações para cada elemento antes de usá-lo.
     const condoNameButtonSpan = document.getElementById('condo-name-display-button');
     if (condoNameButtonSpan) condoNameButtonSpan.textContent = data.nome || "Nome Indefinido";
 
@@ -106,7 +105,7 @@ function updateCondoDataOnUI(data) {
 }
 
 
-// --- RENDERIZAÇÃO DE LOCALIZAÇÃO (ATUALIZADO) ---
+// --- RENDERIZAÇÃO DE LOCALIZAÇÃO ---
 function renderLocationConfigForDisplayUI(configData, containerElement) {
     if (!configData || !configData.pavimentos || configData.pavimentos.length === 0) {
         if (containerElement) containerElement.innerHTML = '<p>Nenhuma configuração de localização definida.</p>';
@@ -182,6 +181,76 @@ function setupEditButton(condoId) {
     }
 }
 
+// --- FUNÇÕES DE CÓDIGO DE SUPERVISOR (CORRIGIDO) ---
+async function setupSupervisorCode(condoId) {
+    const codeDisplay = document.getElementById('supervisor-code-display');
+    const generateCodeBtn = document.getElementById('generate-supervisor-code');
+    const copyCodeBtn = document.getElementById('copy-supervisor-code');
+
+    if (!codeDisplay || !generateCodeBtn || !copyCodeBtn) {
+        console.warn('Elementos do código de supervisor não encontrados no modal.');
+        return;
+    }
+
+    // CORREÇÃO: Chamar a função RPC 'get_supervisor_code' em vez de um select direto.
+    const { data: supervisorCode, error } = await supabase.rpc('get_supervisor_code', {
+        condo_id_param: condoId
+    });
+
+    if (error) {
+        console.error('Erro ao buscar código do supervisor via RPC:', error);
+        codeDisplay.textContent = 'Erro ao carregar.';
+        return;
+    }
+
+    if (supervisorCode) {
+        codeDisplay.textContent = supervisorCode;
+        generateCodeBtn.textContent = 'Gerar Novo Código';
+    } else {
+        codeDisplay.textContent = 'Nenhum código gerado.';
+    }
+
+    // Gerar novo código
+    generateCodeBtn.addEventListener('click', async () => {
+        const newCode = generateRandomCode(8);
+        const { error: updateError } = await supabase
+            .from('condominio')
+            .update({ supervisor_code: newCode })
+            .eq('id', condoId);
+
+        if (updateError) {
+            alert('Erro ao gerar o código. Tente novamente.');
+            console.error('Erro ao atualizar o código:', updateError);
+        } else {
+            codeDisplay.textContent = newCode;
+            generateCodeBtn.textContent = 'Gerar Novo Código';
+            alert('Novo código de supervisor gerado com sucesso!');
+        }
+    });
+
+    // Copiar código
+    copyCodeBtn.addEventListener('click', () => {
+        const code = codeDisplay.textContent;
+        if (code && code !== 'Nenhum código gerado.' && code !== 'Erro ao carregar.') {
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Código copiado para a área de transferência!');
+            }, (err) => {
+                alert('Falha ao copiar o código.');
+                console.error('Erro ao copiar:', err);
+            });
+        }
+    });
+}
+
+function generateRandomCode(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
+
 
 // --- FUNÇÃO PRINCIPAL PARA BUSCAR DADOS ---
 async function initializeCondoPage() {
@@ -209,6 +278,7 @@ async function initializeCondoPage() {
             currentCondoData = data[0];
             updateCondoDataOnUI(currentCondoData);
             setupEditButton(currentCondoData.id);
+            setupSupervisorCode(currentCondoData.id); // Chama a função corrigida
         } else {
             throw new Error('Não foi possível carregar os dados do condomínio ou você não tem acesso.');
         }

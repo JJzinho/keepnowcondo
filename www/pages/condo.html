@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-T">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Condomínio</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Inter+Tight:wght@500;700&display=swap" rel="stylesheet">
@@ -22,34 +22,36 @@
          </a>
          <h1 class="app-bar-title" style="display: none;" id="condo-name-header"></h1>
          <div class="app-bar-nav-container">
-              <div class="navbar-container">
-                  <button class="navbar-toggle" id="navbar-toggle">
-                      <i class="material-icons">menu</i>
-                  </button>
-                  <div class="navbar-dropdown" id="navbar-dropdown">
-                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
-                          <i class="material-icons">account_circle</i>
-                          <span>Perfil</span>
-                      </a>
-                      <a href="notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
-                          <i class="material-icons">notifications</i>
-                          <span>Notificações</span>
-                          <span class="notification-badge" style="display: none;"></span>
-                      </a>
-                      <a href="configuracoes.html" class="navbar-item">
-                          <i class="material-icons">settings</i>
-                          <span>Configurações</span>
-                      </a>
-                  </div>
-              </div>
-          </div>
+               <div class="navbar-container">
+                   <button class="navbar-toggle" id="navbar-toggle">
+                       <i class="material-icons">menu</i>
+                   </button>
+                   <div class="navbar-dropdown" id="navbar-dropdown">
+                       <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                           <i class="material-icons">account_circle</i>
+                           <span>Perfil</span>
+                       </a>
+                       <a href="notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
+                           <i class="material-icons">notifications</i>
+                           <span>Notificações</span>
+                           <span class="notification-badge" style="display: none;"></span>
+                       </a>
+                       <a href="configuracoes.html" class="navbar-item">
+                           <i class="material-icons">settings</i>
+                           <span>Configurações</span>
+                       </a>
+                   </div>
+               </div>
+         </div>
     </div>
     <img src="" alt="Condomínio" class="condo-image" id="condo-image-display">
     <div style="text-align: center; margin-top: 15px; margin-bottom: 15px;" class="condo-name-container-with-guide">
         <button class="button button-primary" id="show-more-btn-condo-name">
             <span id="condo-name-display-button">Carregando...</span>
-            <button id="edit-condo-btn"></button>
-        </a>
+        </button>
+        <button id="edit-condo-btn" class="button-icon" title="Editar dados do condomínio">
+            <i class="material-icons">edit</i>
+        </button>
     </div>
     <div class="menu-card">
        <a href="documentos.html" class="menu-item">
@@ -96,7 +98,6 @@
                 <i class="material-icons">help_outline</i>
             </button>
        </a>
-         </a>
        <a href="relatorios.html" class="menu-item">
             <span class="menu-item-content-wrapper">
                 <div class="menu-item-icon"></div>
@@ -200,6 +201,24 @@
                       <span class="info-display" id="modal-admin-phone-display"></span>
                   </div>
               </div>
+
+              <!-- Seção do Código de Supervisor -->
+              <div class="modal-section-title">Acesso de Supervisor</div>
+                <div class="modal-row">
+                    <span class="material-icons info-icon">vpn_key</span>
+                    <div class="modal-field-content">
+                        <strong style="margin-right: 8px;">Código:</strong>
+                        <span class="info-display" id="supervisor-code-display">Carregando...</span>
+                    </div>
+                </div>
+                <div class="modal-row">
+                    <div class="modal-field-content" style="margin-left: 40px; display: flex; gap: 10px;">
+                        <button id="generate-supervisor-code" class="button button-small">Gerar Código</button>
+                        <button id="copy-supervisor-code" class="button-secondary button-small">Copiar</button>
+                    </div>
+                </div>
+
+
               <div class="info-display" id="modal-location-config-container" style="display: block;"> <div class="modal-section-title">
                       <i class="material-icons">place</i> Configuração de Localizações e Equipamentos
                   </div>

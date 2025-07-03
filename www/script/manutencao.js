@@ -82,10 +82,30 @@ const ManutencaoPage = {
             clear: () => sessionStorage.removeItem(ManutencaoPage.draftManager.ticket.key)
         },
         visit: {
-            // Lógica para rascunho de visitas (mantida como no seu original)
             key: 'manutencaoVisitDraft',
-            save: () => { /* ... */ },
-            load: () => { /* ... */ },
+            save: () => {
+                const form = ManutencaoPage.utils.getById('scheduledVisitForm');
+                if (!form) return;
+                const draft = {
+                    supplier: form.querySelector('#visitSupplier')?.value,
+                    dateTime: form.querySelector('#visitDateTime')?.value,
+                    description: form.querySelector('#visitDescription')?.value,
+                    recurrence: form.querySelector('#visitRecurrence')?.value,
+                };
+                sessionStorage.setItem(ManutencaoPage.draftManager.visit.key, JSON.stringify(draft));
+            },
+            load: () => {
+                const draftJSON = sessionStorage.getItem(ManutencaoPage.draftManager.visit.key);
+                if (!draftJSON) return;
+                const draft = JSON.parse(draftJSON);
+                const form = ManutencaoPage.utils.getById('scheduledVisitForm');
+                if (draft && form) {
+                    form.querySelector('#visitSupplier').value = draft.supplier || '';
+                    form.querySelector('#visitDateTime').value = draft.dateTime || '';
+                    form.querySelector('#visitDescription').value = draft.description || '';
+                    form.querySelector('#visitRecurrence').value = draft.recurrence || '';
+                }
+            },
             clear: () => sessionStorage.removeItem(ManutencaoPage.draftManager.visit.key)
         }
     },
@@ -138,8 +158,22 @@ const ManutencaoPage = {
         upcomingVisits.sort((a, b) => new Date(a.data_hora) - new Date(b.data_hora)).forEach(visit => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'scheduled-visit-item';
-            itemDiv.innerHTML = `<div class="visit-item-header"><h5>${visit.fornecedor?.nome || 'Fornecedor'}</h5><span class="visit-item-date">${this.utils.formatDate(visit.data_hora, true)}</span></div><p><strong>Descrição:</strong> ${visit.descricao}</p>`;
+            itemDiv.innerHTML = `
+                <div class="visit-item-header">
+                    <h5>${visit.fornecedor?.nome || 'Fornecedor'}</h5>
+                    <span class="visit-item-date">${this.utils.formatDate(visit.data_hora, true)}</span>
+                </div>
+                <p><strong>Descrição:</strong> ${visit.descricao}</p>
+                <div class="visit-item-actions">
+                    <button class="btn btn-secondary btn-small edit-visit-btn" data-visit-id="${visit.id}"><i class="material-icons">edit</i> Editar</button>
+                    <button class="btn btn-danger btn-small delete-visit-btn" data-visit-id="${visit.id}"><i class="material-icons">delete</i> Excluir</button>
+                </div>
+            `;
             container.appendChild(itemDiv);
+
+            // Add event listeners for edit and delete buttons
+            itemDiv.querySelector('.edit-visit-btn').onclick = () => this.openScheduledVisitModal(visit);
+            itemDiv.querySelector('.delete-visit-btn').onclick = () => this.deleteScheduledVisit(visit.id);
         });
     },
 
@@ -179,7 +213,7 @@ const ManutencaoPage = {
         locationCatSelect.innerHTML = '<option value="" selected disabled>Selecione...</option>';
         this.state.locationConfig?.pavimentos?.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(p => locationCatSelect.add(new Option(p.nome, p.nome)));
         
-        this.utils.getById('ticket-location-area-chamado').innerHTML = '<option value="" selected disabled>Selecione o Pavimento...</option>';
+        this.utils.getById('ticket-location-area-chamado').innerHTML = '<option value="" selected disabled>Selecione o Pavimento...';
         this.utils.getById('ticket-location-area-chamado').disabled = true;
 
         if (activity) {
@@ -192,6 +226,102 @@ const ManutencaoPage = {
             this.draftManager.ticket.load();
         }
         this.utils.toggleModal('ticket-modal', true);
+    },
+
+    openScheduledVisitModal(visit = null) {
+        this.state.currentEditingVisitId = visit ? visit.id : null;
+        const modalTitle = this.utils.getById('scheduledVisitModalTitle');
+        const form = this.utils.getById('scheduledVisitForm');
+        modalTitle.textContent = visit ? 'Editar Visita Agendada' : 'Programar Nova Visita';
+        form.reset();
+        this.utils.getById('scheduledVisitId').value = ''; // Clear ID for new visit
+        this.draftManager.visit.clear(); // Clear draft when opening fresh or for editing
+
+        const supplierSelect = this.utils.getById('visitSupplier');
+        supplierSelect.innerHTML = '<option value="" selected disabled>Selecione...</option>';
+        this.state.suppliers.filter(s => s.possui_contrato).sort((a,b) => a.nome.localeCompare(b.nome)).forEach(s => supplierSelect.add(new Option(s.nome, s.id)));
+
+        if (visit) {
+            this.utils.getById('scheduledVisitId').value = visit.id;
+            supplierSelect.value = visit.fornecedor_id;
+            this.utils.getById('visitDateTime').value = visit.data_hora.substring(0, 16); // Formata para datetime-local
+            this.utils.getById('visitDescription').value = visit.descricao;
+            this.utils.getById('visitRecurrence').value = visit.recorrencia;
+            // Se a recorrência for customizada, preencher o campo customizado.
+            // if (visit.recorrencia === 'custom' && visit.custom_recurrence_value) {
+            //     this.utils.getById('visitCustomRecurrenceValue').value = visit.custom_recurrence_value;
+            // }
+        } else {
+             // Define a data/hora inicial para agora, arredondando para o próximo minuto.
+            const now = new Date();
+            now.setSeconds(0);
+            now.setMilliseconds(0);
+            this.utils.getById('visitDateTime').value = now.toISOString().substring(0, 16);
+            this.draftManager.visit.load(); // Load draft only for new visits
+        }
+        this.utils.toggleModal('scheduledVisitModal', true);
+    },
+
+    async handleScheduledVisitSubmit(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const form = this.utils.getById('scheduledVisitForm');
+        const visitId = this.utils.getById('scheduledVisitId').value; // For editing
+        const supplierId = this.utils.getById('visitSupplier').value;
+        const dateTime = this.utils.getById('visitDateTime').value;
+        const description = this.utils.getById('visitDescription').value.trim();
+        const recurrence = this.utils.getById('visitRecurrence').value;
+
+        // Basic validation
+        if (!supplierId || !dateTime || !description) {
+            alert("Por favor, preencha todos os campos obrigatórios (Fornecedor, Data/Hora, Descrição).");
+            return;
+        }
+
+        const visitData = {
+            condominio_id: this.state.condoId,
+            fornecedor_id: supplierId,
+            data_hora: dateTime,
+            descricao: description,
+            recorrencia: recurrence,
+            status: 'AGENDADA' // Default status for new visits
+        };
+
+        let error = null;
+        if (visitId) {
+            // Update existing visit
+            const { error: updateError } = await supabase.from('visita_tecnica').update(visitData).eq('id', visitId);
+            error = updateError;
+        } else {
+            // Insert new visit
+            const { error: insertError } = await supabase.from('visita_tecnica').insert([visitData]);
+            error = insertError;
+        }
+
+        if (error) {
+            console.error("Erro ao salvar visita:", error);
+            alert("Falha ao salvar visita no banco de dados.");
+        } else {
+            this.draftManager.visit.clear();
+            alert("Visita salva com sucesso!");
+            this.utils.toggleModal('scheduledVisitModal', false);
+            // Re-initialize the page to refresh lists after saving/updating a visit
+            await this.initialize(); 
+        }
+    },
+
+    async deleteScheduledVisit(visitId) {
+        if (!confirm("Tem certeza que deseja excluir esta visita agendada?")) {
+            return;
+        }
+        const { error } = await supabase.from('visita_tecnica').delete().eq('id', visitId);
+        if (error) {
+            console.error("Erro ao excluir visita:", error);
+            alert("Falha ao excluir visita do banco de dados.");
+        } else {
+            alert("Visita excluída com sucesso!");
+            await this.initialize(); // Re-initialize to refresh lists
+        }
     },
 
     populateTicketLocationAreas(pavimentoNome, areaToSelect = null) {
@@ -330,9 +460,13 @@ const ManutencaoPage = {
     setupEventListeners() {
         const s = this.utils.getById;
         s('create-ticket-btn-manutencao')?.addEventListener('click', () => this.openTicketModal());
+        s('openScheduledVisitModalBtn')?.addEventListener('click', () => this.openScheduledVisitModal());
         s('ticket-form-manutencao')?.addEventListener('submit', (e) => this.handleTicketSubmit(e));
         s('ticket-form-manutencao')?.addEventListener('input', this.draftManager.ticket.save);
         
+        s('scheduledVisitForm')?.addEventListener('submit', (e) => this.handleScheduledVisitSubmit(e));
+        s('scheduledVisitForm')?.addEventListener('input', this.draftManager.visit.save);
+
         s('back-to-form-btn-chamado')?.addEventListener('click', () => {
             this.utils.toggleModal('preview-modal', false);
             this.utils.toggleModal('ticket-modal', true);
