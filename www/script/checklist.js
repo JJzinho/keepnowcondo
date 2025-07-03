@@ -4,7 +4,7 @@ import { getPredefinedChecklistData } from './preloaded_activities.js';
 import PushNotificationManager from './PushNotificationManager.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("Checklist JS (v11.0 - Final Version with Push) Loaded...");
+    console.log("Checklist JS (v12.0 - Modal de Realização) Loaded...");
 
     const state = {
         condoId: null,
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         activities: [],
         occurrenceTypes: [],
         currentEditingActivityId: null,
+        currentRealizacaoActivity: null, // Novo estado para a atividade sendo realizada
     };
 
     const utils = {
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formatDate: (dateInput) => {
             if (!dateInput) return 'N/A';
             const date = new Date(dateInput);
+            // Ajusta a data para a timezone local para garantir que seja exibida corretamente
             const userTimezoneOffset = date.getTimezoneOffset() * 60000;
             const adjustedDate = new Date(date.getTime() + userTimezoneOffset);
             return !isNaN(adjustedDate.getTime()) ? adjustedDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Data inválida';
@@ -36,7 +38,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'Mensal': { value: 1, unit: 'month' }, 'Bimestral': { value: 2, unit: 'month' }, 'Trimestral': { value: 3, unit: 'month' },
                 'Semestral': { value: 6, unit: 'month' }, 'Anual': { value: 1, unit: 'year' }, 'Bienal': { value: 2, unit: 'year' }
             };
+            
+            // Garante que startDate é um objeto Date válido
             const date = new Date(startDate);
+            if (isNaN(date.getTime())) {
+                console.error("Invalid startDate provided to calculateNextDeadline:", startDate);
+                return null; 
+            }
+
             if (periodicity === 'Customizado') {
                 if (customPeriodVal === 'Conforme necessidade') return null;
                 const match = customPeriodVal.match(/(\d+)\s*(ano|mes|semana|dia)s?/i);
@@ -59,23 +68,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else { return null; }
             return date.toISOString().split('T')[0];
         },
-        showRealizacaoPrompt: async (activity) => {
-            const dataRealizacao = prompt("Informe a data da realização da atividade (formato: yyyy-mm-dd):");
-            if (!dataRealizacao) return;
-            const novaData = utils.calculateNextDeadline(
-                activity.periodicidade.includes('dia') || activity.periodicidade.includes('mes') || activity.periodicidade.includes('ano') ? 'Customizado' : activity.periodicidade,
-                activity.periodicidade,
-                new Date(dataRealizacao)
-            );
-            if (!novaData) return alert("Não foi possível calcular a nova data.");
-            const atualizada = await db.updateActivity(activity.id, { proximo_vencimento: novaData });
-            if (atualizada) {
-                const index = state.activities.findIndex(a => a.id === activity.id);
-                if (index !== -1) {
-                    state.activities[index] = atualizada;
-                    ui.renderChecklistItems();
-                }
-            }
+        // Altera showRealizacaoPrompt para abrir um modal
+        showRealizacaoPrompt: (activity) => {
+            state.currentRealizacaoActivity = activity; // Armazena a atividade no estado
+            utils.getById('realizacaoActivityTitle').textContent = activity.titulo; // Exibe o título da atividade no modal
+            utils.getById('dataRealizacao').value = new Date().toISOString().split('T')[0]; // Preenche com a data atual
+            utils.toggleModal('realizacaoActivityModal', true); // Abre o modal
         }
     };
 
@@ -148,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             itemDiv.querySelector('.btn-info')?.addEventListener('click', (e) => {
                 e.stopPropagation();
-                utils.showRealizacaoPrompt(activity);
+                utils.showRealizacaoPrompt(activity); // Agora abre o modal customizado
             });
 
             return itemDiv;
@@ -213,6 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 equipe_responsavel: utils.getById('team-checklist').value,
                 tipo_manutencao: utils.getById('type-checklist').value,
                 periodicidade: periodicityValue,
+                // Garante que customPeriod é salvo se a periodicidade for 'Customizado'
+                customPeriod: periodSelectValue === 'Customizado' ? customPeriodVal : null, 
                 proximo_vencimento: utils.calculateNextDeadline(periodSelectValue, customPeriodVal, new Date())
             };
 
@@ -236,6 +236,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ui.renderChecklistItems();
                 utils.toggleModal('createActivityModal', false);
             }
+        },
+        // Novo handler para submissão do modal de realização
+        handleRealizacaoSubmit: async (event) => {
+            event.preventDefault();
+            const activity = state.currentRealizacaoActivity;
+            if (!activity) return; // Não há atividade armazenada
+
+            const dataRealizacaoInput = utils.getById('dataRealizacao').value;
+
+            // Validação da data
+            if (!dataRealizacaoInput) {
+                return alert("Por favor, informe a data da realização.");
+            }
+            const dataRealizacao = new Date(dataRealizacaoInput + 'T00:00:00'); // Adiciona T00:00:00 para evitar problemas de fuso horário
+            if (isNaN(dataRealizacao.getTime())) {
+                return alert("Data inválida. Por favor, verifique o dia, mês e ano.");
+            }
+            
+            const novaData = utils.calculateNextDeadline(
+                activity.periodicidade,
+                activity.customPeriod,
+                dataRealizacao
+            );
+
+            if (!novaData) {
+                alert("Não foi possível calcular a nova data. Verifique a periodicidade ou o valor customizado.");
+                return; // Não fecha o modal se houver falha no cálculo
+            }
+            
+            const atualizada = await db.updateActivity(activity.id, { proximo_vencimento: novaData });
+
+            if (atualizada) {
+                const index = state.activities.findIndex(a => a.id === activity.id);
+                if (index !== -1) {
+                    state.activities[index] = atualizada;
+                    ui.renderChecklistItems();
+                }
+            } else {
+                alert("Falha ao atualizar a data de periodicidade.");
+            }
+            utils.toggleModal('realizacaoActivityModal', false); // Fecha o modal após a operação
+            state.currentRealizacaoActivity = null; // Limpa a atividade armazenada
+        },
+        // Novo handler para cancelar o modal de realização
+        cancelRealizacao: () => {
+            utils.toggleModal('realizacaoActivityModal', false);
+            state.currentRealizacaoActivity = null; // Limpa a atividade armazenada
         },
         redirectToTicketCreation: (activityId) => {
             sessionStorage.setItem('sourceActivityIdForTicket', activityId);
@@ -263,9 +310,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         state.occurrenceTypes = await db.fetchOccurrenceTypes();
         state.activities = await db.fetchActivities();
 
+        // Seed predefined data if no activities exist for the condo
         if (state.activities.length === 0 && state.occurrenceTypes.length === 0) {
-            await db.seedPredefinedData();
-            state.activities = await db.fetchActivities();
+            const predefinedData = getPredefinedChecklistData();
+            const activitiesToInsert = predefinedData.activities.map(activity => ({
+                ...activity,
+                condominio_id: state.condoId,
+                // Garante mapeamento correto para periodicidade e customPeriod
+                periodicidade: activity.period, 
+                customPeriod: activity.customPeriod || null, 
+                // Define a data de próximo_vencimento inicial para hoje para preenchimento
+                proximo_vencimento: utils.calculateNextDeadline(activity.period, activity.customPeriod, new Date())
+            }));
+            
+            const occurrenceTypesToInsert = predefinedData.occurrenceTypes.map(type => ({
+                condominio_id: state.condoId,
+                nome: type.name,
+                chave: type.key
+            }));
+
+            if (occurrenceTypesToInsert.length > 0) {
+                const { error: occurrenceError } = await supabase.from('tipo_ocorrencia').insert(occurrenceTypesToInsert);
+                if (occurrenceError) {
+                    console.error("Erro ao inserir tipos de ocorrência padrão:", occurrenceError);
+                } else {
+                    state.occurrenceTypes = await db.fetchOccurrenceTypes(); // Busca a lista atualizada
+                }
+            }
+
+            if (activitiesToInsert.length > 0) {
+                const { error: activitiesError } = await supabase.from('checklist_activity').insert(activitiesToInsert);
+                if (activitiesError) {
+                    console.error("Erro ao inserir atividades padrão:", activitiesError);
+                } else {
+                    state.activities = await db.fetchActivities(); // Busca a lista atualizada
+                }
+            }
         }
         
         ui.populateOccurrenceSelect('filter-sistema');
@@ -277,10 +357,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         utils.getById('period-checklist').addEventListener('change', handlers.toggleCustomPeriodInput);
         utils.getById('createActivityModal').querySelector('.modal-dynamic-close').addEventListener('click', () => utils.toggleModal('createActivityModal', false));
 
+        // Novos event listeners para o modal de realização
+        utils.getById('realizacaoForm').addEventListener('submit', handlers.handleRealizacaoSubmit);
+        utils.getById('cancelRealizacaoBtn').addEventListener('click', handlers.cancelRealizacao);
+        utils.getById('realizacaoActivityModal').querySelector('.modal-dynamic-close').addEventListener('click', handlers.cancelRealizacao);
+
+
         try {
             await PushNotificationManager.register();
         } catch (e) {
             console.error("Falha ao registrar para notificações push:", e);
+            // Nota: O erro "Capacitor is not defined" indica que o ambiente de execução pode não ter o Capacitor disponível,
+            // o que é esperado se você estiver executando no navegador web em vez de um ambiente Capacitor nativo.
+            // Isso não impede o funcionamento da lógica do checklist.
         }
     };
 

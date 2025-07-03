@@ -160,7 +160,23 @@
             </form>
         </div>
     </div>
-
+<div id="realizacaoActivityModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="modal-dynamic-close close-button">&times;</span>
+        <h2>Confirmar Realização da Atividade</h2>
+        <p>Atividade: <strong id="realizacaoActivityTitle"></strong></p>
+        <form id="realizacaoForm">
+            <div class="input-group">
+                <label for="dataRealizacao">Data da Realização:</label>
+                <input type="date" id="dataRealizacao" required>
+            </div>
+            <div class="modal-buttons">
+                <button type="submit" class="btn primary-btn">Confirmar</button>
+                <button type="button" class="btn secondary-btn" id="cancelRealizacaoBtn">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
     <script type="module" src="../script/supabaseClient.js"></script>
     <script type="module" src="../script/preloaded_activities.js"></script>
     <script type="module" src="../script/checklist.js"></script>

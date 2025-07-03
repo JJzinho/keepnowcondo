@@ -9,13 +9,37 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    <div class="app-bar">
+ <div class="app-bar">
         <button class="app-bar-back-button" onclick="history.back();" style="display: inline-flex;">
             <i class="material-icons">arrow_back</i>
         </button>
-        <h1 class="app-bar-title">Central de Relatórios</h1>
+         <a href="condo.html" class="app-bar-logo-link">
+             <img src="https://storage.googleapis.com/flutterflow-io-6f20.appspot.com/projects/erdn-7awoaw/assets/60rvipp2d6di/image-removebg-preview.png" alt="Logo" class="app-bar-logo">
+         </a>
+         <h1 class="app-bar-title" style="display: none;"></h1>
+         <div class="app-bar-nav-container">
+              <div class="navbar-container">
+                  <button class="navbar-toggle" id="navbar-toggle">
+                      <i class="material-icons">menu</i>
+                  </button>
+                  <div class="navbar-dropdown" id="navbar-dropdown">
+                      <a href="#" class="navbar-item disabled" title="Funcionalidade de Perfil ainda não implementada">
+                          <i class="material-icons">account_circle</i>
+                          <span>Perfil</span>
+                      </a>
+                      <a href="notificacoes.html" class="navbar-item" title="Funcionalidade de Notificações ainda não implementada">
+                          <i class="material-icons">notifications</i>
+                          <span>Notificações</span>
+                          <span class="notification-badge" style="display: none;"></span>
+                      </a>
+                      <a href="configuracoes.html" class="navbar-item">
+                          <i class="material-icons">settings</i>
+                          <span>Configurações</span>
+                      </a>
+                  </div>
+              </div>
+          </div>
     </div>
-
     <div class="container">
         <h1>Gerar Relatórios</h1>
         <p>Selecione um dos relatórios disponíveis para gerar, salvar e compartilhar.</p>
