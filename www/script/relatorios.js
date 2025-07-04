@@ -37,7 +37,7 @@ const ReportsPage = {
         
         const generateBtn = document.getElementById('generate-checklist-report-btn');
         generateBtn.disabled = true;
-        generateBtn.innerHTML = '<i class="material-icons">sync</i> Gerando...';
+        generateBtn.innerHTML = '<i class="material-icons">sync</i> Gerando e Enviando...';
         this.state.isLoading = true;
 
         const success = await this.fetchData();
@@ -84,16 +84,51 @@ const ReportsPage = {
             headStyles: { fillColor: [22, 160, 133] },
         });
 
-        // Utiliza a função .save() do jsPDF para acionar o download no navegador
+        // --- NOVA LÓGICA: ENVIAR PARA SUPABASE STORAGE E ABRIR URL ---
         try {
-            const fileName = `relatorio_atividades_${this.state.condoName.replace(/\s/g, '_')}.pdf`;
-            doc.save(fileName);
+            // 1. Obter o PDF como Blob
+            const pdfBlob = doc.output('blob');
+            const fileName = `relatorio_atividades_${this.state.condoName.replace(/\s/g, '_')}_${Date.now()}.pdf`;
+            const filePath = `condo_reports/${this.state.condoId}/${fileName}`; // Caminho dentro do bucket
+
+            // 2. Fazer upload para o Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('reports') // USANDO O BUCKET 'reports'
+                .upload(filePath, pdfBlob, {
+                    cacheControl: '3600',
+                    contentType: 'application/pdf',
+                    upsert: true // Permite sobrescrever se o nome for o mesmo (improvável com timestamp)
+                });
+
+            if (uploadError) {
+                console.error('Erro ao fazer upload do PDF para o Supabase Storage:', uploadError);
+                alert('Não foi possível fazer o upload do relatório. Erro: ' + uploadError.message);
+                return;
+            }
+
+            // 3. Obter a URL pública do arquivo
+            const { data: publicUrlData } = supabase.storage
+                .from('reports') // USANDO O BUCKET 'reports'
+                .getPublicUrl(filePath);
+
+            if (!publicUrlData || !publicUrlData.publicUrl) {
+                console.error('Não foi possível obter a URL pública do PDF.');
+                alert('Relatório gerado, mas não foi possível obter a URL para download.');
+                return;
+            }
+
+            const publicUrl = publicUrlData.publicUrl;
+
+            // 4. Abrir a URL pública em uma nova aba/janela
+            window.open(publicUrl, '_blank');
+            alert("Relatório gerado e aberto em uma nova aba para download.");
+
         } catch (error) {
-            console.error("Erro ao gerar o PDF:", error);
-            alert("Não foi possível gerar o PDF. Tente novamente.");
+            console.error("Erro completo ao gerar ou enviar o PDF:", error);
+            alert("Não foi possível gerar ou abrir o PDF. Tente novamente.");
+        } finally {
+            this.resetButton(generateBtn);
         }
-        
-        this.resetButton(generateBtn);
     },
     
     resetButton(button) {

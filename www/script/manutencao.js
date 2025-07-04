@@ -199,7 +199,7 @@ const ManutencaoPage = {
         if (!form) return;
         
         form.reset();
-        this.draftManager.ticket.clear();
+        // REMOVIDO: this.draftManager.ticket.clear(); // Não limpa o rascunho ao abrir o modal
         this.state.currentTicket = {};
         this.utils.getById('ticketAssociatedActivityId').value = '';
         this.utils.getById('equipment-section-chamado')?.classList.add('hidden');
@@ -216,6 +216,13 @@ const ManutencaoPage = {
         this.utils.getById('ticket-location-area-chamado').innerHTML = '<option value="" selected disabled>Selecione o Pavimento...';
         this.utils.getById('ticket-location-area-chamado').disabled = true;
 
+        // Resetar o campo de localização customizado ao abrir o modal
+        const customLocationInput = this.utils.getById('ticket-location-area-custom-chamado');
+        const customLocationGroup = this.utils.getById('custom-location-area-group');
+        if (customLocationInput) customLocationInput.value = '';
+        if (customLocationGroup) customLocationGroup.style.display = 'none';
+
+
         if (activity) {
             // Se veio do checklist, pré-preenche os dados
             this.utils.getById('ticketAssociatedActivityId').value = activity.id;
@@ -223,7 +230,7 @@ const ManutencaoPage = {
             if (activity.tipo_ocorrencia_id) occurrenceSelect.value = activity.tipo_ocorrencia_id;
         } else {
             // Se não, tenta carregar um rascunho salvo
-            this.draftManager.ticket.load();
+            this.draftManager.ticket.load(); 
         }
         this.utils.toggleModal('ticket-modal', true);
     },
@@ -235,8 +242,8 @@ const ManutencaoPage = {
         modalTitle.textContent = visit ? 'Editar Visita Agendada' : 'Programar Nova Visita';
         form.reset();
         this.utils.getById('scheduledVisitId').value = ''; // Clear ID for new visit
-        this.draftManager.visit.clear(); // Clear draft when opening fresh or for editing
-
+        // REMOVIDO: this.draftManager.visit.clear(); // Não limpa o rascunho ao abrir o modal
+        
         const supplierSelect = this.utils.getById('visitSupplier');
         supplierSelect.innerHTML = '<option value="" selected disabled>Selecione...</option>';
         this.state.suppliers.filter(s => s.possui_contrato).sort((a,b) => a.nome.localeCompare(b.nome)).forEach(s => supplierSelect.add(new Option(s.nome, s.id)));
@@ -302,7 +309,7 @@ const ManutencaoPage = {
             console.error("Erro ao salvar visita:", error);
             alert("Falha ao salvar visita no banco de dados.");
         } else {
-            this.draftManager.visit.clear();
+            this.draftManager.visit.clear(); // MANTIDO: Limpa rascunho após salvamento com sucesso
             alert("Visita salva com sucesso!");
             this.utils.toggleModal('scheduledVisitModal', false);
             // Re-initialize the page to refresh lists after saving/updating a visit
@@ -326,20 +333,53 @@ const ManutencaoPage = {
 
     populateTicketLocationAreas(pavimentoNome, areaToSelect = null) {
         const areaSelect = this.utils.getById('ticket-location-area-chamado');
+        const customLocationInput = this.utils.getById('ticket-location-area-custom-chamado');
+        const customLocationGroup = this.utils.getById('custom-location-area-group');
+
         areaSelect.innerHTML = '<option value="" selected disabled>Selecione...</option>';
-        areaSelect.disabled = true;
+        areaSelect.disabled = true; // Desabilita até que um pavimento seja selecionado
+
+        if (customLocationInput) customLocationInput.value = ''; // Limpa o campo customizado
+        if (customLocationGroup) customLocationGroup.style.display = 'none'; // Esconde o campo customizado
+
         this.utils.getById('equipment-section-chamado')?.classList.add('hidden');
         
         const pavimento = this.state.locationConfig?.pavimentos?.find(p => p.nome === pavimentoNome);
         if (pavimento?.sublocais) {
+            // Adiciona a opção "Local Geral / Outro"
+            areaSelect.add(new Option('Local Geral / Outro', 'OUTRO'));
+
             pavimento.sublocais.sort((a, b) => a.nome.localeCompare(b.nome)).forEach(s => areaSelect.add(new Option(s.nome, s.nome)));
-            areaSelect.disabled = false;
+            areaSelect.disabled = false; // Habilita o select após preencher as opções
+            
             // Se uma área foi passada para ser pré-selecionada (vindo do rascunho), seleciona-a.
             if (areaToSelect) {
                 areaSelect.value = areaToSelect;
                 this.populateTicketEquipment(pavimentoNome, areaToSelect);
+                // Se a área pré-selecionada for 'OUTRO', mostra o campo customizado
+                if (areaToSelect === 'OUTRO' && customLocationGroup) {
+                    customLocationGroup.style.display = 'block';
+                }
             }
         }
+    },
+
+    // Nova função para lidar com a seleção do sublocal
+    handleSublocalSelection() {
+        const areaSelect = ManutencaoPage.utils.getById('ticket-location-area-chamado');
+        const customLocationInput = ManutencaoPage.utils.getById('ticket-location-area-custom-chamado');
+        const customLocationGroup = ManutencaoPage.utils.getById('custom-location-area-group');
+        const selectedValue = areaSelect.value;
+
+        if (selectedValue === 'OUTRO') {
+            if (customLocationGroup) customLocationGroup.style.display = 'block';
+            if (customLocationInput) customLocationInput.value = ''; // Limpa o campo para nova digitação
+        } else {
+            if (customLocationGroup) customLocationGroup.style.display = 'none';
+        }
+        // Repopula equipamentos caso a seleção mude de/para "OUTRO"
+        const locationCatSelect = ManutencaoPage.utils.getById('ticket-location-category-chamado');
+        ManutencaoPage.populateTicketEquipment(locationCatSelect.value, selectedValue);
     },
 
     populateTicketEquipment(pavimentoNome, sublocalNome) {
@@ -348,6 +388,12 @@ const ManutencaoPage = {
         if (!equipmentSection || !equipmentList) return;
         
         equipmentList.innerHTML = '';
+        // Não mostra equipamentos se a opção for 'OUTRO'
+        if (sublocalNome === 'OUTRO') {
+            equipmentSection.classList.add('hidden');
+            return;
+        }
+
         const pavimento = this.state.locationConfig?.pavimentos?.find(p => p.nome === pavimentoNome);
         const sublocal = pavimento?.sublocais?.find(s => s.nome === sublocalNome);
         
@@ -366,7 +412,18 @@ const ManutencaoPage = {
         event.preventDefault();
         const tipoOcorrenciaId = this.utils.getById('occurrence-type-chamado').value;
         const localizacaoCat = this.utils.getById('ticket-location-category-chamado').value;
-        const localizacaoArea = this.utils.getById('ticket-location-area-chamado').value;
+        let localizacaoArea = this.utils.getById('ticket-location-area-chamado').value; // Valor do select
+
+        // CORREÇÃO: Pega o valor da localização customizada se "OUTRO" for selecionado
+        const customLocationInput = this.utils.getById('ticket-location-area-custom-chamado');
+        if (localizacaoArea === 'OUTRO' && customLocationInput) {
+            localizacaoArea = customLocationInput.value.trim();
+            if (!localizacaoArea) { // Validação do campo customizado
+                alert("Por favor, digite a localização customizada.");
+                return;
+            }
+        }
+
         const descricao = this.utils.getById('description-chamado').value.trim();
         const prioridade = this.utils.getById('priority-chamado').value;
         if (!tipoOcorrenciaId || !localizacaoCat || !localizacaoArea || !descricao || !prioridade) {
@@ -381,7 +438,7 @@ const ManutencaoPage = {
             checklist_activity_id: this.utils.getById('ticketAssociatedActivityId').value || null,
             tipo_ocorrencia_id: tipoOcorrenciaId,
             tipo_ocorrencia_nome: tipoOcorrenciaSelect.options[tipoOcorrenciaSelect.selectedIndex].text,
-            localizacao: `${localizacaoCat} - ${localizacaoArea}`,
+            localizacao: `${localizacaoCat} - ${localizacaoArea}`, // Usa o localizacaoArea final
             descricao: descricao,
             prioridade: prioridade,
             equipamentos_selecionados: selectedEquipment.length > 0 ? selectedEquipment : null
@@ -415,16 +472,125 @@ const ManutencaoPage = {
         relevantSuppliers.forEach(s => supplierSelect.add(new Option(s.nome, s.id)));
         
         supplierSelect.onchange = () => {
-            const supplier = this.state.suppliers.find(s => s.id == supplierSelect.value);
+            const selectedSupplierId = Number(supplierSelect.value.trim());
+            const supplier = this.state.suppliers.find(s => s.id === selectedSupplierId);
+
+            // Debugging: Adicionado para ajudar a identificar o problema quando o botão é desabilitado
+            console.log("---------- Debug PopulatePreviewModal (onchange) ----------");
+            console.log("ID do Fornecedor Selecionado (onchange):", selectedSupplierId);
+            console.log("Objeto Fornecedor Encontrado (onchange):", supplier);
+            console.log("Telefone do Fornecedor (onchange):", supplier ? supplier.telefone : 'N/A');
+            console.log("Estado final do botão WhatsApp:", !supplier?.telefone ? 'Desabilitado' : 'Habilitado');
+            console.log("---------------------------------------------------------");
+
             whatsappBtn.disabled = !supplier?.telefone;
-            saveBtn.disabled = !supplierSelect.value;
+            saveBtn.disabled = !selectedSupplierId;
         };
         whatsappBtn.disabled = true;
         saveBtn.disabled = true;
     },
 
-    generateWhatsAppMessage() { /* ... (sem alterações) ... */ },
-    sendWhatsAppMessage() { /* ... (sem alterações) ... */ },
+    generateWhatsAppMessage() {
+        const ticket = this.state.currentTicket;
+        const selectedSupplierId = Number(this.utils.getById('supplier-select-chamado').value.trim());
+        const supplier = this.state.suppliers.find(s => s.id === selectedSupplierId);
+
+        if (!supplier || !supplier.telefone) {
+            // Este alerta só deve ser acionado se o botão for clicado e o telefone for inválido
+            alert("Nenhum fornecedor selecionado ou telefone não disponível.");
+            return "";
+        }
+
+        const condominioNome = this.state.condoDetails.nome || "Condomínio";
+        const condominioEndereco = this.state.condoDetails.endereco || "Endereço não informado";
+        const condominioBairro = this.state.condoDetails.bairro || "Bairro não informado";
+        const condominioCidade = this.state.condoDetails.cidade || "Cidade não informada";
+        const condominioCep = this.state.condoDetails.cep || "CEP não informado";
+
+        let equipamentosText = '';
+        if (ticket.equipamentos_selecionados && ticket.equipamentos_selecionados.length > 0) {
+            equipamentosText = `\n*Equipamentos*: ${ticket.equipamentos_selecionados.map(eq => `${eq.nome} (Qtde: ${eq.quantidade})`).join(', ')}`;
+        }
+
+        const message = `
+Olá ${supplier.nome || 'Fornecedor'},
+
+Gostaria de solicitar um orçamento para um serviço em nosso condomínio *${condominioNome}*, localizado em *${condominioEndereco}, ${condominioBairro}, ${condominioCidade} - CEP: ${condominioCep}*.
+
+*Detalhes do Chamado*:
+- *Sistema*: ${ticket.tipo_ocorrencia_nome}
+- *Localização*: ${ticket.localizacao}
+- *Descrição*: ${ticket.descricao}
+- *Prioridade*: ${ticket.prioridade}
+${equipamentosText}
+
+Por favor, me informe a disponibilidade e o valor para a execução deste serviço.
+
+Obrigado!
+        `.trim();
+        return encodeURIComponent(message);
+    },
+    
+    async sendWhatsAppMessage() {
+        const selectedSupplierId = Number(this.utils.getById('supplier-select-chamado').value.trim());
+        const supplier = this.state.suppliers.find(s => s.id === selectedSupplierId);
+
+        // Estes logs são para o caso do botão ser clicável
+        console.log("---------- Debug sendWhatsAppMessage (clique do botão) ----------");
+        console.log("ID do Fornecedor Selecionado (clique):", selectedSupplierId);
+        console.log("Objeto Fornecedor Encontrado (clique):", supplier);
+        console.log("Telefone do Fornecedor (clique):", supplier ? supplier.telefone : 'N/A');
+        console.log("-------------------------------------------------------------");
+
+
+        // Validação robusta do telefone
+        if (!supplier || typeof supplier.telefone !== 'string' || supplier.telefone.trim() === '') {
+            alert("Telefone do fornecedor não encontrado ou inválido. Verifique o cadastro do fornecedor.");
+            console.error("Erro: Fornecedor não encontrado ou telefone ausente/inválido.", { selectedSupplierId, supplier });
+            return;
+        }
+        const rawPhoneNumber = supplier.telefone; // Telefone original do banco de dados
+
+        // Normaliza o número de telefone para o formato E.164 (sem '+')
+        let cleanedPhoneNumber = rawPhoneNumber.replace(/\D/g, ''); 
+        
+        // Garante que o número comece com '55' (código do Brasil) se não estiver lá
+        // e que tenha o tamanho correto para um número brasileiro (DDD + número)
+        if (!cleanedPhoneNumber.startsWith('55') || (cleanedPhoneNumber.length !== 12 && cleanedPhoneNumber.length !== 13)) {
+            // Se o número tem 10 ou 11 dígitos e não começa com 55, assume que é um número local e adiciona '55'
+            if (cleanedPhoneNumber.length === 10 || cleanedPhoneNumber.length === 11) {
+                cleanedPhoneNumber = '55' + cleanedPhoneNumber;
+            } else {
+                // Se o número não se encaixa nos padrões esperados, loga um aviso e tenta assim mesmo.
+                console.warn(`Número de telefone com formato inesperado: ${rawPhoneNumber}. Tentando enviar como está.`);
+            }
+        }
+        
+        const message = this.generateWhatsAppMessage();
+        const whatsappUrl = `https://wa.me/${cleanedPhoneNumber}?text=${message}`;
+
+        console.log("URL do WhatsApp Gerada:", whatsappUrl);
+
+        // Prioriza a abertura via web (window.open)
+        try {
+            window.open(whatsappUrl, '_blank'); // Tenta abrir diretamente via navegador
+            console.log("Tentativa de abrir via window.open");
+        } catch (error) {
+            console.error("Erro ao tentar abrir via window.open:", error);
+            // Fallback para Capacitor Browser se window.open falhar
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Browser) {
+                try {
+                    await window.Capacitor.Plugins.Browser.open({ url: whatsappUrl });
+                    console.log("Tentativa de abrir via Capacitor.Browser.open");
+                } catch (capacitorError) {
+                    console.error("Erro ao tentar abrir via Capacitor.Browser.open:", capacitorError);
+                    alert("Não foi possível abrir o WhatsApp. Verifique se o aplicativo está instalado ou tente novamente.");
+                }
+            } else {
+                alert("Não foi possível abrir o WhatsApp. Nenhuma forma de abertura de URL disponível.");
+            }
+        }
+    },
 
     async confirmAndSaveTicket() {
         const supplierId = this.utils.getById('supplier-select-chamado').value;
@@ -448,7 +614,7 @@ const ManutencaoPage = {
             console.error("Erro ao criar chamado:", error);
             alert("Falha ao criar chamado no banco de dados.");
         } else {
-            this.draftManager.ticket.clear();
+            this.draftManager.ticket.clear(); // MANTIDO: Limpa rascunho após salvamento com sucesso
             alert("Chamado salvo com sucesso!");
             window.location.href = './chamados.html';
         }
@@ -477,15 +643,17 @@ const ManutencaoPage = {
         document.querySelectorAll('.modal-dynamic-close').forEach(btn => {
             btn.onclick = () => {
                 this.utils.toggleModal(btn.dataset.modalId, false);
-                this.draftManager.ticket.clear();
-                this.draftManager.visit.clear();
+                this.draftManager.ticket.clear(); // MANTIDO: Limpa rascunho ao fechar o modal
+                this.draftManager.visit.clear(); // MANTIDO: Limpa rascunho ao fechar o modal
             };
         });
         
         const locationCatSelect = s('ticket-location-category-chamado');
         const areaSelect = s('ticket-location-area-chamado');
+        
+        // Listener para popular sublocais e controlar o campo customizado
         locationCatSelect.onchange = () => this.populateTicketLocationAreas(locationCatSelect.value);
-        areaSelect.onchange = () => this.populateTicketEquipment(locationCatSelect.value, areaSelect.value);
+        areaSelect.onchange = () => ManutencaoPage.handleSublocalSelection(); // Chama a nova função de controle do sublocal
     },
 
     async initialize() {
@@ -505,10 +673,18 @@ const ManutencaoPage = {
             supabase.from('visita_tecnica').select('*, fornecedor(nome, telefone)').eq('condominio_id', this.state.condoId),
             supabase.from('fornecedor').select('*, tipo_ocorrencia(nome)').eq('condominio_id', this.state.condoId),
             supabase.from('tipo_ocorrencia').select('*').eq('condominio_id', this.state.condoId),
-            supabase.from('condominio').select('nome, endereco, location_config').eq('id', this.state.condoId).single()
+            // CORREÇÃO: Adiciona cep, bairro, cidade à seleção do condomínio
+            supabase.from('condominio').select('nome, endereco, cep, bairro, cidade, location_config').eq('id', this.state.condoId).single()
         ]);
         
-        this.state.condoDetails = condoRes.data ? { nome: condoRes.data.nome, endereco: condoRes.data.endereco } : {};
+        // CORREÇÃO: Popula this.state.condoDetails com os novos campos
+        this.state.condoDetails = condoRes.data ? { 
+            nome: condoRes.data.nome, 
+            endereco: condoRes.data.endereco,
+            cep: condoRes.data.cep,
+            bairro: condoRes.data.bairro,
+            cidade: condoRes.data.cidade
+        } : {};
         this.state.locationConfig = condoRes.data?.location_config || { pavimentos: [] };
         this.state.activities = activitiesRes.data || [];
         this.state.scheduledVisits = visitsRes.data || [];

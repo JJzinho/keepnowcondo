@@ -40,25 +40,39 @@
               </div>
           </div>
     </div>
-    <div class="container">
-        <h1>Gerar Relatórios</h1>
-        <p>Selecione um dos relatórios disponíveis para gerar, salvar e compartilhar.</p>
-
-        <div class="report-card">
-            <div class="report-info">
-                <i class="material-icons report-icon">checklist</i>
-                <div class="report-text">
-                    <h3>Plano de Gestão de Atividades</h3>
-                    <p>Gera um relatório completo em PDF com todas as atividades do checklist, seus status e próximos vencimentos.</p>
-                </div>
-            </div>
-            <button id="generate-checklist-report-btn" class="btn btn-primary">
-                <i class="material-icons">picture_as_pdf</i> Gerar PDF
-            </button>
+  <div class="report-card report-card-blue"> <div class="report-info">
+        <i class="material-icons report-icon">description</i> <div class="report-text">
+            <h3>Relatório de Alterações de Documentos</h3>
+            <p>Gera um relatório em PDF com o histórico de todas as alterações e substituições de documentos nas pastas.</p>
         </div>
-
     </div>
-
+    <button id="generate-document-report-btn" class="btn btn-primary">
+        <i class="material-icons">picture_as_pdf</i> Gerar PDF
+    </button>
+</div>
+<div class="report-card">
+    <div class="report-info">
+        <i class="material-icons report-icon">checklist</i>
+        <div class="report-text">
+            <h3>Plano de Gestão de Atividades</h3>
+            <p>Gera um relatório completo em PDF com todas as atividades do checklist, seus status e próximos vencimentos.</p>
+        </div>
+    </div>
+    <button id="generate-checklist-report-btn" class="btn btn-primary">
+        <i class="material-icons">picture_as_pdf</i> Gerar PDF
+    </button>
+</div>
+<div class="report-card report-card-orange">
+    <div class="report-info">
+        <i class="material-icons report-icon">archive</i> <div class="report-text">
+            <h3>Relatório de Chamados Arquivados</h3>
+            <p>Gera um relatório completo em PDF com todos os chamados que foram arquivados.</p>
+        </div>
+    </div>
+    <button id="generate-archived-report-btn" class="btn btn-primary">
+        <i class="material-icons">picture_as_pdf</i> Gerar PDF
+    </button>
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 

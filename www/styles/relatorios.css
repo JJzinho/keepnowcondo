@@ -4,7 +4,7 @@
 }
 
 .report-card {
-    background-color: #FF5963;
+    background-color: #ff8800;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -65,4 +65,20 @@
 .btn:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+/* Estilo para o card de relatório de documentos (azul) */
+.report-card-blue {
+    background-color: #e0f7fa; /* Um tom de azul claro */
+    border: 1px solid #00acc1; /* Borda um pouco mais escura */
+    box-shadow: 0 4px 8px rgba(0, 172, 193, 0.2); /* Sombra azulada */
+}
+
+/* Opcional: Ajustar a cor do texto ou ícone se o fundo azul for muito escuro */
+.report-card-blue .report-text h3 {
+    color: #004d40; /* Texto mais escuro para contraste */
+}
+
+.report-card-blue .report-icon {
+    color: #0097a7; /* Ícone azul mais vibrante */
 }

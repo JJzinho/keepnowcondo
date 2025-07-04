@@ -70,6 +70,10 @@
                     <div class="form-group"><label class="form-label" for="occurrence-type-chamado">Sistema</label><select class="form-select" id="occurrence-type-chamado" required><option value="" selected disabled>Selecione...</option></select></div>
                     <div class="form-group"><label class="form-label" for="ticket-location-category-chamado">Localização (Pavimento)</label><select class="form-select" id="ticket-location-category-chamado" required><option value="" selected disabled>Carregando...</option></select></div>
                     <div class="form-group"><label class="form-label" for="ticket-location-area-chamado">Área Específica / Sublocal</label><select class="form-select" id="ticket-location-area-chamado" required disabled><option value="" selected disabled>Selecione o Pavimento...</option></select></div>
+                    <div class="form-group" id="custom-location-area-group" style="display: none;">
+                 <label for="ticket-location-area-custom-chamado">Digite a localização (Outro):</label>
+                 <input type="text" id="ticket-location-area-custom-chamado" placeholder="Ex: Área externa, Sala 101, etc.">
+                 </div>
                     <div id="equipment-section-chamado" class="form-group hidden"><label class="form-label">Equipamentos na Área <span class="optional-label">(Opcional)</span></label><div id="equipment-list-chamado" class="equipment-list-box"></div></div>
                     <div class="form-group"><label class="form-label" for="description-chamado">Descrição</label><textarea class="form-control" id="description-chamado" placeholder="Descreva o problema ou a solicitação" required rows="3"></textarea></div>
                     <div class="form-group"><label class="form-label" for="priority-chamado">Prioridade</label><select class="form-select" id="priority-chamado" required><option value="" selected disabled>Selecione...</option><option value="Baixo">Baixo</option><option value="Média">Média</option><option value="Alta">Alta</option><option value="Urgência">Urgência</option></select></div>
