@@ -31,7 +31,10 @@
     "@capacitor/push-notifications": "^7.0.1",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/angular": "^8.0.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "ionicons": "^7.0.0",
+    "mercadopago": "^2.8.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -65,5 +68,14 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.6.3"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "main": "karma.conf.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JJzinho/KeepNow-Condo.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JJzinho/KeepNow-Condo/issues"
+  }
 }

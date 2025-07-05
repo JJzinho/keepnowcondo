@@ -1,10 +1,38 @@
 /* www/styles/relatorios.css */
+:root {
+    --primary-color: #4B39EF;
+    --primary-color-dark: #3a2dbd;
+    --card-blue-bg: #e0f7fa;
+    --card-blue-border: #00acc1;
+    --card-blue-shadow: rgba(0, 172, 193, 0.2);
+    --card-blue-text: #004d40;
+    --card-blue-icon: #0097a7;
+
+    --card-green-bg: #e8f5e9;
+    --card-green-border: #2e7d32;
+    --card-green-shadow: rgba(46, 125, 50, 0.2);
+    --card-green-text: #1b5e20;
+    --card-green-icon: #388e3c;
+
+    --card-orange-bg: #fff3e0;
+    --card-orange-border: #f57c00;
+    --card-orange-shadow: rgba(245, 124, 0, 0.2);
+    --card-orange-text: #e65100;
+    --card-orange-icon: #fb8c00;
+}
+
+
+body {
+    background-color: #f4f7f9;
+}
+
 .container {
     padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .report-card {
-    background-color: #ff8800;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 20px;
@@ -14,30 +42,60 @@
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
+    border: 1px solid;
 }
 
 .report-info {
     display: flex;
     align-items: center;
     gap: 20px;
+    flex-grow: 1;
 }
 
 .report-icon {
     font-size: 48px;
-    color: var(--primary-color);
 }
 
 .report-text h3 {
     margin: 0 0 5px 0;
-    color: #ffffff;
+    font-weight: 600;
 }
 
 .report-text p {
     margin: 0;
-    color: #ffffff;
     font-size: 0.9em;
-    max-width: 400px;
+    max-width: 450px;
+    line-height: 1.5;
 }
+
+/* Card-specific colors */
+.report-card-blue {
+    background-color: var(--card-blue-bg);
+    border-color: var(--card-blue-border);
+    box-shadow: 0 4px 8px var(--card-blue-shadow);
+}
+.report-card-blue .report-text h3 { color: var(--card-blue-text); }
+.report-card-blue .report-text p { color: #00695c; }
+.report-card-blue .report-icon { color: var(--card-blue-icon); }
+
+.report-card-green {
+    background-color: var(--card-green-bg);
+    border-color: var(--card-green-border);
+    box-shadow: 0 4px 8px var(--card-green-shadow);
+}
+.report-card-green .report-text h3 { color: var(--card-green-text); }
+.report-card-green .report-text p { color: #2e7d32; }
+.report-card-green .report-icon { color: var(--card-green-icon); }
+
+.report-card-orange {
+    background-color: var(--card-orange-bg);
+    border-color: var(--card-orange-border);
+    box-shadow: 0 4px 8px var(--card-orange-shadow);
+}
+.report-card-orange .report-text h3 { color: var(--card-orange-text); }
+.report-card-orange .report-text p { color: #ef6c00; }
+.report-card-orange .report-icon { color: var(--card-orange-icon); }
+
 
 .btn {
     display: inline-flex;
@@ -47,38 +105,48 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
-    font-weight: 500;
-    text-transform: uppercase;
-    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    color: white;
+}
+.btn .material-icons {
+    font-size: 1.2em;
 }
 
 .btn-primary {
     background-color: var(--primary-color);
-    color: white;
 }
 
 .btn-primary:hover {
     background-color: var(--primary-color-dark);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 .btn:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+    box-shadow: none;
+}
+.btn:disabled .material-icons.spin {
+    animation: spin 1s linear infinite;
 }
 
-/* Estilo para o card de relatório de documentos (azul) */
-.report-card-blue {
-    background-color: #e0f7fa; /* Um tom de azul claro */
-    border: 1px solid #00acc1; /* Borda um pouco mais escura */
-    box-shadow: 0 4px 8px rgba(0, 172, 193, 0.2); /* Sombra azulada */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
-/* Opcional: Ajustar a cor do texto ou ícone se o fundo azul for muito escuro */
-.report-card-blue .report-text h3 {
-    color: #004d40; /* Texto mais escuro para contraste */
-}
-
-.report-card-blue .report-icon {
-    color: #0097a7; /* Ícone azul mais vibrante */
+@media (max-width: 600px) {
+    .report-card {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 15px;
+    }
 }
