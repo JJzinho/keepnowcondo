@@ -10,6 +10,7 @@ const loginForm = document.getElementById('login-form');
 const signupErrorP = document.getElementById('signup-error');
 const loginErrorP = document.getElementById('login-error');
 const loader = document.getElementById('loader'); // Opcional: para feedback visual
+const rememberMeCheckbox = document.getElementById('remember-me'); // Adicionado elemento do checkbox
 
 // --- LÓGICA DA ANIMAÇÃO DOS PAINÉIS ---
 if (registerBtn && container) {
@@ -86,6 +87,14 @@ if (loginForm) {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
+        // Salva a preferência do usuário para o checkbox "Manter conectado"
+        // Note: Por padrão, o Supabase.js já utiliza localStorage para persistir a sessão,
+        // o que já implementa o comportamento de "manter conectado" entre sessões do navegador.
+        // Este salvamento é para lembrar o estado visual do checkbox.
+        if (rememberMeCheckbox) {
+            localStorage.setItem('rememberMePreference', rememberMeCheckbox.checked);
+        }
+
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         
         if (loader) loader.style.display = 'none';
@@ -107,6 +116,17 @@ supabase.auth.onAuthStateChange((event, session) => {
 // --- VERIFICAÇÃO AUTOMÁTICA NO CARREGAMENTO DA PÁGINA ---
 // Lida com o caso de um usuário já logado acessando a página.
 document.addEventListener('DOMContentLoaded', async () => {
+    // Restaura o estado do checkbox "Manter conectado"
+    if (rememberMeCheckbox) {
+        const rememberedPreference = localStorage.getItem('rememberMePreference');
+        // Se a preferência foi salva como 'false', desmarca. Caso contrário (null, 'true'), mantém marcado.
+        if (rememberedPreference === 'false') {
+            rememberMeCheckbox.checked = false;
+        } else {
+            rememberMeCheckbox.checked = true; // Padrão para marcado se não houver preferência ou for 'true'
+        }
+    }
+
     // 1. Verifica se o usuário acabou de fazer logout
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('logout')) {

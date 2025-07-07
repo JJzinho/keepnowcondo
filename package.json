@@ -23,6 +23,7 @@
     "@angular/router": "^19.0.0",
     "@capacitor/android": "^7.3.0",
     "@capacitor/app": "^7.0.1",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/browser": "^7.0.1",
     "@capacitor/camera": "^7.0.1",
     "@capacitor/core": "^7.3.0",
@@ -31,7 +32,9 @@
     "@capacitor/push-notifications": "^7.0.1",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/angular": "^8.0.0",
+    "axios": "^1.10.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "ionicons": "^7.0.0",
     "mercadopago": "^2.8.0",
@@ -77,5 +80,6 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/JJzinho/KeepNow-Condo/issues"
-  }
+  },
+  "keywords": []
 }

@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Seus estilos CSS -->
     <link rel="stylesheet" href="./styles/index.css">
     <link rel="stylesheet" href="./styles/loading.css">
     <title>Login Keepnow</title>
-    <!-- REMOVIDO: A tag de script do Supabase foi removida daqui, pois é carregada como módulo no final do body. -->
-</head>
+    </head>
 <body>
     <div class="container" id="container">
         <div class="form-container sign-up">
@@ -27,10 +25,13 @@
                 <h1>Entrar</h1>
                 <input type="email" id="login-email" placeholder="Email" required>
                 <input type="password" id="login-password" placeholder="Senha" required>
+                <div class="remember-me-group">
+                    <input type="checkbox" id="remember-me" checked>
+                    <label for="remember-me">Manter conectado</label>
+                </div>
                 <a href="#">Esqueceu a senha?</a>
                 <button type="submit">Entrar</button>
                 <p id="login-error" class="error-message"></p>
-                <!-- CORREÇÃO: Link de acesso do supervisor movido para dentro do contexto de login -->
                 <div class="supervisor-access">
                     <a href="./pages/supervisor_login.html">Acesso de Supervisor</a>
                 </div>
@@ -52,7 +53,6 @@
         </div>
     </div> 
 
-    <!-- Carregando os scripts como módulos no final do body para melhor performance e funcionamento correto -->
     <script type="module" src="./script/supabaseClient.js"></script>
     <script type="module" src="./script/index.js"></script>
 </body>

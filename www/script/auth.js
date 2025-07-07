@@ -108,6 +108,14 @@ if (loginForm) {
 // --- LISTENER GLOBAL DE AUTENTICAÇÃO ---
 // Escuta por eventos de login/logout para decidir o que fazer.
 supabase.auth.onAuthStateChange((event, session) => {
+    // Verifica o parâmetro 'logout' na URL para evitar redirecionamento automático pós-logout.
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('logout')) {
+        console.log("Logout bem-sucedido. Limpando URL para evitar auto-redirecionamento.");
+        window.history.replaceState({}, document.title, window.location.pathname); // Limpa a URL
+        return; // Sai da função para não processar o evento 'SIGNED_IN'
+    }
+
     if (event === 'SIGNED_IN') {
         // Disparado após um login ou cadastro bem-sucedido.
         // A tela de loading já está ativa, então apenas continuamos o fluxo.
