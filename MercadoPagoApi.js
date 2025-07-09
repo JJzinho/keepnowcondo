@@ -23,8 +23,7 @@ fetch('https://api.mercadopago.com/preapproval_plan', {
       payment_types: [{ id: "credit_card" }],
       payment_methods: [{ id: "bolbradesco" }]
     },
-    // Redirecionar para inicio.html após o pagamento
-    back_url: "https://www.keepnow.com.br/www/pages/inicio.html" 
+    back_url: "https://www.keepnow.com.br/www/pages/cadastro.html" 
   })
 })
 .then(response => response.json())

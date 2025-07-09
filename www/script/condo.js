@@ -145,7 +145,8 @@ const guideSummariesDisplay = {
     planoGestao: { title: "Plano de Gestão (Check-up)", summary: "Crie e acompanhe o plano de gestão..." },
     aberturaChamado: { title: "Abertura de Chamado", summary: "Registre formalmente problemas..." },
     fornecedores: { title: "Fornecedores e Serviços", summary: "Administre os fornecedores..." },
-    acompanhamentoChamados: { title: "Acompanhamento de Chamados", summary: "Acompanhe o status dos chamados..." }
+    acompanhamentoChamados: { title: "Acompanhamento de Chamados", summary: "Acompanhe o status dos chamados..." }, // Added comma here
+    relatoriosGeral: { title: "Gerador de Relátorios", summary: "Crie um relátorio das atividades do seu condominio..." }
 };
 
 function openGuideModalDisplay(guideId) {

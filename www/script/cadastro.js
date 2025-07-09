@@ -187,6 +187,8 @@ const submitForm = async (event) => {
             location_config_data: locationConfig, // *** Passa o objeto JSON para a função RPC
         };
 
+        let resultCondoId; // Para armazenar o ID do condomínio recém-criado ou atualizado
+
         if (condoId) {
             // Atualização
             condoData.condo_id_to_update = condoId;
@@ -194,12 +196,14 @@ const submitForm = async (event) => {
 
             const { error } = await supabase.rpc('update_condo_details', condoData);
             if (error) throw error;
+            resultCondoId = condoId; // Se for edição, o ID é o mesmo
             alert('Condomínio atualizado com sucesso!');
 
         } else {
             // Criação
             const { data: newCondoId, error: createError } = await supabase.rpc('create_new_condo', condoData);
             if (createError) throw createError;
+            resultCondoId = newCondoId; // Armazena o ID do novo condomínio
 
             // Se uma foto foi selecionada, faz o upload agora com o ID recém-criado
             if (photoFile) {
@@ -214,7 +218,20 @@ const submitForm = async (event) => {
             alert('Condomínio cadastrado com sucesso!');
         }
 
-        window.location.href = './inicio.html';
+        // --- INÍCIO DA INTEGRAÇÃO COM MERCADO PAGO (Fluxo Simulado) ---
+        // Em um cenário real, você faria uma chamada para o seu backend aqui.
+        // O backend criaria uma preferência de pagamento no Mercado Pago e retornaria o 'init_point'.
+        // O 'init_point' é o URL para o qual você deve redirecionar o usuário.
+
+        // URL placeholder do Mercado Pago. SUBSTITUA por seu init_point real.
+        // Você pode passar o condoId ou o user_id nos parâmetros para que seu backend
+        // saiba a qual entidade associar a assinatura após o pagamento.
+        const mercadoPagoPaymentUrl = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=YOUR_MERCADO_PAGO_PREFERENCE_ID_HERE&condo_id=${resultCondoId}&user_id=${(await supabase.auth.getUser()).data.user.id}`;
+
+        alert('Condomínio salvo! Você será redirecionado para a página de pagamento.');
+        window.location.href = mercadoPagoPaymentUrl;
+        // --- FIM DA INTEGRAÇÃO COM MERCADO PAGO (Fluxo Simulado) ---
+
 
     } catch (error) {
         console.error('Erro ao salvar condomínio:', error);

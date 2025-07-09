@@ -98,6 +98,12 @@ if (loginForm) {
         if (error) {
             loginErrorP.textContent = 'E-mail ou senha inválidos.';
         } else {
+            // Save the email if 'remember me' is checked
+            if (rememberMeCheckbox && rememberMeCheckbox.checked) {
+                localStorage.setItem('lastLoggedInEmail', email);
+            } else {
+                localStorage.removeItem('lastLoggedInEmail'); // Clear if unchecked
+            }
             // Chama a função de redirecionamento após login bem-sucedido
             checkCondoStatusAndRedirect();
         }
@@ -114,6 +120,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             rememberMeCheckbox.checked = false;
         } else {
             rememberMeCheckbox.checked = true;
+        }
+
+        // Pre-fill email if remember me is checked and email is saved
+        if (rememberMeCheckbox.checked) {
+            const lastEmail = localStorage.getItem('lastLoggedInEmail');
+            if (lastEmail) {
+                const loginEmailInput = document.getElementById('login-email');
+                if (loginEmailInput) {
+                    loginEmailInput.value = lastEmail;
+                }
+            }
         }
     }
 
