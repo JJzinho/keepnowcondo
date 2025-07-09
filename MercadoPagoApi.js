@@ -16,14 +16,15 @@ fetch('https://api.mercadopago.com/preapproval_plan', {
         frequency: 1,
         frequency_type: "months"
       },
-      transaction_amount: 10,
+      transaction_amount: 29.90,
       currency_id: "BRL"
     },
     payment_methods_allowed: {
       payment_types: [{ id: "credit_card" }],
       payment_methods: [{ id: "bolbradesco" }]
     },
-    back_url: "https://www.keepnow.com.br/www/pages/cadastro.html"
+    // Redirecionar para inicio.html após o pagamento
+    back_url: "https://www.keepnow.com.br/www/pages/inicio.html" 
   })
 })
 .then(response => response.json())

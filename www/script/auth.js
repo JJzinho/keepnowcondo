@@ -1,4 +1,5 @@
-// NOVO: Importa o sistema de loading
+// www/script/auth.js
+
 import { showLoading, hideLoading } from './ui.js';
 import { supabase } from './supabaseClient.js';
 
@@ -19,27 +20,25 @@ if(loginBtn) loginBtn.addEventListener('click', () => container.classList.remove
 
 /**
  * Função final do fluxo: verifica se o usuário tem condomínio
- * e redireciona para a tela correta. Esta função também é responsável
- * por esconder o loading no final de todo o processo.
+ * e redireciona para a tela correta.
+ * Esta função é genérica e pode ser chamada onde o redirecionamento é necessário.
  */
 async function checkCondoStatusAndRedirect() {
-    // Não chamamos showLoading() aqui, pois ele já foi iniciado pelo login/cadastro.
     console.log("Verificando status do condomínio...");
     try {
         const { data, error } = await supabase.rpc('check_user_has_condo');
         if (error) throw error;
 
-        // Redireciona com base na resposta
         if (data) {
-        window.location.replace('./pages/inicio.html'); 
+            window.location.replace('./pages/inicio.html');
         } else {
-        window.location.replace('./pages/cadastro.html');        }
+            window.location.replace('./pages/cadastro.html');
+        }
     } catch (error) {
         console.error('Erro na verificação de status:', error.message);
         alert('Ocorreu um erro ao verificar seus dados. Por favor, tente fazer o login novamente.');
         await supabase.auth.signOut();
     } finally {
-        // NOVO: Garante que o loading seja escondido no final de tudo.
         hideLoading();
     }
 }
@@ -50,7 +49,6 @@ if (signUpForm) {
         event.preventDefault();
         signupError.textContent = '';
         
-        // NOVO: Mostra o loading no início da operação
         showLoading();
 
         const name = document.getElementById('signup-name').value;
@@ -68,11 +66,9 @@ if (signUpForm) {
         if (error) {
             signupError.textContent = 'Erro ao cadastrar: ' + error.message;
             console.error(error);
-            // NOVO: Esconde o loading se deu erro, pois o fluxo para aqui.
             hideLoading();
         }
-        // Se o cadastro for bem-sucedido, onAuthStateChange será acionado
-        // e chamará checkCondoStatusAndRedirect, que vai esconder o loading.
+        // O redirecionamento (checkCondoStatusAndRedirect) agora é chamado em index.js após o sucesso.
     });
 }
 
@@ -83,7 +79,6 @@ if (loginForm) {
         event.preventDefault();
         loginError.textContent = '';
 
-        // NOVO: Mostra o loading no início da operação
         showLoading();
 
         const email = document.getElementById('login-email').value;
@@ -97,28 +92,23 @@ if (loginForm) {
         if (error) {
             loginError.textContent = 'E-mail ou senha inválidos.';
             console.error(error);
-            // NOVO: Esconde o loading se deu erro, pois o fluxo para aqui.
             hideLoading();
         }
-        // Se o login for bem-sucedido, onAuthStateChange será acionado
-        // e chamará checkCondoStatusAndRedirect, que vai esconder o loading.
+        // O redirecionamento (checkCondoStatusAndRedirect) agora é chamado em index.js após o sucesso.
     });
 }
 
 // --- LISTENER GLOBAL DE AUTENTICAÇÃO ---
-// Escuta por eventos de login/logout para decidir o que fazer.
+// Este listener agora só trata o 'SIGNED_OUT' para redirecionar para a página de login.
+// O 'SIGNED_IN' não é tratado aqui para evitar duplicação com a lógica de form submit em index.js.
 supabase.auth.onAuthStateChange((event, session) => {
-    // Verifica o parâmetro 'logout' na URL para evitar redirecionamento automático pós-logout.
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('logout')) {
-        console.log("Logout bem-sucedido. Limpando URL para evitar auto-redirecionamento.");
-        window.history.replaceState({}, document.title, window.location.pathname); // Limpa a URL
-        return; // Sai da função para não processar o evento 'SIGNED_IN'
-    }
-
-    if (event === 'SIGNED_IN') {
-        // Disparado após um login ou cadastro bem-sucedido.
-        // A tela de loading já está ativa, então apenas continuamos o fluxo.
-        checkCondoStatusAndRedirect();
+    if (event === 'SIGNED_OUT') {
+        // Quando o usuário faz logout (via configurações ou por expiração de sessão),
+        // redireciona para a página de login se não for um logout via URL param já tratado.
+        hideLoading();
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('logout')) {
+            window.location.replace('/www/index.html');
+        }
     }
 });
