@@ -139,14 +139,13 @@ function renderLocationConfigForDisplayUI(configData, containerElement) {
 
 
 // --- LÓGICA DO GUIDE MODAL ---
-const guideSummariesDisplay = {
-    infoGeraisLoc: { title: "Informações Gerais e Localizações", summary: "Consulte os dados cadastrais..." },
-    documentos: { title: "Documentos", summary: "Armazene e gerencie documentos..." },
-    planoGestao: { title: "Plano de Gestão (Check-up)", summary: "Crie e acompanhe o plano de gestão..." },
-    aberturaChamado: { title: "Abertura de Chamado", summary: "Registre formalmente problemas..." },
-    fornecedores: { title: "Fornecedores e Serviços", summary: "Administre os fornecedores..." },
-    acompanhamentoChamados: { title: "Acompanhamento de Chamados", summary: "Acompanhe o status dos chamados..." }, // Added comma here
-    relatoriosGeral: { title: "Gerador de Relátorios", summary: "Crie um relátorio das atividades do seu condominio..." }
+const guideSummariesDisplay = {infoGeraisLoc: { title: "Informações Gerais e Localizações", summary: "Acesse facilmente todas as informações cadastrais do condomínio, incluindo os dados completos do síndico atual, detalhes da administradora responsável, localização exata de torres e unidades, além de registros atualizados que facilitam a gestão, a comunicação e a tomada de decisões no dia a dia condominial" },
+    documentos: { title: "Documentos", summary: "Centralize, armazene e gerencie todos os seus documentos de forma segura, prática e organizada. Tenha acesso rápido a arquivos importantes, controle versões, defina permissões de visualização e edição, e mantenha o histórico completo de atividades para garantir transparência e rastreabilidade em todas as etapas." },
+    planoGestao: { title: "Plano de Gestão (Check-up)", summary: "Crie, organize e acompanhe o plano de gestão do condomínio de forma inteligente. Defina atividades periódicas de manutenção preventiva e corretiva, automatize lembretes e atribuições, e visualize com clareza o cronograma de tarefas. Facilite o acompanhamento das execuções, evitando esquecimentos e garantindo a conservação ideal das áreas comuns e sistemas essenciais do condomínio." },
+    aberturaChamado: { title: "Abertura de Chamado", summary: "Abra chamados diretamente para fornecedores responsáveis por reparos em equipamentos, estruturas ou áreas comuns do condomínio. Registre ocorrências detalhadas, envie fotos, acompanhe o status do atendimento e agende visitas técnicas de forma prática e centralizada. Tenha mais controle e agilidade na resolução de problemas do dia a dia condominial." },
+    fornecedores: { title: "Fornecedores e Serviços", summary: "Gerencie de forma centralizada todos os fornecedores do condomínio, categorizando por especialidade, serviços prestados e tipos de sistemas atendidos (como elétrica, hidráulica, segurança, climatização, entre outros). Mantenha um cadastro completo com dados de contato, histórico de atendimentos e avaliações de desempenho, facilitando a contratação, o agendamento de serviços e o controle das manutenções realizadas." },
+    acompanhamentoChamados: { title: "Acompanhamento de Chamados", summary: "Registre chamados de forma prática informando o problema identificado, local afetado e fornecedor responsável. Insira detalhes, fotos e datas previstas para atendimento, permitindo o acompanhamento completo do processo — do agendamento à finalização do serviço. Tudo fica salvo em histórico, facilitando consultas futuras e garantindo transparência na gestão condominial." }, // Added comma here
+    relatoriosGeral: { title: "Gerador de Relátorios", summary: "Gere relatórios completos com o histórico de gestão do condomínio, incluindo documentos vencidos ou substituídos, andamento e status do plano de gestão, além de chamados finalizados. Tenha uma visão clara e organizada das ações realizadas, facilitando auditorias, prestação de contas e o acompanhamento contínuo da manutenção e administração condominial." }
 };
 
 function openGuideModalDisplay(guideId) {
