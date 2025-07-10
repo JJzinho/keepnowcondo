@@ -129,7 +129,7 @@ const validateCnpj = (cnpj) => {
 const validateForm = () => {
     const cnpjInput = document.getElementById('cnpj');
     const cnpjError = document.getElementById('cnpj-error');
-    if (!validateCnpj(cnpjInput.value)) {
+    if (!cnpjInput.value || !validateCnpj(cnpjInput.value)) { // Garante que o campo não está vazio também
         cnpjError.textContent = 'CNPJ inválido.';
         cnpjInput.classList.add('invalid');
         cnpjInput.focus();
@@ -138,7 +138,12 @@ const validateForm = () => {
         cnpjError.textContent = '';
         cnpjInput.classList.remove('invalid');
     }
-    // Adicionar outras validações se necessário
+    // Adicionar outras validações se necessário, como nome do condomínio
+    if (!document.getElementById('nome').value.trim()) {
+        alert("O nome do condomínio é obrigatório.");
+        document.getElementById('nome').focus();
+        return false;
+    }
     return true;
 };
 
@@ -158,15 +163,12 @@ const submitForm = async (event) => {
         let photoUrl = currentCondoData?.foto_url || null;
         const photoFile = document.getElementById('photo-input').files[0];
 
-        // Se há uma nova foto, faz o upload primeiro (precisamos de um ID)
-        if (photoFile && condoId) {
-             photoUrl = await uploadCondoPhoto(photoFile, condoId);
-        }
+        // NOTA: Se for um NOVO condomínio (condoId é null), o upload da foto
+        // precisa esperar a criação do condomínio para ter um ID.
+        // Vamos adiar o upload da foto para DEPOIS de obter o resultCondoId.
 
         const cleanPhone = (value) => value.replace(/\D/g, '');
 
-        // *** CORREÇÃO APLICADA AQUI ***
-        // Captura os dados da configuração de localização
         const locationConfig = getLocationConfigData();
 
         const condoData = {
@@ -183,16 +185,19 @@ const submitForm = async (event) => {
             torres_qnt: parseInt(document.getElementById('torres').value, 10) || null,
             admin_nome_condo: document.getElementById('admin_nome').value,
             admin_telefone_condo: cleanPhone(document.getElementById('admin_telefone').value),
-            foto_url_condo: photoUrl, // Começa com a URL atual
-            location_config_data: locationConfig, // *** Passa o objeto JSON para a função RPC
+            // foto_url_condo será definido após o upload se for um novo condomínio
+            location_config_data: locationConfig,
         };
 
         let resultCondoId; // Para armazenar o ID do condomínio recém-criado ou atualizado
 
         if (condoId) {
-            // Atualização
-            condoData.condo_id_to_update = condoId;
+            // Se for edição, o condomínio já existe, pode fazer upload da foto diretamente
+            if (photoFile) {
+                photoUrl = await uploadCondoPhoto(photoFile, condoId);
+            }
             condoData.foto_url_condo = photoUrl; // Garante que a nova URL seja salva
+            condoData.condo_id_to_update = condoId;
 
             const { error } = await supabase.rpc('update_condo_details', condoData);
             if (error) throw error;
@@ -200,15 +205,15 @@ const submitForm = async (event) => {
             alert('Condomínio atualizado com sucesso!');
 
         } else {
-            // Criação
+            // Se for criação, primeiro cria o condomínio para obter o ID
             const { data: newCondoId, error: createError } = await supabase.rpc('create_new_condo', condoData);
             if (createError) throw createError;
             resultCondoId = newCondoId; // Armazena o ID do novo condomínio
 
-            // Se uma foto foi selecionada, faz o upload agora com o ID recém-criado
+            // Agora que temos o ID, podemos fazer o upload da foto (se houver)
             if (photoFile) {
                 const newPhotoUrl = await uploadCondoPhoto(photoFile, newCondoId);
-                // Atualiza a URL da foto no registro recém-criado
+                // E então, atualiza o condomínio recém-criado com a URL da foto
                 const { error: updatePhotoError } = await supabase
                     .from('condominio')
                     .update({ foto_url: newPhotoUrl })
@@ -218,24 +223,56 @@ const submitForm = async (event) => {
             alert('Condomínio cadastrado com sucesso!');
         }
 
-        // --- INÍCIO DA INTEGRAÇÃO COM MERCADO PAGO (Fluxo Simulado) ---
-        // Em um cenário real, você faria uma chamada para o seu backend aqui.
-        // O backend criaria uma preferência de pagamento no Mercado Pago e retornaria o 'init_point'.
-        // O 'init_point' é o URL para o qual você deve redirecionar o usuário.
+        // --- INÍCIO DA INTEGRAÇÃO COM MERCADO PAGO (FLUXO REAL) ---
+        // 1. Obtenha o ID do usuário logado
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            throw new Error("Usuário não autenticado para iniciar o pagamento.");
+        }
 
-        // URL placeholder do Mercado Pago. SUBSTITUA por seu init_point real.
-        // Você pode passar o condoId ou o user_id nos parâmetros para que seu backend
-        // saiba a qual entidade associar a assinatura após o pagamento.
-        const mercadoPagoPaymentUrl = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=YOUR_MERCADO_PAGO_PREFERENCE_ID_HERE&condo_id=${resultCondoId}&user_id=${(await supabase.auth.getUser()).data.user.id}`;
+        // 2. Chame SEU BACKEND para criar a Preferência de Pagamento no Mercado Pago
+        // Substitua 'YOUR_BACKEND_URL' pela URL base do seu servidor de backend
+        // Ex: https://api.seuservidor.com/mercadopago/create-subscription-preference
+        const backendPaymentEndpoint = 'YOUR_BACKEND_URL/mercadopago/create-subscription-preference';
 
-        alert('Condomínio salvo! Você será redirecionado para a página de pagamento.');
-        window.location.href = mercadoPagoPaymentUrl;
-        // --- FIM DA INTEGRAÇÃO COM MERCADO PAGO (Fluxo Simulado) ---
+        // Dados a serem enviados para o seu backend para criar a preferência
+        const paymentData = {
+            userId: user.id,
+            condoId: resultCondoId,
+            // Você pode adicionar mais dados aqui, como o ID do plano de assinatura
+            // que você configurará no Mercado Pago, se tiver vários planos.
+            planDescription: 'Assinatura Mensal KeepNow' // Exemplo
+        };
 
+        const response = await fetch(backendPaymentEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Se seu backend exigir autenticação, inclua um token de acesso aqui
+                // 'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify(paymentData)
+        });
+
+        if (!response.ok) {
+            const errorResponse = await response.json();
+            throw new Error(`Falha ao iniciar pagamento: ${errorResponse.message || response.statusText}`);
+        }
+
+        const responseData = await response.json();
+        const mercadoPagoInitPoint = responseData.init_point; // Seu backend deve retornar esta URL
+
+        if (mercadoPagoInitPoint) {
+            alert('Condomínio salvo! Redirecionando para o Mercado Pago para finalizar a assinatura do plano.');
+            window.location.href = mercadoPagoInitPoint;
+        } else {
+            throw new Error("Não foi possível obter o link de pagamento do Mercado Pago.");
+        }
+        // --- FIM DA INTEGRAÇÃO COM MERCADO PAGO ---
 
     } catch (error) {
-        console.error('Erro ao salvar condomínio:', error);
-        alert(`Erro ao salvar: ${error.message}`);
+        console.error('Erro ao salvar condomínio ou iniciar pagamento:', error);
+        alert(`Erro ao salvar ou iniciar pagamento: ${error.message}. Por favor, tente novamente.`);
         submitBtn.style.display = 'block';
         loadingIndicator.style.display = 'none';
     }
