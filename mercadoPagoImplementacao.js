@@ -16,7 +16,8 @@ Deno.serve(async (req) => {
     const { action, data } = await req.json();
 
     // Get Mercado Pago access token from environment variable
-    const mercadoPagoAccessToken = Deno.env.get('TEST-7010832792903159-070711-fb06e9423ee11fccb91cd939dde3e7e3-2532487401');
+    // ATENÇÃO: Em produção, use Deno.env.get('MERCADO_PAGO_ACCESS_TOKEN') e configure a variável de ambiente.
+    const mercadoPagoAccessToken = Deno.env.get('TEST-7010832792903159-070711-fb06e9423ee11fccb91cd939dde3e7e3-2532487401'); // Mantenha para testes, mas substitua em produção
     if (!mercadoPagoAccessToken) {
       return new Response(JSON.stringify({ error: 'Mercado Pago access token not configured' }), {
         status: 500,
@@ -29,8 +30,8 @@ Deno.serve(async (req) => {
     
     // Initialize Supabase client with user's auth token to respect RLS
     const supabaseClient = createClient(
-      Deno.env.get('https://cshnufsmcyruyesnvoqx.supabase.co') ?? '',
-      Deno.env.get('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzaG51ZnNtY3lydXllc252b3F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NzQ4NDEsImV4cCI6MjA2NTE1MDg0MX0.ZiafyB294G6ajQE0iN2Jevm4SrQuPc_MPhux5XWc650') ?? '',
+      Deno.env.get('SUPABASE_URL') ?? 'https://cshnufsmcyruyesnvoqx.supabase.co', // Use variável de ambiente em produção
+      Deno.env.get('SUPABASE_ANON_KEY') ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzaG51ZnNtY3lydXllc252b3F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1NzQ4NDEsImV4cCI6MjA2NTE1MDg0MX0.ZiafyB294G6ajQE0iN2Jevm4SrQuPc_MPhux5XWc650', // Use variável de ambiente em produção
       {
         global: {
           headers: { Authorization: req.headers.get('Authorization') ?? '' }
@@ -42,6 +43,9 @@ Deno.serve(async (req) => {
     switch (action) {
       case 'create_preference':
         return await createPreference(client, data);
+      
+      case 'create_subscription_plan': // NOVO: Ação para criar plano de pré-aprovação
+        return await createSubscriptionPlan(client, data);
       
       case 'get_payment':
         return await getPayment(client, data.paymentId);
@@ -65,7 +69,7 @@ Deno.serve(async (req) => {
 });
 
 /**
- * Create a payment preference
+ * Create a payment preference (para pagamentos únicos)
  */
 async function createPreference(client, data) {
   const preference = await client.preference.create({
@@ -74,7 +78,7 @@ async function createPreference(client, data) {
         title: item.title,
         quantity: item.quantity,
         unit_price: item.price,
-        currency_id: data.currency_id || 'ARS', // Default to Argentine Peso
+        currency_id: data.currency_id || 'BRL',
       })),
       back_urls: {
         success: data.success_url,
@@ -88,6 +92,37 @@ async function createPreference(client, data) {
   });
 
   return new Response(JSON.stringify(preference), {
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * NOVO: Criar um plano de pré-aprovação (assinatura)
+ */
+async function createSubscriptionPlan(client, data) {
+  // Use os dados recebidos do frontend para criar o plano
+  const preapprovalPlan = await client.preapprovalPlan.create({
+    body: {
+      reason: data.reason || "Assinatura KeepNow Condo",
+      auto_recurring: {
+        frequency: data.frequency || 1,
+        frequency_type: data.frequency_type || "months",
+        repetitions: data.repetitions || null, // null para ilimitado
+        billing_day: data.billing_day || 1, // Dia do mês para cobrança
+        billing_day_proportional: data.billing_day_proportional || false,
+        free_trial: data.free_trial || undefined, // { frequency: 1, frequency_type: "months" }
+        transaction_amount: data.transaction_amount,
+        currency_id: data.currency_id || "BRL"
+      },
+      back_url: data.back_url || "https://www.keepnow.com.br/www/pages/cadastro.html", // URL de retorno após o checkout
+      // notification_url: 'SUA_URL_DO_WEBHOOK_PARA_ASSINATURAS', // Opcional, se precisar de um webhook diferente para planos
+      external_reference: JSON.stringify({ userId: data.userId, condoId: data.condoId }), // Importante para identificar no webhook
+    }
+  });
+
+  // O "init_point" é a URL para redirecionar o usuário para o checkout do Mercado Pago
+  return new Response(JSON.stringify({ init_point: preapprovalPlan.init_point }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' }
   });
@@ -117,14 +152,14 @@ async function processWebhook(client, supabaseClient, webhookData) {
     });
   }
 
-  // Handle different webhook types
+  // Handle payment webhooks
   if (webhookData.type === 'payment') {
     const paymentId = webhookData.data.id;
     const payment = await client.payment.get({ id: paymentId });
     
     // Store payment information in your database
     const { data, error } = await supabaseClient
-      .from('payments')
+      .from('payments') // Garanta que você tenha uma tabela 'payments' para pagamentos únicos
       .insert({
         payment_id: payment.id,
         status: payment.status,
@@ -140,6 +175,42 @@ async function processWebhook(client, supabaseClient, webhookData) {
     if (error) {
       console.error('Error storing payment:', error);
       // Still return 200 to Mercado Pago to acknowledge receipt
+    }
+  } 
+  // NOVO: Lidar com webhooks de pré-aprovação (assinaturas)
+  else if (webhookData.type === 'preapproval') {
+    const preapprovalId = webhookData.data.id;
+    try {
+      const preapproval = await client.preapproval.get({ id: preapprovalId });
+
+      let parsedExternalReference = {};
+      if (preapproval.external_reference) {
+        try {
+          parsedExternalReference = JSON.parse(preapproval.external_reference);
+        } catch (e) {
+          console.warn('Could not parse external_reference as JSON:', preapproval.external_reference);
+        }
+      }
+
+      const { userId, condoId } = parsedExternalReference;
+
+      const { data, error } = await supabaseClient
+        .from('subscriptions') // Sua tabela de assinaturas
+        .upsert({
+          user_id: userId,
+          mercadopago_plan_id: preapproval.preapproval_plan_id,
+          mercadopago_subscription_id: preapproval.id,
+          status: preapproval.status,
+          current_period_end: preapproval.next_payment_date ? new Date(preapproval.next_payment_date).toISOString() : null,
+          created_at: preapproval.date_created ? new Date(preapproval.date_created).toISOString() : new Date().toISOString(),
+          // Você pode adicionar mais campos aqui, como condominium_id
+        }, { onConflict: 'mercadopago_subscription_id' }); // Atualiza se a assinatura já existe
+
+      if (error) {
+        console.error('Error upserting subscription:', error);
+      }
+    } catch (e) {
+      console.error('Error processing preapproval webhook:', e);
     }
   }
   

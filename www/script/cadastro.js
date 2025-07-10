@@ -163,10 +163,6 @@ const submitForm = async (event) => {
         let photoUrl = currentCondoData?.foto_url || null;
         const photoFile = document.getElementById('photo-input').files[0];
 
-        // NOTA: Se for um NOVO condomínio (condoId é null), o upload da foto
-        // precisa esperar a criação do condomínio para ter um ID.
-        // Vamos adiar o upload da foto para DEPOIS de obter o resultCondoId.
-
         const cleanPhone = (value) => value.replace(/\D/g, '');
 
         const locationConfig = getLocationConfigData();
@@ -185,35 +181,30 @@ const submitForm = async (event) => {
             torres_qnt: parseInt(document.getElementById('torres').value, 10) || null,
             admin_nome_condo: document.getElementById('admin_nome').value,
             admin_telefone_condo: cleanPhone(document.getElementById('admin_telefone').value),
-            // foto_url_condo será definido após o upload se for um novo condomínio
             location_config_data: locationConfig,
         };
 
         let resultCondoId; // Para armazenar o ID do condomínio recém-criado ou atualizado
 
         if (condoId) {
-            // Se for edição, o condomínio já existe, pode fazer upload da foto diretamente
             if (photoFile) {
                 photoUrl = await uploadCondoPhoto(photoFile, condoId);
             }
-            condoData.foto_url_condo = photoUrl; // Garante que a nova URL seja salva
+            condoData.foto_url_condo = photoUrl;
             condoData.condo_id_to_update = condoId;
 
             const { error } = await supabase.rpc('update_condo_details', condoData);
             if (error) throw error;
-            resultCondoId = condoId; // Se for edição, o ID é o mesmo
+            resultCondoId = condoId;
             alert('Condomínio atualizado com sucesso!');
 
         } else {
-            // Se for criação, primeiro cria o condomínio para obter o ID
             const { data: newCondoId, error: createError } = await supabase.rpc('create_new_condo', condoData);
             if (createError) throw createError;
-            resultCondoId = newCondoId; // Armazena o ID do novo condomínio
+            resultCondoId = newCondoId;
 
-            // Agora que temos o ID, podemos fazer o upload da foto (se houver)
             if (photoFile) {
                 const newPhotoUrl = await uploadCondoPhoto(photoFile, newCondoId);
-                // E então, atualiza o condomínio recém-criado com a URL da foto
                 const { error: updatePhotoError } = await supabase
                     .from('condominio')
                     .update({ foto_url: newPhotoUrl })
@@ -230,18 +221,31 @@ const submitForm = async (event) => {
             throw new Error("Usuário não autenticado para iniciar o pagamento.");
         }
 
-        // 2. Chame SEU BACKEND para criar a Preferência de Pagamento no Mercado Pago
-        // Substitua 'YOUR_BACKEND_URL' pela URL base do seu servidor de backend
-        // Ex: https://api.seuservidor.com/mercadopago/create-subscription-preference
-        const backendPaymentEndpoint = 'YOUR_BACKEND_URL/mercadopago/create-subscription-preference';
+        // 2. Chame SEU BACKEND para criar o Plano de Pré-aprovação no Mercado Pago
+        // ATENÇÃO: Substitua 'YOUR_DENO_DEPLOY_URL' pela URL real do seu serviço Deno ou outro backend.
+        const backendPaymentEndpoint = 'YOUR_DENO_DEPLOY_URL/mercadopago'; // Exemplo: https://sua-funcao-deno.deno.dev/mercadopago
 
-        // Dados a serem enviados para o seu backend para criar a preferência
+        // Dados a serem enviados para o seu backend para criar a assinatura
         const paymentData = {
-            userId: user.id,
-            condoId: resultCondoId,
-            // Você pode adicionar mais dados aqui, como o ID do plano de assinatura
-            // que você configurará no Mercado Pago, se tiver vários planos.
-            planDescription: 'Assinatura Mensal KeepNow' // Exemplo
+            action: 'create_subscription_plan', // NOVO: Ação para criar plano de assinatura
+            data: {
+                userId: user.id,
+                condoId: resultCondoId,
+                reason: "Assinatura Mensal KeepNow Condo",
+                transaction_amount: 29.90,
+                currency_id: "BRL",
+                frequency: 1,
+                frequency_type: "months",
+                repetitions: null, // Para assinatura ilimitada
+                billing_day: 10, // Dia de cobrança (ex: todo dia 10 do mês)
+                billing_day_proportional: false,
+                free_trial: {
+                    frequency: 1,
+                    frequency_type: "months"
+                },
+                // back_url pode ser passada aqui ou definida no backend
+                back_url: "https://www.keepnow.com.br/www/pages/condo.html?subscription_status=success" // Exemplo: Redirecionar para o painel do condomínio
+            }
         };
 
         const response = await fetch(backendPaymentEndpoint, {
@@ -256,7 +260,7 @@ const submitForm = async (event) => {
 
         if (!response.ok) {
             const errorResponse = await response.json();
-            throw new Error(`Falha ao iniciar pagamento: ${errorResponse.message || response.statusText}`);
+            throw new Error(`Falha ao iniciar assinatura: ${errorResponse.message || response.statusText}`);
         }
 
         const responseData = await response.json();
